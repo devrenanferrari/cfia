@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /c/Users/user/Desktop/Projetos/cfia/cfia/ log --oneline -10)",
+      "Bash(pnpm --version)",
+      "Bash(npx --yes create-next-app --version)",
+      "Bash(npm show:*)",
+      "Bash(npm --version)",
+      "Read(//c/Users/user/Desktop/Projetos/cfia/**)",
+      "Bash(npx create-next-app@latest cfia --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git)",
+      "Bash(mv c:/Users/user/Desktop/Projetos/cfia/cfia/README.md /tmp/cfia-README.md)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git)",
+      "Bash(npm install:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npx shadcn@latest init --defaults -y)"
+    ]
+  }
+}

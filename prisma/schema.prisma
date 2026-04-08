@@ -1,0 +1,248 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Auth (NextAuth) ───────────────────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Usuários ──────────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  bio           String?
+  role          String    @default("STUDENT") // STUDENT | INSTRUCTOR | ADMIN
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts     Account[]
+  sessions     Session[]
+  courses      Course[]      @relation("InstructorCourses")
+  enrollments  Enrollment[]
+  reviews      Review[]
+  progress     Progress[]
+  certificates Certificate[]
+}
+
+// ─── Categorias ────────────────────────────────────────────────────────────────
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  icon        String?
+  createdAt   DateTime @default(now())
+
+  courses Course[]
+}
+
+// ─── Cursos ────────────────────────────────────────────────────────────────────
+
+model Course {
+  id          String  @id @default(cuid())
+  title       String
+  slug        String  @unique
+  description String?
+  thumbnail   String?
+  price       Float   @default(0)
+  isFree      Boolean @default(true)
+  isPublished Boolean @default(false)
+  level       String  @default("BEGINNER") // BEGINNER | INTERMEDIATE | ADVANCED
+  language    String  @default("pt-BR")
+  duration    Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  instructorId String
+  instructor   User      @relation("InstructorCourses", fields: [instructorId], references: [id])
+  categoryId   String?
+  category     Category? @relation(fields: [categoryId], references: [id])
+
+  modules      Module[]
+  enrollments  Enrollment[]
+  reviews      Review[]
+  certificates Certificate[]
+  tags         CourseTag[]
+}
+
+// ─── Tags ──────────────────────────────────────────────────────────────────────
+
+model Tag {
+  id      String      @id @default(cuid())
+  name    String      @unique
+  courses CourseTag[]
+}
+
+model CourseTag {
+  courseId String
+  tagId    String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  tag      Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([courseId, tagId])
+}
+
+// ─── Módulos e Aulas ───────────────────────────────────────────────────────────
+
+model Module {
+  id       String   @id @default(cuid())
+  title    String
+  order    Int
+  courseId String
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons  Lesson[]
+
+  createdAt DateTime @default(now())
+}
+
+model Lesson {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  videoUrl    String?
+  duration    Int?
+  order       Int
+  isFree      Boolean    @default(false)
+  type        String  @default("VIDEO") // VIDEO | TEXT | QUIZ
+  content     String?
+  moduleId    String
+  module      Module     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  progress    Progress[]
+  quizzes     Quiz[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Quizzes ───────────────────────────────────────────────────────────────────
+
+model Quiz {
+  id        String     @id @default(cuid())
+  lessonId  String
+  lesson    Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  questions Question[]
+}
+
+model Question {
+  id     String   @id @default(cuid())
+  text   String
+  quizId String
+  quiz   Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  options Option[]
+}
+
+model Option {
+  id         String   @id @default(cuid())
+  text       String
+  isCorrect  Boolean  @default(false)
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+// ─── Matrículas ────────────────────────────────────────────────────────────────
+
+model Enrollment {
+  id          String           @id @default(cuid())
+  userId      String
+  courseId    String
+  status      String   @default("ACTIVE") // ACTIVE | COMPLETED | CANCELLED
+  enrolledAt  DateTime @default(now())
+  completedAt DateTime?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+// ─── Progresso ─────────────────────────────────────────────────────────────────
+
+model Progress {
+  id          String    @id @default(cuid())
+  userId      String
+  lessonId    String
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+}
+
+// ─── Avaliações ────────────────────────────────────────────────────────────────
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String?
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+// ─── Certificados ──────────────────────────────────────────────────────────────
+
+model Certificate {
+  id       String   @id @default(cuid())
+  userId   String
+  courseId String
+  issuedAt DateTime @default(now())
+  code     String   @unique @default(cuid())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
