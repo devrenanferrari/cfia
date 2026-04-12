@@ -15,7 +15,8 @@
       "Bash(npx shadcn@latest init --defaults -y)",
       "Bash(npx shadcn@latest add card badge avatar input label textarea select separator skeleton toast dialog sheet dropdown-menu -y)",
       "Bash(npx shadcn@latest add card badge avatar input label textarea select separator skeleton dialog sheet dropdown-menu progress sonner -y)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" -H \"AccessKey: 34a862b7-4b3c-405c-a3a751ec573a-3c51-4204\" \"https://video.bunnycdn.com/library/636152/videos?page=1&itemsPerPage=1\")"
     ]
   }
 }

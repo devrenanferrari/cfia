@@ -79,6 +79,7 @@ export default async function CourseLearnPage({
             lesson={currentLesson}
             courseId={course.id}
             isCompleted={completedIds.has(currentLesson.id)}
+            bunnyLibraryId={process.env.BUNNY_STREAM_LIBRARY_ID ?? ""}
           />
         ) : (
           <div className="border rounded-lg p-12 text-center text-muted-foreground">

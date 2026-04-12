@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ─── Auth (NextAuth) ───────────────────────────────────────────────────────────
@@ -53,7 +54,7 @@ model User {
   emailVerified DateTime?
   image         String?
   bio           String?
-  role          String    @default("STUDENT") // STUDENT | INSTRUCTOR | ADMIN
+  role          Role      @default(STUDENT)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -64,6 +65,12 @@ model User {
   reviews      Review[]
   progress     Progress[]
   certificates Certificate[]
+}
+
+enum Role {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
 }
 
 // ─── Categorias ────────────────────────────────────────────────────────────────
@@ -90,7 +97,7 @@ model Course {
   price       Float   @default(0)
   isFree      Boolean @default(true)
   isPublished Boolean @default(false)
-  level       String  @default("BEGINNER") // BEGINNER | INTERMEDIATE | ADVANCED
+  level       Level   @default(BEGINNER)
   language    String  @default("pt-BR")
   duration    Int?
 
@@ -107,6 +114,12 @@ model Course {
   reviews      Review[]
   certificates Certificate[]
   tags         CourseTag[]
+}
+
+enum Level {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
 }
 
 // ─── Tags ──────────────────────────────────────────────────────────────────────
@@ -147,7 +160,7 @@ model Lesson {
   duration    Int?
   order       Int
   isFree      Boolean    @default(false)
-  type        String  @default("VIDEO") // VIDEO | TEXT | QUIZ
+  type        LessonType @default(VIDEO)
   content     String?
   moduleId    String
   module      Module     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
@@ -156,6 +169,12 @@ model Lesson {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum LessonType {
+  VIDEO
+  TEXT
+  QUIZ
 }
 
 // ─── Quizzes ───────────────────────────────────────────────────────────────────
@@ -168,10 +187,10 @@ model Quiz {
 }
 
 model Question {
-  id     String   @id @default(cuid())
-  text   String
-  quizId String
-  quiz   Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  id      String   @id @default(cuid())
+  text    String
+  quizId  String
+  quiz    Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
   options Option[]
 }
 
@@ -189,14 +208,20 @@ model Enrollment {
   id          String           @id @default(cuid())
   userId      String
   courseId    String
-  status      String   @default("ACTIVE") // ACTIVE | COMPLETED | CANCELLED
-  enrolledAt  DateTime @default(now())
+  status      EnrollmentStatus @default(ACTIVE)
+  enrolledAt  DateTime         @default(now())
   completedAt DateTime?
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
 }
 
 // ─── Progresso ─────────────────────────────────────────────────────────────────

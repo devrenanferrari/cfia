@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Role, Level, LessonType } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -10,7 +10,7 @@ async function main() {
     create: {
       email: "admin@cfia.com.br",
       name: "Admin cfia",
-      role: "ADMIN",
+      role: Role.ADMIN,
       emailVerified: new Date(),
     },
   });
@@ -21,7 +21,7 @@ async function main() {
     create: {
       email: "instrutor@cfia.com.br",
       name: "Prof. Ana Lima",
-      role: "INSTRUCTOR",
+      role: Role.INSTRUCTOR,
       emailVerified: new Date(),
       bio: "Especialista em Machine Learning com 10 anos de experiência.",
     },
@@ -33,7 +33,7 @@ async function main() {
     create: {
       email: "aluno@cfia.com.br",
       name: "João Silva",
-      role: "STUDENT",
+      role: Role.STUDENT,
       emailVerified: new Date(),
     },
   });
@@ -76,7 +76,7 @@ async function main() {
       slug: "machine-learning-do-zero",
       description:
         "Aprenda Machine Learning do zero com Python. Cubra regressão, classificação, clustering, redes neurais e muito mais com projetos práticos.",
-      level: "BEGINNER",
+      level: Level.BEGINNER,
       isFree: true,
       isPublished: true,
       instructorId: instructor.id,
@@ -105,14 +105,14 @@ async function main() {
   });
 
   const lessons = [
-    { id: "les-ml-1", title: "O que é Machine Learning?", order: 1, moduleId: mod1.id, isFree: true, type: "VIDEO", duration: 15 },
-    { id: "les-ml-2", title: "Tipos de aprendizado", order: 2, moduleId: mod1.id, isFree: true, type: "VIDEO", duration: 20 },
-    { id: "les-ml-3", title: "Configurando o ambiente Python", order: 3, moduleId: mod1.id, isFree: false, type: "TEXT", duration: 10 },
-    { id: "les-ml-4", title: "Regressão Linear", order: 1, moduleId: mod2.id, isFree: false, type: "VIDEO", duration: 35 },
-    { id: "les-ml-5", title: "Regressão Logística", order: 2, moduleId: mod2.id, isFree: false, type: "VIDEO", duration: 30 },
-    { id: "les-ml-6", title: "Árvores de Decisão", order: 3, moduleId: mod2.id, isFree: false, type: "VIDEO", duration: 40 },
-    { id: "les-ml-7", title: "Métricas de avaliação", order: 1, moduleId: mod3.id, isFree: false, type: "VIDEO", duration: 25 },
-    { id: "les-ml-8", title: "Validação cruzada", order: 2, moduleId: mod3.id, isFree: false, type: "VIDEO", duration: 20 },
+    { id: "les-ml-1", title: "O que é Machine Learning?", order: 1, moduleId: mod1.id, isFree: true, type: LessonType.VIDEO, duration: 15 },
+    { id: "les-ml-2", title: "Tipos de aprendizado", order: 2, moduleId: mod1.id, isFree: true, type: LessonType.VIDEO, duration: 20 },
+    { id: "les-ml-3", title: "Configurando o ambiente Python", order: 3, moduleId: mod1.id, isFree: false, type: LessonType.TEXT, duration: 10 },
+    { id: "les-ml-4", title: "Regressão Linear", order: 1, moduleId: mod2.id, isFree: false, type: LessonType.VIDEO, duration: 35 },
+    { id: "les-ml-5", title: "Regressão Logística", order: 2, moduleId: mod2.id, isFree: false, type: LessonType.VIDEO, duration: 30 },
+    { id: "les-ml-6", title: "Árvores de Decisão", order: 3, moduleId: mod2.id, isFree: false, type: LessonType.VIDEO, duration: 40 },
+    { id: "les-ml-7", title: "Métricas de avaliação", order: 1, moduleId: mod3.id, isFree: false, type: LessonType.VIDEO, duration: 25 },
+    { id: "les-ml-8", title: "Validação cruzada", order: 2, moduleId: mod3.id, isFree: false, type: LessonType.VIDEO, duration: 20 },
   ];
 
   for (const lesson of lessons) {
