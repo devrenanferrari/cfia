@@ -2,6 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import GoogleProvider from "next-auth/providers/google";
 import EmailProvider from "next-auth/providers/email";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "./prisma";
 
 export const authOptions: NextAuthOptions = {
@@ -31,6 +32,32 @@ export const authOptions: NextAuthOptions = {
           GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          }),
+        ]
+      : []),
+    // Provider apenas para desenvolvimento (sem senha — só verifica se o email existe no banco)
+    ...(process.env.NODE_ENV !== "production"
+      ? [
+          CredentialsProvider({
+            id: "dev-login",
+            name: "Login de Teste",
+            credentials: {
+              email: { label: "Email", type: "email" },
+            },
+            async authorize(credentials) {
+              if (!credentials?.email) return null;
+              const user = await prisma.user.findUnique({
+                where: { email: credentials.email },
+              });
+              if (!user) return null;
+              return {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                image: user.image,
+                role: user.role,
+              };
+            },
           }),
         ]
       : []),

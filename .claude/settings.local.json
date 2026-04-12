@@ -12,7 +12,10 @@
       "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git)",
       "Bash(npm install:*)",
       "Bash(npx prisma:*)",
-      "Bash(npx shadcn@latest init --defaults -y)"
+      "Bash(npx shadcn@latest init --defaults -y)",
+      "Bash(npx shadcn@latest add card badge avatar input label textarea select separator skeleton toast dialog sheet dropdown-menu -y)",
+      "Bash(npx shadcn@latest add card badge avatar input label textarea select separator skeleton dialog sheet dropdown-menu progress sonner -y)",
+      "Bash(npm run:*)"
     ]
   }
 }
