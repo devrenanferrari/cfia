@@ -1,10 +1,11 @@
+export const dynamic = "force-dynamic";
+
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { BookOpen, Code, Search, Star, Users } from "lucide-react";
+import { BookOpen, Search, SlidersHorizontal } from "lucide-react";
+import { CourseCard } from "@/components/course-card";
 
 interface SearchParams {
   q?: string;
@@ -17,8 +18,8 @@ async function getCourses(params: SearchParams) {
 
   if (params.q) {
     where.OR = [
-      { title: { contains: params.q } },
-      { description: { contains: params.q } },
+      { title: { contains: params.q, mode: "insensitive" } },
+      { description: { contains: params.q, mode: "insensitive" } },
     ];
   }
   if (params.categoria) {
@@ -53,152 +54,174 @@ export default async function CoursesPage({
   const params = await searchParams;
   const courses = await getCourses(params);
   const categories = await prisma.category.findMany({ orderBy: { name: "asc" } });
+  const hasFilters = params.q || params.categoria || params.nivel;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Todos os cursos</h1>
-        <p className="text-muted-foreground">
-          {courses.length} curso{courses.length !== 1 ? "s" : ""} disponíve{courses.length !== 1 ? "is" : "l"}
-        </p>
-      </div>
+    <div>
+      {/* Hero banner IBM Style */}
+      <div
+        className="py-16 px-4 md:px-8 border-b"
+        style={{
+          backgroundColor: "var(--cds-background)",
+          borderColor: "var(--cds-border-subtle)",
+        }}
+      >
+        <div className="mx-auto max-w-[1584px]">
+          <div className="max-w-2xl">
+            <h1 className="text-4xl md:text-5xl font-light mb-4" style={{ color: "var(--cds-text-primary)", letterSpacing: "0" }}>
+              Cursos
+            </h1>
+            <p className="text-base" style={{ color: "var(--cds-text-secondary)" }}>
+              {courses.length} curso{courses.length !== 1 ? "s" : ""} disponíve{courses.length !== 1 ? "is" : "l"} para desenvolvimento profissional em IA.
+            </p>
+          </div>
 
-      {/* Filtros */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-8">
-        <form className="flex-1 flex gap-2" method="GET">
-          <Input
-            name="q"
-            placeholder="Buscar cursos..."
-            defaultValue={params.q}
-            className="max-w-sm"
-          />
-          <Button type="submit" variant="outline" size="icon">
-            <Search className="h-4 w-4" />
-          </Button>
-        </form>
-        <div className="flex gap-2 flex-wrap">
-          <Button
-            variant={!params.nivel ? "secondary" : "outline"}
-            size="sm"
-            asChild
-          >
-            <Link href="/cursos">Todos</Link>
-          </Button>
-          {["beginner", "intermediate", "advanced"].map((n) => (
+          {/* Search bar */}
+          <form className="flex gap-2 mt-8 max-w-xl" method="GET">
+            {params.categoria && (
+              <input type="hidden" name="categoria" value={params.categoria} />
+            )}
+            {params.nivel && (
+              <input type="hidden" name="nivel" value={params.nivel} />
+            )}
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: "var(--cds-text-helper)" }} />
+              <Input
+                name="q"
+                placeholder="Buscar no catálogo..."
+                defaultValue={params.q}
+                className="h-12 pl-12 rounded-none bg-transparent"
+              />
+            </div>
             <Button
-              key={n}
-              variant={params.nivel === n ? "secondary" : "outline"}
-              size="sm"
-              asChild
+              type="submit"
+              className="h-12 px-6 rounded-none font-semibold text-sm"
+              style={{ backgroundColor: "var(--cds-button-primary)", color: "#ffffff" }}
             >
-              <Link href={`/cursos?nivel=${n}`}>{levelLabel[n.toUpperCase()]}</Link>
+              Pesquisar
             </Button>
-          ))}
+          </form>
         </div>
       </div>
 
-      <div className="flex gap-8">
-        {/* Sidebar de categorias */}
-        {categories.length > 0 && (
-          <aside className="hidden lg:block w-56 flex-shrink-0">
-            <h3 className="font-semibold mb-3 text-sm">Categorias</h3>
-            <ul className="space-y-1">
-              <li>
+      <div className="mx-auto max-w-[1584px] px-4 md:px-8 py-10">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar filters */}
+          <aside className="w-full lg:w-64 shrink-0 space-y-8">
+            <div className="flex items-center gap-2 mb-6">
+              <SlidersHorizontal className="h-4 w-4" style={{ color: "var(--cds-text-primary)" }} />
+              <h2 className="font-semibold text-sm uppercase tracking-widest" style={{ color: "var(--cds-text-primary)" }}>Filtros</h2>
+              {hasFilters && (
                 <Link
                   href="/cursos"
-                  className={`block px-3 py-2 rounded-md text-sm transition-colors ${
-                    !params.categoria
-                      ? "bg-primary/10 text-primary font-medium"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                  }`}
+                  className="text-xs ml-auto hover:underline"
+                  style={{ color: "var(--cds-interactive)" }}
                 >
-                  Todos
+                  Limpar
                 </Link>
-              </li>
-              {categories.map((cat) => (
-                <li key={cat.id}>
-                  <Link
-                    href={`/cursos?categoria=${cat.slug}`}
-                    className={`block px-3 py-2 rounded-md text-sm transition-colors ${
-                      params.categoria === cat.slug
-                        ? "bg-primary/10 text-primary font-medium"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                    }`}
-                  >
-                    {cat.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </aside>
-        )}
+              )}
+            </div>
 
-        {/* Grid de cursos */}
-        <div className="flex-1">
-          {courses.length === 0 ? (
-            <div className="text-center py-20 text-muted-foreground">
-              <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-40" />
-              <p>Nenhum curso encontrado.</p>
+            <div>
+              <h3 className="text-sm font-semibold mb-3">Categorias</h3>
+              <div className="flex flex-col gap-1">
+                <Link
+                  href={`/cursos?${new URLSearchParams({ ...params, categoria: "" }).toString()}`}
+                  className="px-3 py-2 text-sm transition-colors border-l-2"
+                  style={{
+                    borderColor: !params.categoria ? "var(--cds-interactive)" : "transparent",
+                    color: !params.categoria ? "var(--cds-text-primary)" : "var(--cds-text-secondary)",
+                    backgroundColor: !params.categoria ? "var(--cds-layer-01)" : "transparent",
+                    fontWeight: !params.categoria ? 600 : 400,
+                  }}
+                >
+                  Todas as categorias
+                </Link>
+                {categories.map((c) => (
+                  <Link
+                    key={c.id}
+                    href={`/cursos?${new URLSearchParams({ ...params, categoria: c.slug }).toString()}`}
+                    className="px-3 py-2 text-sm transition-colors border-l-2 hover:bg-[var(--cds-layer-01)] hover:text-[var(--cds-text-primary)]"
+                    style={{
+                      borderColor: params.categoria === c.slug ? "var(--cds-interactive)" : "transparent",
+                      color: params.categoria === c.slug ? "var(--cds-text-primary)" : "var(--cds-text-secondary)",
+                      backgroundColor: params.categoria === c.slug ? "var(--cds-layer-01)" : "transparent",
+                      fontWeight: params.categoria === c.slug ? 600 : 400,
+                    }}
+                  >
+                    {c.name}
+                  </Link>
+                ))}
+              </div>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {courses.map((course) => (
-                <Card key={course.id} className="flex flex-col hover:shadow-md transition-shadow">
-                  <CardHeader className="p-0">
-                    <div className="aspect-video bg-gradient-to-br from-primary/20 to-accent/40 rounded-t-lg flex items-center justify-center">
-                      {course.thumbnail ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={course.thumbnail}
-                          alt={course.title}
-                          className="w-full h-full object-cover rounded-t-lg"
-                        />
-                      ) : (
-                        <Code className="h-12 w-12 text-primary/60" />
-                      )}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex-1 p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      {course.category && (
-                        <Badge variant="secondary" className="text-xs">{course.category.name}</Badge>
-                      )}
-                      <Badge variant="outline" className="text-xs">
-                        {levelLabel[course.level] ?? course.level}
-                      </Badge>
-                    </div>
-                    <h3 className="font-semibold text-base line-clamp-2 mb-1">{course.title}</h3>
-                    <p className="text-xs text-muted-foreground mb-2">por {course.instructor.name}</p>
-                    {course.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">{course.description}</p>
-                    )}
-                    <div className="flex items-center gap-3 mt-3 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Users className="h-3.5 w-3.5" />
-                        {course._count.enrollments}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
-                        {course._count.reviews > 0 ? "4.5" : "Novo"}
-                      </span>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="p-4 pt-0 flex items-center justify-between">
-                    <div className="font-bold">
-                      {course.isFree ? (
-                        <span className="text-green-600">Grátis</span>
-                      ) : (
-                        <span>R$ {course.price.toFixed(2).replace(".", ",")}</span>
-                      )}
-                    </div>
-                    <Button size="sm" asChild>
-                      <Link href={`/cursos/${course.slug}`}>Ver curso</Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
+
+            <div>
+              <h3 className="text-sm font-semibold mb-3">Nível</h3>
+              <div className="flex flex-col gap-1">
+                <Link
+                  href={`/cursos?${new URLSearchParams({ ...params, nivel: "" }).toString()}`}
+                  className="px-3 py-2 text-sm transition-colors border-l-2"
+                  style={{
+                    borderColor: !params.nivel ? "var(--cds-interactive)" : "transparent",
+                    color: !params.nivel ? "var(--cds-text-primary)" : "var(--cds-text-secondary)",
+                    backgroundColor: !params.nivel ? "var(--cds-layer-01)" : "transparent",
+                    fontWeight: !params.nivel ? 600 : 400,
+                  }}
+                >
+                  Todos os níveis
+                </Link>
+                {Object.entries(levelLabel).map(([key, label]) => (
+                  <Link
+                    key={key}
+                    href={`/cursos?${new URLSearchParams({ ...params, nivel: key.toLowerCase() }).toString()}`}
+                    className="px-3 py-2 text-sm transition-colors border-l-2 hover:bg-[var(--cds-layer-01)] hover:text-[var(--cds-text-primary)]"
+                    style={{
+                      borderColor: params.nivel?.toUpperCase() === key ? "var(--cds-interactive)" : "transparent",
+                      color: params.nivel?.toUpperCase() === key ? "var(--cds-text-primary)" : "var(--cds-text-secondary)",
+                      backgroundColor: params.nivel?.toUpperCase() === key ? "var(--cds-layer-01)" : "transparent",
+                      fontWeight: params.nivel?.toUpperCase() === key ? 600 : 400,
+                    }}
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </div>
             </div>
-          )}
+          </aside>
+
+          {/* Grid */}
+          <div className="flex-1">
+            {courses.length === 0 ? (
+              <div
+                className="py-20 text-center rounded-none"
+                style={{ backgroundColor: "var(--cds-layer-01)" }}
+              >
+                <div
+                  className="h-12 w-12 flex items-center justify-center mx-auto mb-4"
+                  style={{ backgroundColor: "var(--cds-layer-02)" }}
+                >
+                  <BookOpen className="h-6 w-6" style={{ color: "var(--cds-text-helper)" }} />
+                </div>
+                <h3 className="font-semibold text-[var(--cds-text-primary)] mb-1">
+                  Nenhum curso encontrado
+                </h3>
+                <p className="text-sm" style={{ color: "var(--cds-text-secondary)" }}>
+                  Tente ajustar seus filtros de busca.
+                </p>
+                {hasFilters && (
+                  <Button variant="outline" className="mt-6 rounded-none bg-transparent" asChild>
+                    <Link href="/cursos">Limpar filtros</Link>
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-1 bg-[var(--cds-layer-02)] border border-[var(--cds-layer-02)]">
+                {courses.map((course, i) => (
+                  <CourseCard key={course.id} course={course} index={i} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

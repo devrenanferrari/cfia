@@ -1,27 +1,31 @@
 import { PrismaClient, Role, Level, LessonType } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Usuários de teste
+  const passwordHash = await bcrypt.hash("cfia2024", 12);
+
   const admin = await prisma.user.upsert({
     where: { email: "admin@cfia.com.br" },
-    update: {},
+    update: { password: passwordHash },
     create: {
       email: "admin@cfia.com.br",
       name: "Admin cfia",
       role: Role.ADMIN,
+      password: passwordHash,
       emailVerified: new Date(),
     },
   });
 
   const instructor = await prisma.user.upsert({
     where: { email: "instrutor@cfia.com.br" },
-    update: {},
+    update: { password: passwordHash },
     create: {
       email: "instrutor@cfia.com.br",
       name: "Prof. Ana Lima",
       role: Role.INSTRUCTOR,
+      password: passwordHash,
       emailVerified: new Date(),
       bio: "Especialista em Machine Learning com 10 anos de experiência.",
     },
@@ -29,11 +33,12 @@ async function main() {
 
   const student = await prisma.user.upsert({
     where: { email: "aluno@cfia.com.br" },
-    update: {},
+    update: { password: passwordHash },
     create: {
       email: "aluno@cfia.com.br",
       name: "João Silva",
       role: Role.STUDENT,
+      password: passwordHash,
       emailVerified: new Date(),
     },
   });
@@ -152,12 +157,10 @@ async function main() {
   });
 
   console.log("✅ Seed concluído!\n");
-  console.log("Logins de teste:");
+  console.log("Logins de teste (senha: cfia2024):");
   console.log("  Admin:     admin@cfia.com.br      (role: ADMIN)");
   console.log("  Instrutor: instrutor@cfia.com.br  (role: INSTRUCTOR)");
   console.log("  Aluno:     aluno@cfia.com.br       (role: STUDENT)");
-  console.log("\n⚠️  Como o email real não está configurado, use o Prisma Studio");
-  console.log("    para criar sessões manualmente: npx prisma studio\n");
 }
 
 main()

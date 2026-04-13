@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -29,7 +31,11 @@ export default async function InstructorDashboardPage() {
           <h1 className="text-2xl font-bold">Painel do instrutor</h1>
           <p className="text-muted-foreground">Gerencie seus cursos e acompanhe o progresso dos alunos.</p>
         </div>
-        <Button asChild>
+        <Button
+          className="rounded-[56px] px-5 font-semibold"
+          style={{ backgroundColor: "#0052ff" }}
+          asChild
+        >
           <Link href="/instrutor/cursos/novo">
             <PlusCircle className="mr-2 h-4 w-4" />
             Criar curso
@@ -76,7 +82,11 @@ export default async function InstructorDashboardPage() {
             <CardContent className="text-center py-12 text-muted-foreground">
               <BookOpen className="h-10 w-10 mx-auto mb-3 opacity-40" />
               <p className="mb-4">Você ainda não criou nenhum curso.</p>
-              <Button asChild>
+              <Button
+                className="rounded-[56px] px-6 font-semibold"
+                style={{ backgroundColor: "#0052ff" }}
+                asChild
+              >
                 <Link href="/instrutor/cursos/novo">Criar primeiro curso</Link>
               </Button>
             </CardContent>

@@ -1,9 +1,9 @@
-import { type NextRequest } from "next/server";
-import { createClient } from "@/utils/supabase/middleware";
+import { type NextRequest, NextResponse } from "next/server";
 
-export async function middleware(request: NextRequest) {
-  const { supabaseResponse } = createClient(request);
-  return supabaseResponse;
+// We use NextAuth for authentication, not Supabase Auth.
+// This middleware just passes requests through.
+export function middleware(request: NextRequest) {
+  return NextResponse.next();
 }
 
 export const config = {

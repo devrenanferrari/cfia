@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -108,14 +110,14 @@ export default async function CourseLearnPage({
                         href={`/dashboard/cursos/${slug}?aula=${lesson.id}`}
                         className={`flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
                           isCurrent
-                            ? "bg-primary/10 text-primary"
+                            ? "bg-[#0052ff0f] text-[#0052ff]"
                             : "hover:bg-muted/50"
                         }`}
                       >
                         {isCompleted ? (
                           <CheckCircle className="h-4 w-4 flex-shrink-0 text-green-500" />
                         ) : (
-                          <Circle className={`h-4 w-4 flex-shrink-0 ${isCurrent ? "text-primary" : "text-muted-foreground"}`} />
+                          <Circle className={`h-4 w-4 flex-shrink-0 ${isCurrent ? "text-[#0052ff]" : "text-muted-foreground"}`} />
                         )}
                         <span className="line-clamp-2">{lesson.title}</span>
                         {lesson.duration && (

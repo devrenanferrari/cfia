@@ -55,8 +55,21 @@ model User {
   image         String?
   bio           String?
   role          Role      @default(STUDENT)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  password      String?
+
+  // Stripe
+  stripeCustomerId   String?          @unique
+  subscriptionId     String?          @unique
+  subscriptionStatus SubscriptionStatus @default(INACTIVE)
+  subscriptionPlan   SubscriptionPlan?
+  subscriptionEndsAt DateTime?
+
+  instructorStatus InstructorStatus @default(NONE)
+  instructorBio    String?
+  instructorLinkedin String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   accounts     Account[]
   sessions     Session[]
@@ -65,12 +78,33 @@ model User {
   reviews      Review[]
   progress     Progress[]
   certificates Certificate[]
+  news         News[]        @relation("NewsAuthor")
 }
 
 enum Role {
   STUDENT
   INSTRUCTOR
   ADMIN
+}
+
+enum SubscriptionStatus {
+  INACTIVE
+  ACTIVE
+  TRIALING
+  PAST_DUE
+  CANCELLED
+}
+
+enum SubscriptionPlan {
+  MONTHLY
+  ANNUAL
+}
+
+enum InstructorStatus {
+  NONE
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 // ─── Categorias ────────────────────────────────────────────────────────────────
@@ -270,4 +304,19 @@ model Certificate {
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
+}
+
+// ─── Notícias (News) ───────────────────────────────────────────────────────────
+
+model News {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  summary   String?
+  content   String   @db.Text
+  published Boolean  @default(false)
+  authorId  String
+  author    User     @relation("NewsAuthor", fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

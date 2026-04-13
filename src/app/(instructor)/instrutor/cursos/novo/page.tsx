@@ -153,12 +153,18 @@ export default function NewCoursePage() {
             </div>
 
             <div className="flex gap-3 pt-2">
-              <Button type="submit" disabled={loading}>
+              <Button
+                type="submit"
+                className="rounded-[56px] px-6 font-semibold"
+                style={{ backgroundColor: "#0052ff" }}
+                disabled={loading}
+              >
                 {loading ? "Criando..." : "Criar curso"}
               </Button>
               <Button
                 type="button"
                 variant="outline"
+                className="rounded-[56px] px-6"
                 onClick={() => router.back()}
               >
                 Cancelar

@@ -1,123 +1,254 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import Link from "next/link";
-import { Mail } from "lucide-react";
+import { Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 
 export default function RegisterPage() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
+  const router = useRouter();
 
-  async function handleEmailRegister(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (password !== confirm) {
+      toast.error("As senhas não coincidem.");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("A senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
     setLoading(true);
     try {
-      const res = await signIn("email", {
-        email,
-        callbackUrl: "/dashboard",
-        redirect: false,
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), email: email.toLowerCase().trim(), password }),
       });
-      if (res?.error) throw new Error("Erro ao criar conta");
-      setSent(true);
-      toast.success("Email enviado! Verifique sua caixa de entrada.");
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error ?? "Erro ao criar conta.");
+        return;
+      }
+      toast.success("Conta criada! Faça login para iniciar sua sessão.");
+      router.push("/entrar");
     } catch {
-      toast.error("Não foi possível criar a conta. Tente novamente.");
+      toast.error("Erro ao processar sua requisição. Tente novamente.");
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleGoogleRegister() {
-    setLoading(true);
-    await signIn("google", { callbackUrl: "/dashboard" });
-  }
-
-  if (sent) {
-    return (
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-3 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <Mail className="h-6 w-6 text-primary" />
-          </div>
-          <CardTitle>Confirme seu email</CardTitle>
-          <CardDescription>
-            Enviamos um link de confirmação para <strong>{email}</strong>
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="text-center text-sm text-muted-foreground">
-          <p>Clique no link para confirmar sua conta. O link expira em 24 horas.</p>
-        </CardContent>
-      </Card>
-    );
-  }
+  const passwordStrength = password.length === 0 ? 0 : password.length < 6 ? 1 : password.length < 10 ? 2 : 3;
+  // Carbon colors for strength: Weak (Error), Medium (Warning), Strong (Success)
+  const strengthColors = ["var(--cds-layer-02)", "var(--cds-support-error)", "var(--cds-support-warning)", "var(--cds-support-success)"];
+  const strengthLabels = ["", "Vulnerável", "Razoável", "Segura"];
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="text-center">
-        <CardTitle>Criar conta grátis</CardTitle>
-        <CardDescription>Comece a aprender Inteligência Artificial hoje</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={handleGoogleRegister}
-          disabled={loading}
-        >
-          <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-          </svg>
-          Cadastrar com Google
-        </Button>
+    <div
+      className="min-h-screen flex flex-col md:flex-row"
+      style={{ backgroundColor: "var(--cds-layer-01)" }}
+    >
+      {/* Left panel - Branding/Info */}
+      <div
+        className="hidden md:flex flex-col justify-between p-12 w-1/3 min-w-[400px] border-r"
+        style={{ borderColor: "var(--cds-border-subtle)", backgroundColor: "var(--cds-text-primary)" }}
+      >
+        <Link href="/" className="inline-block text-2xl font-semibold mb-12" style={{ color: "#ffffff" }}>
+          CFIA
+        </Link>
+        <div>
+          <h2 className="text-4xl font-light mb-6 leading-tight" style={{ color: "#ffffff", letterSpacing: "0" }}>
+            Conhecimento avançado, acessível para você.
+          </h2>
+          <p className="text-base" style={{ color: "var(--cds-text-secondary)", lineHeight: "1.6" }}>
+            Acesso a centenas de horas de aulas teóricas e práticas. Torne-se um especialista com a plataforma oficial de IA do Brasil.
+          </p>
+        </div>
+        <div className="pt-12 text-sm" style={{ color: "var(--cds-text-helper)" }}>
+          © {new Date().getFullYear()} CFIA. Todos os direitos reservados.
+        </div>
+      </div>
 
-        <div className="flex items-center gap-3">
-          <Separator className="flex-1" />
-          <span className="text-xs text-muted-foreground">ou</span>
-          <Separator className="flex-1" />
+      {/* Right panel - Form */}
+      <div className="flex-1 flex flex-col justify-center p-6 sm:p-12 md:p-24 bg-white relative">
+        <div className="md:hidden absolute top-6 flex w-full left-6">
+          <Link href="/" className="font-semibold text-lg" style={{ color: "var(--cds-text-primary)" }}>
+            CFIA
+          </Link>
         </div>
 
-        <form onSubmit={handleEmailRegister} className="space-y-3">
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="mt-1"
-            />
+        <div className="w-full max-w-md mx-auto md:mx-0 pt-16 md:pt-0">
+          <div className="mb-10">
+            <h1 className="text-[32px] font-light mb-2 leading-tight" style={{ color: "var(--cds-text-primary)", letterSpacing: "0" }}>
+              Credenciamento
+            </h1>
+            <p className="text-sm" style={{ color: "var(--cds-text-secondary)" }}>
+              Preencha o formulário abaixo para registrar-se no sistema.
+            </p>
           </div>
-          <Button type="submit" className="w-full" disabled={loading || !email}>
-            {loading ? "Criando conta..." : "Criar conta com email"}
-          </Button>
-        </form>
 
-        <p className="text-xs text-center text-muted-foreground">
-          Ao criar sua conta, você concorda com nossos{" "}
-          <Link href="/termos" className="underline hover:text-foreground">termos de uso</Link>
-          {" "}e{" "}
-          <Link href="/privacidade" className="underline hover:text-foreground">política de privacidade</Link>.
-        </p>
-      </CardContent>
-      <CardFooter className="justify-center text-sm text-muted-foreground">
-        Já tem conta?{" "}
-        <Link href="/entrar" className="text-primary font-medium ml-1 hover:underline">
-          Entrar
-        </Link>
-      </CardFooter>
-    </Card>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label htmlFor="name" className="text-xs font-semibold" style={{ color: "var(--cds-text-secondary)" }}>
+                Nome Completo
+              </label>
+              <input
+                id="name"
+                placeholder="Ex: Alan Turing"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="w-full h-12 px-4 transition-colors focus:outline-none"
+                style={{
+                  backgroundColor: "var(--cds-field)",
+                  borderBottom: "1px solid var(--cds-border-strong)",
+                  color: "var(--cds-text-primary)"
+                }}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-xs font-semibold" style={{ color: "var(--cds-text-secondary)" }}>
+                Endereço de Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                placeholder="seu.email@exemplo.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full h-12 px-4 transition-colors focus:outline-none"
+                style={{
+                  backgroundColor: "var(--cds-field)",
+                  borderBottom: "1px solid var(--cds-border-strong)",
+                  color: "var(--cds-text-primary)"
+                }}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-xs font-semibold" style={{ color: "var(--cds-text-secondary)" }}>
+                Senha de Acesso
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Selecione uma senha segura"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full h-12 px-4 pr-12 transition-colors focus:outline-none"
+                  style={{
+                    backgroundColor: "var(--cds-field)",
+                    borderBottom: "1px solid var(--cds-border-strong)",
+                    color: "var(--cds-text-primary)"
+                  }}
+                />
+                <button
+                  type="button"
+                  className="absolute right-0 top-0 h-12 w-12 flex items-center justify-center transition-colors hover:bg-[var(--cds-layer-02)]"
+                  style={{ color: "var(--cds-text-secondary)" }}
+                  onClick={() => setShowPassword((v) => !v)}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+
+              {/* Carbon Password Strength indicator */}
+              {password.length > 0 && (
+                <div className="pt-2">
+                  <div className="flex gap-1 h-1.5 mb-2">
+                    {[1, 2, 3].map((level) => (
+                      <div
+                        key={level}
+                        className="flex-1 transition-colors duration-300"
+                        style={{
+                          backgroundColor:
+                            passwordStrength >= level
+                              ? strengthColors[passwordStrength]
+                              : "var(--cds-layer-02)",
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <p
+                    className="text-xs font-mono tracking-widest uppercase transition-colors"
+                    style={{ color: strengthColors[passwordStrength] }}
+                  >
+                    Status: {strengthLabels[passwordStrength]}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="confirm" className="text-xs font-semibold" style={{ color: "var(--cds-text-secondary)" }}>
+                Confirmação de Senha
+              </label>
+              <input
+                id="confirm"
+                type={showPassword ? "text" : "password"}
+                placeholder="Repita sua senha"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                required
+                className="w-full h-12 px-4 transition-colors focus:outline-none"
+                style={{
+                  backgroundColor: "var(--cds-field)",
+                  borderBottom: "1px solid var(--cds-border-strong)",
+                  color: "var(--cds-text-primary)"
+                }}
+              />
+            </div>
+
+            <div className="pt-6">
+              <Button
+                type="submit"
+                className="w-full h-14 rounded-none font-semibold text-base flex justify-between px-6 transition-colors"
+                style={{
+                  backgroundColor: "var(--cds-interactive)",
+                  color: "#ffffff"
+                }}
+                disabled={loading || !name || !email || !password || !confirm}
+              >
+                {loading ? (
+                  <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+                ) : (
+                  <>
+                    <span>Confirmar Cadastro</span>
+                    <ArrowRight className="h-5 w-5" />
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+
+          <div className="mt-8 pt-8 border-t" style={{ borderColor: "var(--cds-border-subtle)" }}>
+            <p className="text-sm" style={{ color: "var(--cds-text-secondary)" }}>
+              Já possui conta?{" "}
+              <Link
+                href="/entrar"
+                className="font-medium hover:underline transition-colors mt-2 block"
+                style={{ color: "var(--cds-interactive)" }}
+              >
+                Faça Login <ArrowRight className="h-3 w-3 inline ml-1" />
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

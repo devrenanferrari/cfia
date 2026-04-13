@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
@@ -60,6 +62,8 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
         where: { userId_courseId: { userId: session.user.id, courseId: course.id } },
       })
     : null;
+
+  const isSubscribed = session?.user?.subscriptionStatus === "ACTIVE";
 
   const totalLessons = course.modules.reduce((acc, m) => acc + m.lessons.length, 0);
   const avgRating =
@@ -204,7 +208,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
 
         {/* Sidebar de compra */}
         <div className="lg:col-span-1">
-          <div className="sticky top-24 border rounded-xl p-6 shadow-sm bg-card">
+          <div className="sticky top-24 border rounded-2xl p-6 shadow-sm bg-white">
             <div className="aspect-video bg-gradient-to-br from-primary/20 to-accent/40 rounded-lg mb-4 flex items-center justify-center">
               {course.thumbnail ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -213,11 +217,25 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                 <Code className="h-16 w-16 text-primary/50" />
               )}
             </div>
-            <div className="text-3xl font-bold mb-4">
+            <div className="mb-4">
               {course.isFree ? (
-                <span className="text-green-600">Grátis</span>
+                <span className="text-2xl font-bold text-green-600">Grátis</span>
+              ) : isSubscribed ? (
+                <div>
+                  <span
+                    className="text-sm font-semibold px-3 py-1.5 rounded-full"
+                    style={{ backgroundColor: "#05966915", color: "#059669" }}
+                  >
+                    ✓ Incluído no seu plano
+                  </span>
+                </div>
               ) : (
-                <span>R$ {course.price.toFixed(2).replace(".", ",")}</span>
+                <div>
+                  <span className="text-2xl font-bold">R$ {course.price.toFixed(2).replace(".", ",")}</span>
+                  <p className="text-xs mt-1" style={{ color: "#5b616e" }}>
+                    Ou acesse com uma assinatura a partir de R$99,90/mês
+                  </p>
+                </div>
               )}
             </div>
             <EnrollButton
@@ -226,6 +244,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
               isEnrolled={!!enrollment}
               isFree={course.isFree}
               isLoggedIn={!!session}
+              isSubscribed={!!isSubscribed}
             />
             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
               <li className="flex items-center gap-2">

@@ -1,32 +1,52 @@
 import { NextAuthOptions } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import GoogleProvider from "next-auth/providers/google";
-import EmailProvider from "next-auth/providers/email";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as NextAuthOptions["adapter"],
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 dias
   },
   pages: {
     signIn: "/entrar",
-    newUser: "/cadastro",
+    newUser: "/dashboard",
     error: "/entrar",
   },
   providers: [
-    EmailProvider({
-      server: {
-        host: process.env.EMAIL_SERVER_HOST || "smtp.gmail.com",
-        port: Number(process.env.EMAIL_SERVER_PORT) || 587,
-        auth: {
-          user: process.env.EMAIL_SERVER_USER,
-          pass: process.env.EMAIL_SERVER_PASSWORD,
-        },
+    CredentialsProvider({
+      id: "credentials",
+      name: "Email e senha",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Senha", type: "password" },
       },
-      from: process.env.EMAIL_FROM || "noreply@cfia.com.br",
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null;
+
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email.toLowerCase().trim() },
+        });
+
+        if (!user?.password) return null;
+
+        const valid = await bcrypt.compare(credentials.password, user.password);
+        if (!valid) return null;
+
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image,
+          role: user.role,
+          subscriptionStatus: user.subscriptionStatus,
+        };
+      },
     }),
+
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
       ? [
           GoogleProvider({
@@ -35,38 +55,22 @@ export const authOptions: NextAuthOptions = {
           }),
         ]
       : []),
-    // Provider apenas para desenvolvimento (sem senha — só verifica se o email existe no banco)
-    ...(process.env.NODE_ENV !== "production"
-      ? [
-          CredentialsProvider({
-            id: "dev-login",
-            name: "Login de Teste",
-            credentials: {
-              email: { label: "Email", type: "email" },
-            },
-            async authorize(credentials) {
-              if (!credentials?.email) return null;
-              const user = await prisma.user.findUnique({
-                where: { email: credentials.email },
-              });
-              if (!user) return null;
-              return {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                image: user.image,
-                role: user.role,
-              };
-            },
-          }),
-        ]
-      : []),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
         token.role = (user as { role?: string }).role ?? "STUDENT";
+        token.subscriptionStatus =
+          (user as { subscriptionStatus?: string }).subscriptionStatus ?? "INACTIVE";
+      }
+      // Ao atualizar a sessão (ex: após pagamento), recarrega do banco
+      if (trigger === "update") {
+        const dbUser = await prisma.user.findUnique({ where: { id: token.id as string } });
+        if (dbUser) {
+          token.role = dbUser.role;
+          token.subscriptionStatus = dbUser.subscriptionStatus;
+        }
       }
       return token;
     },
@@ -74,6 +78,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
+        session.user.subscriptionStatus = token.subscriptionStatus as string;
       }
       return session;
     },

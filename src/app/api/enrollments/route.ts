@@ -19,7 +19,17 @@ export async function POST(req: NextRequest) {
   if (existing) return NextResponse.json({ error: "Já matriculado neste curso" }, { status: 409 });
 
   if (!course.isFree) {
-    return NextResponse.json({ error: "Pagamento necessário para este curso" }, { status: 402 });
+    // Permite matrícula se o aluno tiver assinatura ativa
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { subscriptionStatus: true },
+    });
+    if (user?.subscriptionStatus !== "ACTIVE") {
+      return NextResponse.json(
+        { error: "Assinatura necessária para acessar este curso." },
+        { status: 402 }
+      );
+    }
   }
 
   const enrollment = await prisma.enrollment.create({
