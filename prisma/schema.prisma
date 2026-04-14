@@ -314,9 +314,12 @@ model News {
   slug      String   @unique
   summary   String?
   content   String   @db.Text
+  imageUrl  String?
+  category  String?
   published Boolean  @default(false)
   authorId  String
   author    User     @relation("NewsAuthor", fields: [authorId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+

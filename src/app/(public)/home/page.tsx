@@ -3,161 +3,209 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { CourseCard } from "@/components/course-card";
-import { 
-  ArrowRight, 
-  Calendar, 
-  BookOpen, 
-  CheckCircle2, 
-  Users, 
-  Award, 
-  Briefcase, 
-  GraduationCap
+import { HeroSection, SocialProofBar, StatsBar } from "@/components/home/hero-section";
+import {
+  ArrowRight,
+  Brain,
+  BarChart3,
+  Cpu,
+  Sparkles,
+  BookOpen,
+  FolderGit2,
+  Award,
+  Briefcase,
+  Clock,
 } from "lucide-react";
 
 async function getHomeData() {
-  const [featuredCourses, newsList, stats] = await Promise.all([
-    prisma.course.findMany({
-      where: { isPublished: true },
-      take: 4,
-      orderBy: { createdAt: "desc" },
-      include: {
-        instructor: { select: { name: true } },
-        category: { select: { name: true } },
-        _count: { select: { enrollments: true } },
-      },
-    }),
-    prisma.news.findMany({
-      where: { published: true },
-      take: 3,
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.$transaction([
-      prisma.user.count({ where: { role: "STUDENT" } }),
-      prisma.course.count({ where: { isPublished: true } }),
-      prisma.certificate.count()
-    ])
-  ]);
-  
-  return { 
-    featuredCourses, 
-    newsList,
-    stats: {
-      students: stats[0],
-      courses: stats[1],
-      certificates: stats[2]
-    }
-  };
+  const featuredCourses = await prisma.course.findMany({
+    where: { isPublished: true },
+    take: 3,
+    orderBy: { createdAt: "desc" },
+    include: {
+      instructor: { select: { name: true } },
+      category: { select: { name: true } },
+      _count: { select: { enrollments: true } },
+    },
+  });
+  return { featuredCourses };
 }
 
 export default async function HomePage() {
-  const { featuredCourses, newsList, stats } = await getHomeData();
+  const { featuredCourses } = await getHomeData();
 
   return (
-    <div className="flex flex-col">
-      {/* ── 1. Carbon Hero: Alto Impacto ─────────────────────────── */}
-      <section 
-        className="pt-24 pb-20 px-4 md:px-8 border-b" 
-        style={{ backgroundColor: "var(--cds-text-primary)", color: "#ffffff", borderColor: "var(--cds-border-strong)" }}
-      >
-        <div className="mx-auto max-w-[1584px]">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-7">
-              <div 
-                className="inline-flex items-center px-4 py-2 border mb-8 text-xs font-mono uppercase tracking-widest"
-                style={{ borderColor: "var(--cds-border-strong)", color: "var(--cds-text-secondary)" }}
+    <div className="flex flex-col bg-white">
+
+      {/* ── Hero ─────────────────────────────────────────────── */}
+      <HeroSection />
+
+      {/* ── Prova social ─────────────────────────────────────── */}
+      <SocialProofBar />
+
+      {/* ── Números ──────────────────────────────────────────── */}
+      <StatsBar />
+
+      {/* ── Trilhas de carreira ───────────────────────────────── */}
+      <section className="py-24 px-4 md:px-8 bg-white border-b border-[#e0e0e0]">
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center mb-16">
+            <span
+              className="inline-block text-sm font-semibold px-4 py-1.5 mb-5"
+              style={{ backgroundColor: "#edf5ff", color: "#0043ce", border: "1px solid #a6c8ff" }}
+            >
+              Trilhas de carreira
+            </span>
+            <h2
+              className="text-4xl font-bold mb-4"
+              style={{ color: "#161616", letterSpacing: "-0.02em" }}
+            >
+              Escolha sua carreira em Inteligência Artificial
+            </h2>
+            <p className="text-xl max-w-2xl mx-auto" style={{ color: "#525252" }}>
+              Caminhos estruturados para você evoluir com clareza e chegar ao mercado
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-[#e0e0e0] border border-[#e0e0e0]">
+            {[
+              {
+                Icon: Cpu,
+                title: "Engenheiro de IA",
+                desc: "Construa e coloque modelos em produção",
+                duration: "6–8 meses",
+                color: "#0f62fe",
+                bg: "#edf5ff",
+              },
+              {
+                Icon: BarChart3,
+                title: "Cientista de Dados",
+                desc: "Transforme dados em decisões inteligentes",
+                duration: "4–6 meses",
+                color: "#0f62fe",
+                bg: "#edf5ff",
+              },
+              {
+                Icon: Brain,
+                title: "Engenheiro de Machine Learning",
+                desc: "Treine, otimize e escale modelos",
+                duration: "6–8 meses",
+                color: "#0f62fe",
+                bg: "#edf5ff",
+              },
+              {
+                Icon: Sparkles,
+                title: "Especialista em IA Generativa",
+                desc: "Crie aplicações modernas com IA",
+                duration: "4–5 meses",
+                color: "#0f62fe",
+                bg: "#edf5ff",
+              },
+            ].map((track) => (
+              <div
+                key={track.title}
+                className="bg-white p-8 flex flex-col hover:bg-[#f4f4f4] transition-colors"
               >
-                Acesso Ilimitado • Novas Turmas Abertas
-              </div>
-              <h1 className="text-5xl md:text-[64px] font-light leading-[1.1] mb-8" style={{ letterSpacing: "-0.01em" }}>
-                Referência em conhecimento de Inteligência Artificial no Brasil.
-              </h1>
-              <p className="text-lg md:text-xl mb-12 max-w-2xl font-light" style={{ color: "var(--cds-text-secondary)", lineHeight: "1.6" }}>
-                Aprenda machine learning fundamental, deep learning e engenharia de dados com especialistas do mercado. Conteúdo avançado com a melhor densidade acadêmica, por um preço extremamente acessível.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/assinar"
-                  className="flex items-center justify-between h-14 px-6 transition-colors shadow-none"
-                  style={{ 
-                    backgroundColor: "var(--cds-interactive)", 
-                    color: "#ffffff",
-                    width: "fit-content",
-                    minWidth: "240px"
-                  }}
+                <div
+                  className="h-12 w-12 flex items-center justify-center mb-6"
+                  style={{ backgroundColor: track.bg }}
                 >
-                  <span className="font-semibold text-base mr-12">Assinar Plataforma</span>
-                  <ArrowRight className="h-5 w-5" />
-                </Link>
+                  <track.Icon className="h-6 w-6" style={{ color: track.color }} />
+                </div>
+                <h3 className="font-bold text-lg mb-2" style={{ color: "#161616" }}>
+                  {track.title}
+                </h3>
+                <p className="text-sm mb-5 flex-1" style={{ color: "#525252" }}>
+                  {track.desc}
+                </p>
+                <div className="flex items-center gap-2 mb-6">
+                  <Clock className="h-4 w-4" style={{ color: "#8d8d8d" }} />
+                  <span className="text-sm" style={{ color: "#525252" }}>{track.duration}</span>
+                </div>
                 <Link
                   href="/cursos"
-                  className="flex items-center justify-between h-14 px-6 transition-colors border"
-                  style={{ 
-                    borderColor: "var(--cds-border-strong)", 
-                    color: "#ffffff",
-                    width: "fit-content",
-                    minWidth: "240px",
-                    backgroundColor: "transparent"
-                  }}
+                  className="inline-flex items-center justify-center gap-2 w-full py-3 font-semibold text-sm transition-colors border hover:bg-[#0f62fe] hover:text-white hover:border-[#0f62fe]"
+                  style={{ color: "#0f62fe", borderColor: "#0f62fe" }}
                 >
-                  <span className="font-semibold text-base mr-12">Explorar Catálogo</span>
-                  <ArrowRight className="h-5 w-5" />
+                  Ver trilha <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
-            </div>
-            
-            <div className="hidden lg:block lg:col-span-5">
-              <div className="w-full aspect-square border" style={{ borderColor: "var(--cds-border-strong)", backgroundColor: "var(--cds-layer-01)" }}>
-                {/* Minimalist Graphic for Hero */}
-                <div className="w-full h-full p-8 flex flex-col justify-end grid-bg relative overflow-hidden">
-                  <div className="absolute inset-0" style={{
-                    backgroundImage: "linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)",
-                    backgroundSize: "32px 32px"
-                  }}/>
-                  <div className="relative z-10 p-6 border bg-[var(--cds-text-primary)]" style={{ borderColor: "var(--cds-border-strong)" }}>
-                    <div className="font-mono text-xs uppercase tracking-widest mb-4" style={{ color: "var(--cds-text-secondary)" }}>CFIA / Output</div>
-                    <div className="flex items-end gap-4">
-                       <div className="h-full border-l-2 pl-4" style={{ borderColor: "var(--cds-interactive)" }}>
-                         <div className="text-4xl font-light text-white mb-1">{stats.students}+</div>
-                         <div className="text-sm font-mono" style={{ color: "var(--cds-text-secondary)" }}>Alunos Matriculados</div>
-                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── 2. Propositions (Porque o CFIA?) ─────────────────────────── */}
-      <section className="py-20 px-4 md:px-8 border-b" style={{ backgroundColor: "var(--cds-background)", borderColor: "var(--cds-border-subtle)" }}>
-        <div className="mx-auto max-w-[1584px]">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-[1px]" style={{ backgroundColor: "var(--cds-border-subtle)" }}>
+      {/* ── Como funciona ─────────────────────────────────────── */}
+      <section className="py-24 px-4 md:px-8 border-b border-[#e0e0e0]" style={{ backgroundColor: "#f4f4f4" }}>
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center mb-16">
+            <span
+              className="inline-block text-sm font-semibold px-4 py-1.5 mb-5"
+              style={{ backgroundColor: "#edf5ff", color: "#0043ce", border: "1px solid #a6c8ff" }}
+            >
+              Como funciona
+            </span>
+            <h2
+              className="text-4xl font-bold"
+              style={{ color: "#161616", letterSpacing: "-0.02em" }}
+            >
+              Um caminho claro até sua nova carreira
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-px bg-[#e0e0e0] border border-[#e0e0e0]">
             {[
               {
-                icon: Briefcase,
-                title: "Foco no Mercado de Trabalho",
-                desc: "Esqueça tutoriais rasos. Você construirá projetos reais e completos: desde algoritmos preditivos básicos até finetuning de LLMs usando infraestrutura moderna, exatamente como as big techs fazem."
+                Icon: BookOpen,
+                step: "01",
+                title: "Aprenda",
+                desc: "Cursos práticos e diretos ao ponto, com linguagem simples e sem jargão.",
+                color: "#0f62fe",
+                bg: "#edf5ff",
               },
               {
-                icon: Award,
-                title: "Certificação Institucional",
-                desc: "Todo conhecimento adquirido é testado. Nossos certificados não atestam apenas participação de vídeos, mas resultados concretos que alavancam o seu currículo em processos seletivos concorridos."
+                Icon: FolderGit2,
+                step: "02",
+                title: "Construa",
+                desc: "Desenvolva projetos reais para compor seu portfólio profissional.",
+                color: "#0f62fe",
+                bg: "#edf5ff",
               },
               {
-                icon: GraduationCap,
-                title: "Professores Nível Senior",
-                desc: "Você não aprenderá com criadores de conteúdo casuais, mas com engenheiros e cientistas de dados líderes técnicos resolvendo problemas de grande escala todos os dias."
-              }
-            ].map((prop, i) => (
-              <div key={i} className="bg-white p-12 transition-colors hover:bg-[var(--cds-layer-01)] group">
-                <div className="h-14 w-14 border mb-8 flex items-center justify-center transition-colors group-hover:bg-[var(--cds-layer-02)]" style={{ borderColor: "var(--cds-border-strong)" }}>
-                  <prop.icon className="h-6 w-6" style={{ color: "var(--cds-interactive)" }} />
+                Icon: Award,
+                step: "03",
+                title: "Certifique-se",
+                desc: "Receba certificados reconhecidos ao concluir cada trilha ou curso.",
+                color: "#0f62fe",
+                bg: "#edf5ff",
+              },
+              {
+                Icon: Briefcase,
+                step: "04",
+                title: "Trabalhe",
+                desc: "Prepare-se para vagas e oportunidades na área de IA com confiança.",
+                color: "#0f62fe",
+                bg: "#edf5ff",
+              },
+            ].map((step) => (
+              <div key={step.step} className="bg-white p-10 flex flex-col items-center text-center">
+                <div
+                  className="h-14 w-14 flex items-center justify-center mb-5"
+                  style={{ backgroundColor: step.bg }}
+                >
+                  <step.Icon className="h-7 w-7" style={{ color: step.color }} />
                 </div>
-                <h3 className="text-2xl font-semibold mb-4" style={{ color: "var(--cds-text-primary)" }}>{prop.title}</h3>
-                <p className="text-base" style={{ color: "var(--cds-text-secondary)", lineHeight: "1.6" }}>
-                  {prop.desc}
+                <span
+                  className="text-xs font-bold mb-2 tracking-widest"
+                  style={{ color: "#c6c6c6" }}
+                >
+                  PASSO {step.step}
+                </span>
+                <h3 className="text-xl font-bold mb-3" style={{ color: "#161616" }}>
+                  {step.title}
+                </h3>
+                <p className="text-sm leading-relaxed" style={{ color: "#525252" }}>
+                  {step.desc}
                 </p>
               </div>
             ))}
@@ -165,204 +213,199 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── 3. Cursos em Destaque ────────────────────────────────────── */}
-      <section className="py-24 px-4 md:px-8 bg-white" style={{ borderBottom: "1px solid var(--cds-border-subtle)" }}>
-        <div className="mx-auto max-w-[1584px]">
+      {/* ── Cursos em destaque ────────────────────────────────── */}
+      <section className="py-24 px-4 md:px-8 bg-white border-b border-[#e0e0e0]">
+        <div className="mx-auto max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-            <div className="max-w-2xl">
-              <span className="font-mono text-sm uppercase tracking-widest block mb-4" style={{ color: "var(--cds-text-helper)" }}>01. Currículo Técnico</span>
-              <h2 className="text-4xl md:text-[40px] font-light leading-none mb-4" style={{ color: "var(--cds-text-primary)", letterSpacing: "0" }}>
-                Programas de Formação
+            <div>
+              <span
+                className="inline-block text-sm font-semibold px-4 py-1.5 mb-5"
+                style={{ backgroundColor: "#edf5ff", color: "#0043ce", border: "1px solid #a6c8ff" }}
+              >
+                Cursos em destaque
+              </span>
+              <h2
+                className="text-4xl font-bold"
+                style={{ color: "#161616", letterSpacing: "-0.02em" }}
+              >
+                Comece pelos mais populares
               </h2>
-              <p className="text-lg" style={{ color: "var(--cds-text-secondary)" }}>
-                Cursos estruturados para transformar iniciantes em especialistas através de aplicações matemáticas, algoritmos robustos e práticas de engenharia de software rigorosas.
-              </p>
             </div>
-            <Link 
-              href="/cursos" 
-              className="flex items-center gap-2 text-sm font-semibold transition-colors shrink-0 p-4 border hover:bg-[var(--cds-layer-01)]"
-              style={{ color: "var(--cds-text-primary)", borderColor: "var(--cds-border-strong)" }}
+            <Link
+              href="/cursos"
+              className="inline-flex items-center gap-2 font-semibold text-sm whitespace-nowrap"
+              style={{ color: "#0f62fe" }}
             >
-              Catálogo Completo <ArrowRight className="h-4 w-4" />
+              Ver todos os cursos <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-[1px] bg-[var(--cds-border-subtle)] border border-[var(--cds-border-subtle)]">
-            {featuredCourses.map((course, i) => (
-              <CourseCard key={course.id} course={course} index={i} />
-            ))}
-          </div>
-        </div>
-      </section>
-      
-      {/* ── 4. Notícias / Institucional ─────────────────────────────────────── */}
-      <section 
-        className="py-24 px-4 md:px-8 border-b" 
-        style={{ borderColor: "var(--cds-border-subtle)", backgroundColor: "var(--cds-layer-01)" }}
-      >
-        <div className="mx-auto max-w-[1584px]">
-          <div className="max-w-2xl mb-12">
-            <span className="font-mono text-sm uppercase tracking-widest block mb-4" style={{ color: "var(--cds-text-helper)" }}>02. Sala de Imprensa</span>
-            <h2 className="text-[40px] font-light leading-tight" style={{ color: "var(--cds-text-primary)", letterSpacing: "0" }}>
-              Atualizações e Entregas
-            </h2>
-          </div>
-
-          {newsList.length === 0 ? (
-            <div className="py-12 border-t" style={{ borderColor: "var(--cds-border-subtle)" }}>
-              <p className="text-sm" style={{ color: "var(--cds-text-secondary)" }}>Centro de imprensa temporariamente sem atividades abertas.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-[1px]" style={{ backgroundColor: "var(--cds-border-subtle)" }}>
-              {newsList.map((news) => (
-                <div 
-                  key={news.id} 
-                  className="bg-white p-8 flex flex-col justify-between transition-colors hover:bg-white cursor-pointer group hover:scale-[1.01] duration-300"
-                  style={{ minHeight: "320px", border: "1px solid transparent" }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLDivElement).style.borderColor = "var(--cds-interactive)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLDivElement).style.borderColor = "transparent";
-                  }}
-                >
-                  <div>
-                    <div className="flex items-center gap-2 mb-6">
-                      <Calendar className="h-4 w-4" style={{ color: "var(--cds-text-helper)" }} />
-                      <time className="text-sm font-mono uppercase tracking-widest" style={{ color: "var(--cds-text-secondary)" }}>
-                        {new Intl.DateTimeFormat('pt-BR').format(news.createdAt)}
-                      </time>
-                    </div>
-                    <h3 className="text-2xl font-semibold mb-4 leading-snug" style={{ color: "var(--cds-text-primary)" }}>
-                      {news.title}
-                    </h3>
-                    <p className="text-base line-clamp-3" style={{ color: "var(--cds-text-secondary)", lineHeight: "1.6" }}>
-                      {news.summary}
-                    </p>
-                  </div>
-                  <div className="mt-8 flex items-center gap-2 font-medium text-sm" style={{ color: "var(--cds-interactive)" }}>
-                    Leia o artigo completo <ArrowRight className="h-4 w-4" />
-                  </div>
+          {featuredCourses.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-[#e0e0e0] border border-[#e0e0e0]">
+              {featuredCourses.map((course, i) => (
+                <div key={course.id} className="bg-white">
+                  <CourseCard course={course} index={i} />
                 </div>
               ))}
+            </div>
+          ) : (
+            <div
+              className="text-center py-20 border border-[#e0e0e0]"
+              style={{ backgroundColor: "#f4f4f4" }}
+            >
+              <p style={{ color: "#8d8d8d" }}>Em breve, novos cursos disponíveis.</p>
             </div>
           )}
         </div>
       </section>
 
-      {/* ── 5. Pricing (Vendas Diretas) ────────────────────────────────────── */}
-      <section className="py-24 px-4 md:px-8 bg-white border-b" style={{ borderColor: "var(--cds-border-subtle)" }}>
-        <div className="mx-auto max-w-[1584px]">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="font-mono text-sm uppercase tracking-widest block mb-4" style={{ color: "var(--cds-text-helper)" }}>03. Planos Comerciais</span>
-            <h2 className="text-[40px] font-light leading-tight mb-6" style={{ color: "var(--cds-text-primary)", letterSpacing: "0" }}>
-              Invista na sua excelência técnica
+      {/* ── Projetos reais ────────────────────────────────────── */}
+      <section className="py-24 px-4 md:px-8 border-b border-[#e0e0e0]" style={{ backgroundColor: "#edf5ff" }}>
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center mb-16">
+            <span
+              className="inline-block text-sm font-semibold px-4 py-1.5 mb-5"
+              style={{ backgroundColor: "#d0e2ff", color: "#0043ce", border: "1px solid #a6c8ff" }}
+            >
+              Projetos reais
+            </span>
+            <h2
+              className="text-4xl font-bold mb-4"
+              style={{ color: "#161616", letterSpacing: "-0.02em" }}
+            >
+              Aprenda fazendo, não só assistindo
             </h2>
-            <p className="text-lg" style={{ color: "var(--cds-text-secondary)" }}>
-              Escolha a rota de aprendizagem que se adequa ao seu momento. Comece pelos cursos introdutórios ou assine o plano completo.
+            <p className="text-xl max-w-xl mx-auto" style={{ color: "#525252" }}>
+              Cada trilha inclui projetos práticos que você pode mostrar para empregadores
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Conta Gratuita */}
-            <div className="p-10 border transition-all duration-300 hover:border-[var(--cds-interactive)]" style={{ borderColor: "var(--cds-border-subtle)", backgroundColor: "var(--cds-background)" }}>
-              <h3 className="text-2xl font-semibold mb-2" style={{ color: "var(--cds-text-primary)" }}>Acesso Base</h3>
-              <p className="text-sm mb-6" style={{ color: "var(--cds-text-secondary)", minHeight: "40px" }}>Para estudantes e curiosos que desejam dar os primeiros passos.</p>
-              
-              <div className="text-[48px] font-light mb-8" style={{ color: "var(--cds-text-primary)", letterSpacing: "0" }}>
-                Grátis
-              </div>
-              
-              <ul className="space-y-4 mb-10">
-                {["Acesso restrito a cursos introdutórios (Beginner)", "Materiais de leitura básicos", "Fórum da comunidade"].map((feat, i) => (
-                  <li key={i} className="flex gap-3 text-base" style={{ color: "var(--cds-text-secondary)" }}>
-                    <CheckCircle2 className="h-6 w-6 shrink-0" style={{ color: "var(--cds-text-helper)" }} />
-                    <span>{feat}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/cadastro"
-                className="flex items-center justify-between h-14 px-6 border transition-colors w-full bg-[var(--cds-layer-01)] hover:bg-[var(--cds-layer-02)]"
-                style={{ borderColor: "var(--cds-border-strong)", color: "var(--cds-text-primary)" }}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[#a6c8ff] border border-[#a6c8ff]">
+            {[
+              {
+                emoji: "💬",
+                title: "Chatbot com IA",
+                desc: "Crie um assistente virtual inteligente usando modelos de linguagem modernos",
+              },
+              {
+                emoji: "🎯",
+                title: "Sistema de recomendação",
+                desc: "Construa um sistema que recomenda produtos, filmes ou conteúdos para usuários",
+              },
+              {
+                emoji: "📊",
+                title: "Análise de dados reais",
+                desc: "Explore e visualize datasets reais para extrair insights de negócio",
+              },
+              {
+                emoji: "🚀",
+                title: "Deploy de modelo",
+                desc: "Coloque um modelo de ML em produção e crie uma API para consumi-lo",
+              },
+            ].map((project) => (
+              <div
+                key={project.title}
+                className="bg-white p-8 hover:bg-[#f4f4f4] transition-colors"
               >
-                <span className="font-semibold text-base">Criar conta free</span>
-                <ArrowRight className="h-5 w-5" />
-              </Link>
-            </div>
-
-            {/* Plano Premium */}
-            <div className="p-10 border-2 relative" style={{ borderColor: "var(--cds-interactive)", backgroundColor: "var(--cds-text-primary)" }}>
-              <div 
-                className="absolute top-0 right-0 px-4 py-1 text-xs font-mono uppercase tracking-widest font-semibold"
-                style={{ backgroundColor: "var(--cds-interactive)", color: "white", transform: "translateY(-50%)" }}
-              >
-                Recomendado
+                <div className="text-4xl mb-4">{project.emoji}</div>
+                <h3 className="font-bold text-lg mb-2" style={{ color: "#161616" }}>
+                  {project.title}
+                </h3>
+                <p className="text-sm leading-relaxed" style={{ color: "#525252" }}>
+                  {project.desc}
+                </p>
               </div>
-              <h3 className="text-2xl font-semibold mb-2" style={{ color: "#ffffff" }}>Acesso Premium</h3>
-              <p className="text-sm mb-6" style={{ color: "var(--cds-text-secondary)", minHeight: "40px" }}>Acesso irrestrito a todas as dependências da plataforma por um valor incrivelmente acessível.</p>
-              
-              <div className="flex items-end gap-2 mb-8">
-                <span className="text-[48px] font-light leading-none" style={{ color: "#ffffff", letterSpacing: "0" }}>R$49</span>
-                <span className="text-base font-normal pb-2" style={{ color: "var(--cds-text-secondary)" }}>/mês</span>
-              </div>
-              
-              <ul className="space-y-4 mb-10">
-                {[
-                  "Acesso irrestrito a TODOS os cursos", 
-                  "Certificados vitalícios verificáveis e oficiais", 
-                  "Repositórios de código dos instrutores", 
-                  "Prioridade no suporte técnico"
-                ].map((feat, i) => (
-                  <li key={i} className="flex gap-3 text-base text-white">
-                    <CheckCircle2 className="h-6 w-6 shrink-0" style={{ color: "var(--cds-interactive)" }} />
-                    <span style={{ color: "var(--cds-text-secondary)" }}>{feat}</span>
-                  </li>
-                ))}
-              </ul>
-              
-              <Link
-                href="/assinar"
-                className="flex items-center justify-between h-14 px-6 transition-colors w-full"
-                style={{ backgroundColor: "var(--cds-interactive)", color: "#ffffff" }}
-              >
-                <span className="font-semibold text-base">Assinar agora</span>
-                <ArrowRight className="h-5 w-5" />
-              </Link>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── 6. Final CTA (Carbon Band) ───────────────────────────────── */}
-      <section 
-        className="py-20 px-4 md:px-8"
-        style={{ backgroundColor: "var(--cds-text-primary)" }}
-      >
-        <div className="mx-auto max-w-[1584px] flex flex-col md:flex-row md:items-center justify-between gap-8">
-          <div className="max-w-2xl">
-            <h2 className="text-[40px] font-light mb-4 text-white leading-tight" style={{ letterSpacing: "0" }}>
-              Inicie sua jornada hoje
+      {/* ── Jornada de aprendizado ────────────────────────────── */}
+      <section className="py-24 px-4 md:px-8 bg-white border-b border-[#e0e0e0]">
+        <div className="mx-auto max-w-2xl">
+          <div className="text-center mb-16">
+            <span
+              className="inline-block text-sm font-semibold px-4 py-1.5 mb-5"
+              style={{ backgroundColor: "#edf5ff", color: "#0043ce", border: "1px solid #a6c8ff" }}
+            >
+              Jornada de aprendizado
+            </span>
+            <h2
+              className="text-4xl font-bold"
+              style={{ color: "#161616", letterSpacing: "-0.02em" }}
+            >
+              Veja sua evolução na prática
             </h2>
-            <p className="text-lg" style={{ color: "var(--cds-text-secondary)" }}>
-              Pare de atrasar seu crescimento técnico. Cadastre-se na CFIA.
-            </p>
           </div>
-          
+
+          <div className="flex flex-col gap-px bg-[#e0e0e0] border border-[#e0e0e0]">
+            {[
+              { label: "Fundamentos de IA",  done: true },
+              { label: "Python e Dados",      done: true },
+              { label: "Machine Learning",    done: false },
+              { label: "Deep Learning",       done: false },
+              { label: "Deploy e Produção",   done: false },
+            ].map((step, i) => (
+              <div
+                key={step.label}
+                className="flex items-center gap-4 p-5 transition-all"
+                style={{ backgroundColor: step.done ? "#edf5ff" : "#ffffff" }}
+              >
+                <div
+                  className="h-9 w-9 flex items-center justify-center shrink-0 text-sm font-bold"
+                  style={{
+                    backgroundColor: step.done ? "#0f62fe" : "#e0e0e0",
+                    color: step.done ? "#ffffff" : "#8d8d8d",
+                  }}
+                >
+                  {step.done ? "✓" : i + 1}
+                </div>
+                <span
+                  className="font-semibold"
+                  style={{ color: step.done ? "#0043ce" : "#525252" }}
+                >
+                  {step.label}
+                </span>
+                {!step.done && (
+                  <span
+                    className="ml-auto text-xs px-3 py-1 font-medium"
+                    style={{ backgroundColor: "#f4f4f4", color: "#8d8d8d" }}
+                  >
+                    Próximo
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA Final ─────────────────────────────────────────── */}
+      <section className="py-28 px-4 md:px-8" style={{ backgroundColor: "#0f62fe" }}>
+        <div className="mx-auto max-w-3xl text-center">
+          <h2
+            className="text-4xl md:text-5xl font-bold text-white mb-6"
+            style={{ letterSpacing: "-0.02em" }}
+          >
+            Seu próximo passo na carreira começa aqui
+          </h2>
+          <p className="text-xl mb-10" style={{ color: "rgba(255,255,255,0.72)" }}>
+            Comece hoje e construa seu futuro na área de Inteligência Artificial
+          </p>
           <Link
             href="/cadastro"
-            className="flex items-center justify-between h-16 px-8 transition-colors shrink-0"
-            style={{ 
-              backgroundColor: "var(--cds-interactive)", 
-              color: "#ffffff",
-              minWidth: "280px"
-            }}
+            className="inline-flex items-center gap-3 px-10 py-5 bg-white font-bold text-lg transition-all hover:bg-[#f4f4f4] active:scale-[0.98]"
+            style={{ color: "#0f62fe" }}
           >
-            <span className="font-semibold text-lg mr-8">Criar Conta Agora</span>
+            Começar gratuitamente
             <ArrowRight className="h-6 w-6" />
           </Link>
+          <p className="mt-6 text-sm" style={{ color: "rgba(255,255,255,0.45)" }}>
+            Sem cartão&nbsp;•&nbsp;Acesso imediato&nbsp;•&nbsp;Certificado incluso
+          </p>
         </div>
       </section>
+
     </div>
   );
 }

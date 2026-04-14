@@ -1,471 +1,215 @@
-"use client";
-
-import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Play, Star, Brain, Code2, BarChart3, Cpu, Users, Award, BookOpen, Zap } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 
-const floatingCards = [
-  {
-    icon: Brain,
-    title: "Machine Learning",
-    subtitle: "Módulo 3 · 24 aulas",
-    progress: 68,
-    color: "#0052ff",
-    delay: 0,
-  },
-  {
-    icon: Code2,
-    title: "LLMs na Prática",
-    subtitle: "Módulo 1 · 18 aulas",
-    progress: 32,
-    color: "#7c3aed",
-    delay: 0.15,
-  },
-  {
-    icon: BarChart3,
-    title: "Deep Learning",
-    subtitle: "Módulo 5 · 31 aulas",
-    progress: 85,
-    color: "#059669",
-    delay: 0.3,
-  },
+const STUDENT_AVATARS = [
+  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=48&h=48&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=48&h=48&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=48&h=48&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=48&h=48&fit=crop&q=80",
 ];
-
-function FloatingCard({
-  icon: Icon, title, subtitle, progress, color, delay,
-}: (typeof floatingCards)[0]) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7, delay: 0.6 + delay, ease: "easeOut" }}
-      style={{ animation: `float 6s ease-in-out ${delay}s infinite`, willChange: "transform" }}
-      className="relative rounded-2xl p-4 w-48 shrink-0"
-    >
-      <div
-        className="absolute inset-0 rounded-2xl"
-        style={{
-          background: "rgba(255,255,255,0.08)",
-          backdropFilter: "blur(20px)",
-          border: "1px solid rgba(255,255,255,0.14)",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)",
-        }}
-      />
-      <div className="relative z-10">
-        <div
-          className="h-9 w-9 rounded-xl flex items-center justify-center mb-3"
-          style={{ backgroundColor: `${color}25` }}
-        >
-          <Icon className="h-4 w-4" style={{ color }} />
-        </div>
-        <p className="text-white text-sm font-semibold mb-0.5">{title}</p>
-        <p className="text-white/50 text-xs mb-3">{subtitle}</p>
-        <div className="h-1 rounded-full" style={{ backgroundColor: "rgba(255,255,255,0.1)" }}>
-          <div
-            className="h-full rounded-full transition-all"
-            style={{ width: `${progress}%`, backgroundColor: color }}
-          />
-        </div>
-        <p className="text-white/40 text-xs mt-1.5">{progress}% concluído</p>
-      </div>
-    </motion.div>
-  );
-}
 
 export function HeroSection() {
   return (
     <section
-      className="relative overflow-hidden flex flex-col items-center justify-center px-4 pt-24 pb-20 min-h-[94vh]"
-      style={{ backgroundColor: "#06070a" }}
+      className="relative overflow-hidden pt-28 pb-24 px-4 md:px-8"
+      style={{ background: "linear-gradient(140deg, #ffffff 0%, #edf5ff 60%, #f0f4ff 100%)" }}
     >
-      {/* Gradient orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute rounded-full"
-          style={{
-            width: 700,
-            height: 700,
-            top: "-20%",
-            left: "-15%",
-            background: "radial-gradient(circle, rgba(0,82,255,0.28) 0%, transparent 65%)",
-            filter: "blur(60px)",
-            animation: "orb1 14s ease-in-out infinite",
-          }}
-        />
-        <div
-          className="absolute rounded-full"
-          style={{
-            width: 600,
-            height: 600,
-            top: "5%",
-            right: "-12%",
-            background: "radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 65%)",
-            filter: "blur(60px)",
-            animation: "orb2 18s ease-in-out infinite",
-          }}
-        />
-        <div
-          className="absolute rounded-full"
-          style={{
-            width: 400,
-            height: 400,
-            bottom: "5%",
-            left: "35%",
-            background: "radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 65%)",
-            filter: "blur(70px)",
-            animation: "orb3 22s ease-in-out infinite",
-          }}
-        />
-        {/* Grid */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)
-            `,
-            backgroundSize: "64px 64px",
-          }}
-        />
-        {/* Noise texture */}
-        <div
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E\")",
-            backgroundSize: "200px",
-          }}
-        />
-      </div>
+      <div className="mx-auto max-w-7xl">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
-      {/* Badge */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="relative z-10 flex items-center gap-2 mb-8 px-4 py-2 rounded-full"
-        style={{
-          background: "rgba(255,255,255,0.06)",
-          border: "1px solid rgba(255,255,255,0.1)",
-          backdropFilter: "blur(8px)",
-        }}
-      >
-        <span className="flex h-2 w-2 rounded-full animate-pulse" style={{ backgroundColor: "#0052ff" }} />
-        <span className="text-white/70 text-xs font-medium">Plataforma #1 de IA do Brasil</span>
-        <div className="flex items-center gap-0.5 ml-1">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-          ))}
-        </div>
-      </motion.div>
-
-      {/* Headline */}
-      <div className="relative z-10 text-center max-w-4xl mx-auto mb-8">
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="font-black tracking-tight leading-[1.02] mb-0"
-          style={{ fontSize: "clamp(2.8rem, 7vw, 5.5rem)", letterSpacing: "-0.03em" }}
-        >
-          <span className="text-white block">Domine a</span>
-          <span
-            className="block"
-            style={{
-              background: "linear-gradient(135deg, #4d90ff 0%, #a78bfa 50%, #38bdf8 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            Inteligência
-          </span>
-          <span className="text-white block">Artificial</span>
-        </motion.h1>
-      </div>
-
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.35 }}
-        className="relative z-10 text-center max-w-lg mx-auto mb-10 leading-relaxed"
-        style={{ color: "rgba(255,255,255,0.5)", fontSize: "1.1rem" }}
-      >
-        Cursos práticos, projetos reais e certificados reconhecidos pelo mercado. Aprenda com os melhores especialistas.
-      </motion.p>
-
-      {/* CTAs */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.45 }}
-        className="relative z-10 flex flex-col sm:flex-row items-center gap-3 mb-16"
-      >
-        <Link
-          href="/cadastro"
-          className="flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-sm text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
-          style={{
-            background: "linear-gradient(135deg, #0052ff 0%, #1a6bff 100%)",
-            boxShadow: "0 0 30px rgba(0,82,255,0.5), 0 4px 14px rgba(0,82,255,0.35)",
-          }}
-        >
-          Começar grátis
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-        <Link
-          href="/cursos"
-          className="flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-sm transition-all hover:bg-white/10"
-          style={{
-            color: "rgba(255,255,255,0.8)",
-            border: "1px solid rgba(255,255,255,0.12)",
-            backdropFilter: "blur(8px)",
-          }}
-        >
-          <Play className="h-4 w-4" />
-          Ver cursos
-        </Link>
-      </motion.div>
-
-      {/* Social proof pill */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.5 }}
-        className="relative z-10 flex items-center gap-3 mb-12"
-      >
-        <div className="flex -space-x-2">
-          {["#0052ff", "#7c3aed", "#059669", "#d97706", "#dc2626"].map((color, i) => (
+          {/* ── Left column ── */}
+          <div>
             <div
-              key={i}
-              className="h-7 w-7 rounded-full border-2 flex items-center justify-center text-white text-xs font-bold"
-              style={{ backgroundColor: color, borderColor: "#06070a" }}
+              className="inline-flex items-center gap-2 px-4 py-2 mb-7 text-sm font-medium"
+              style={{ backgroundColor: "#edf5ff", color: "#0043ce", border: "1px solid #a6c8ff" }}
             >
-              {["A", "P", "M", "L", "R"][i]}
+              <span className="h-2 w-2 rounded-full bg-[#0f62fe]" />
+              Plataforma #1 de carreiras em IA do Brasil
             </div>
-          ))}
+
+            <h1
+              className="text-4xl md:text-5xl lg:text-[3.25rem] font-bold leading-[1.1] mb-6"
+              style={{ color: "#161616", letterSpacing: "-0.02em" }}
+            >
+              Torne-se um profissional de{" "}
+              <span style={{ color: "#0f62fe" }}>Inteligência Artificial</span>{" "}
+              e mude sua carreira
+            </h1>
+
+            <p className="text-xl leading-relaxed mb-8" style={{ color: "#525252" }}>
+              Aprenda do zero ao avançado, construa projetos reais e esteja pronto para trabalhar com IA no mercado.
+            </p>
+
+            <ul className="space-y-3 mb-10">
+              {[
+                "Trilhas estruturadas para cada carreira em IA",
+                "Projetos reais para construir seu portfólio",
+                "Certificados reconhecidos pelo mercado",
+              ].map((item) => (
+                <li key={item} className="flex items-center gap-3 text-base" style={{ color: "#393939" }}>
+                  <CheckCircle2 className="h-5 w-5 shrink-0" style={{ color: "#0f62fe" }} />
+                  {item}
+                </li>
+              ))}
+            </ul>
+
+            <div className="flex flex-col sm:flex-row gap-4 mb-5">
+              <Link
+                href="/cadastro"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 font-semibold text-base text-white transition-all hover:bg-[#0353e9] active:scale-[0.98]"
+                style={{ backgroundColor: "#0f62fe" }}
+              >
+                Começar gratuitamente
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+              <Link
+                href="/cursos"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 font-semibold text-base border transition-all hover:bg-[#f4f4f4]"
+                style={{ color: "#161616", borderColor: "#c6c6c6", backgroundColor: "#ffffff" }}
+              >
+                Ver trilhas de carreira
+              </Link>
+            </div>
+
+            <p className="text-sm" style={{ color: "#8d8d8d" }}>
+              Sem cartão&nbsp;•&nbsp;Acesso imediato&nbsp;•&nbsp;Certificado incluso
+            </p>
+          </div>
+
+          {/* ── Right column — Photo + floating badges ── */}
+          <div className="relative hidden lg:block">
+            {/* Badges ficam fora da foto — não sobrepõem o rosto */}
+            <div className="relative w-full" style={{ height: 580 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/tender-feminine-young-female-student-curly-hairstyle-pointing-left-index-finger-smiling-friendly-asking-which-place-dorm-standing-cheerful-white-wall.jpg"
+                alt="Profissional de IA"
+                className="w-full h-full object-cover"
+                style={{ objectPosition: "center top", boxShadow: "0 24px 64px rgba(15, 98, 254, 0.12)" }}
+              />
+
+              {/* Badge: IA — canto superior, fora da área do rosto */}
+              <div
+                className="absolute top-6 -left-16 bg-white px-4 py-3 flex items-center gap-2.5"
+                style={{ border: "1px solid #e0e0e0", boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}
+              >
+                <span className="text-xl">🤖</span>
+                <span className="font-semibold text-sm" style={{ color: "#161616" }}>Inteligência Artificial</span>
+              </div>
+
+              {/* Badge: Carreira — lado direito, meio */}
+              <div
+                className="absolute top-40 -right-14 bg-white px-4 py-3 flex items-center gap-2.5"
+                style={{ border: "1px solid #e0e0e0", boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}
+              >
+                <span className="text-xl">🚀</span>
+                <span className="font-semibold text-sm" style={{ color: "#161616" }}>Nova carreira</span>
+              </div>
+
+              {/* Badge: Certificado — inferior esquerdo */}
+              <div
+                className="absolute bottom-28 -left-14 bg-white px-4 py-3 flex items-center gap-2.5"
+                style={{ border: "1px solid #e0e0e0", boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}
+              >
+                <span className="text-xl">🎓</span>
+                <span className="font-semibold text-sm" style={{ color: "#161616" }}>Certificado</span>
+              </div>
+
+              {/* Badge: Projetos — inferior direito */}
+              <div
+                className="absolute -bottom-5 right-10 bg-white px-4 py-3 flex items-center gap-2.5"
+                style={{ border: "1px solid #e0e0e0", boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}
+              >
+                <span className="text-xl">💼</span>
+                <span className="font-semibold text-sm" style={{ color: "#161616" }}>Projetos reais</span>
+              </div>
+            </div>
+          </div>
+
         </div>
-        <p className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
-          <span className="text-white font-semibold">+10.000</span> alunos já aprendendo
-        </p>
-      </motion.div>
-
-      {/* Floating course cards */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 0.55 }}
-        className="relative z-10 flex flex-wrap justify-center gap-4 max-w-3xl"
-      >
-        {floatingCards.map((card) => (
-          <FloatingCard key={card.title} {...card} />
-        ))}
-      </motion.div>
-
-      {/* Bottom gradient fade */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none"
-        style={{ background: "linear-gradient(to bottom, transparent, #06070a)" }}
-      />
+      </div>
     </section>
   );
 }
 
-// Stats bar
-export function StatsBar({ totalCourses, totalStudents }: { totalCourses: number; totalStudents: number }) {
-  const stats = [
-    { value: `${totalCourses}+`, label: "Cursos disponíveis", icon: BookOpen, color: "#0052ff" },
-    {
-      value: `${(totalStudents || 0) > 1000 ? `${Math.floor(totalStudents / 1000)}k` : totalStudents || "500"}+`,
-      label: "Alunos ativos",
-      icon: Users,
-      color: "#7c3aed",
-    },
-    { value: "200h+", label: "Horas de conteúdo", icon: Zap, color: "#059669" },
-    { value: "4.9★", label: "Avaliação média", icon: Award, color: "#d97706" },
-  ];
-
+export function SocialProofBar() {
   return (
     <div
-      style={{
-        backgroundColor: "#0c0d11",
-        borderTop: "1px solid rgba(255,255,255,0.05)",
-        borderBottom: "1px solid rgba(255,255,255,0.05)",
-      }}
+      className="py-10 px-4 md:px-8 border-y"
+      style={{ backgroundColor: "#f4f4f4", borderColor: "#e0e0e0" }}
     >
-      <div className="mx-auto max-w-5xl px-4">
-        <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-white/[0.05]">
-          {stats.map(({ value, label, icon: Icon, color }, i) => (
-            <motion.div
-              key={label}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="py-8 px-6 text-center flex flex-col items-center"
-            >
-              <div
-                className="h-8 w-8 rounded-lg flex items-center justify-center mb-3"
-                style={{ backgroundColor: `${color}20` }}
-              >
-                <Icon className="h-4 w-4" style={{ color }} />
-              </div>
-              <div
-                className="text-2xl font-black mb-1"
-                style={{
-                  background: "linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.65) 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                {value}
-              </div>
-              <div className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
-                {label}
-              </div>
-            </motion.div>
-          ))}
+      <div className="mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between gap-8">
+
+        <div>
+          <p className="text-sm mb-4" style={{ color: "#8d8d8d" }}>
+            Junte-se a milhares de alunos construindo carreira em tecnologia
+          </p>
+          <div className="flex items-center gap-4">
+            <div className="flex -space-x-3">
+              {STUDENT_AVATARS.map((src, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={i}
+                  src={src}
+                  alt="Aluno"
+                  className="h-10 w-10 rounded-full object-cover"
+                  style={{ border: "2px solid white" }}
+                />
+              ))}
+            </div>
+            <div>
+              <div className="font-bold text-base" style={{ color: "#161616" }}>+12.000 alunos</div>
+              <div className="text-sm" style={{ color: "#525252" }}>já estão aprendendo IA</div>
+            </div>
+          </div>
         </div>
+
+        <div>
+          <p
+            className="text-xs font-semibold mb-3"
+            style={{ color: "#8d8d8d", textTransform: "uppercase", letterSpacing: "0.1em" }}
+          >
+            Alunos trabalhando em empresas como
+          </p>
+          <div className="flex flex-wrap gap-6 items-center">
+            {["Google", "IBM", "Amazon", "Nubank", "iFood"].map((company) => (
+              <span key={company} className="font-bold text-base" style={{ color: "#c6c6c6" }}>
+                {company}
+              </span>
+            ))}
+          </div>
+        </div>
+
       </div>
     </div>
   );
 }
 
-// Bento feature grid
-const bentoItems = [
-  {
-    icon: Brain,
-    title: "Machine Learning & Deep Learning",
-    desc: "Do zero ao estado da arte. Redes neurais, transformers, difusion models e muito mais.",
-    color: "#0052ff",
-    large: true,
-  },
-  {
-    icon: Cpu,
-    title: "LLMs e IA Generativa",
-    desc: "GPT, Claude, Llama — aprenda a construir aplicações com os modelos mais avançados.",
-    color: "#7c3aed",
-    large: false,
-  },
-  {
-    icon: BarChart3,
-    title: "Visão Computacional",
-    desc: "YOLO, ViT, detecção e segmentação de imagens em produção.",
-    color: "#059669",
-    large: false,
-  },
-  {
-    icon: Code2,
-    title: "MLOps & Deploy",
-    desc: "Leve seus modelos para produção com Docker, Kubernetes e pipelines automatizados.",
-    color: "#d97706",
-    large: false,
-  },
-];
+export function StatsBar() {
+  const stats = [
+    { value: "+12.000", label: "Alunos ativos" },
+    { value: "97%",     label: "Taxa de conclusão" },
+    { value: "+40",     label: "Cursos disponíveis" },
+    { value: "4.9★",   label: "Avaliação média" },
+  ];
 
-export function BentoSection() {
   return (
-    <section className="py-28 px-4 bg-white">
-      <div className="mx-auto max-w-6xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-16"
-        >
-          <span
-            className="inline-block text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-full mb-4"
-            style={{ backgroundColor: "#0052ff10", color: "#0052ff" }}
-          >
-            O que você vai aprender
-          </span>
-          <h2 className="text-4xl font-black mb-4" style={{ color: "#06070a", letterSpacing: "-0.03em" }}>
-            Tudo que o mercado de IA exige
-          </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
-            Currículo atualizado constantemente por especialistas que trabalham com IA no dia a dia.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Large card */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="md:col-span-2 rounded-3xl p-8 relative overflow-hidden min-h-[280px] flex flex-col justify-between"
-            style={{
-              background: "linear-gradient(135deg, #0047e1 0%, #0052ff 50%, #1a6bff 100%)",
-              boxShadow: "0 20px 60px rgba(0,82,255,0.3)",
-            }}
-          >
+    <div className="bg-white border-b" style={{ borderColor: "#e0e0e0" }}>
+      <div className="mx-auto max-w-7xl px-4 md:px-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4">
+          {stats.map(({ value, label }, i) => (
             <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: "radial-gradient(circle at 75% 40%, rgba(255,255,255,0.12) 0%, transparent 55%)",
-              }}
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: `
-                  linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-                  linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)
-                `,
-                backgroundSize: "48px 48px",
-              }}
-            />
-            <div className="relative z-10">
-              <div className="h-12 w-12 rounded-2xl bg-white/15 flex items-center justify-center mb-5 backdrop-blur-sm">
-                <Brain className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Machine Learning & Deep Learning</h3>
-              <p className="text-white/65 max-w-sm leading-relaxed">
-                Do zero ao estado da arte. Redes neurais, transformers, difusion models e muito mais.
-              </p>
+              key={label}
+              className="py-10 px-6 text-center"
+              style={{ borderRight: i < 3 ? "1px solid #e0e0e0" : "none" }}
+            >
+              <div className="text-3xl font-bold mb-1" style={{ color: "#0f62fe" }}>{value}</div>
+              <div className="text-sm" style={{ color: "#525252" }}>{label}</div>
             </div>
-            <div className="relative z-10 flex items-center gap-3 mt-6">
-              <span
-                className="text-xs font-semibold px-3 py-1.5 rounded-full"
-                style={{ backgroundColor: "rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.9)" }}
-              >
-                12 cursos
-              </span>
-              <span
-                className="text-xs font-semibold px-3 py-1.5 rounded-full"
-                style={{ backgroundColor: "rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.9)" }}
-              >
-                120h+ de conteúdo
-              </span>
-            </div>
-          </motion.div>
-
-          {/* Small cards */}
-          <div className="flex flex-col gap-4">
-            {bentoItems.slice(1).map((item, i) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, x: 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.1 + (i + 1) * 0.1 }}
-                className="rounded-3xl p-6 border flex-1 hover:shadow-md transition-all duration-300"
-                style={{ backgroundColor: "#fafafa", borderColor: "#f0f0f0" }}
-              >
-                <div
-                  className="h-10 w-10 rounded-xl flex items-center justify-center mb-4"
-                  style={{ backgroundColor: `${item.color}12` }}
-                >
-                  <item.icon className="h-5 w-5" style={{ color: item.color }} />
-                </div>
-                <h3 className="font-bold text-sm mb-1.5" style={{ color: "#0a0b0d" }}>{item.title}</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
-              </motion.div>
-            ))}
-          </div>
+          ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 }
