@@ -107,19 +107,39 @@ export default async function CourseLearnPage({
 
   if (!course) notFound();
 
+  const typedCourse = course as {
+    id: string;
+    title: string;
+    slug: string;
+    modules: Array<{
+      id: string;
+      title: string;
+      lessons: Array<{
+        id: string;
+        title: string;
+        description: string | null;
+        videoUrl: string | null;
+        type: string;
+        content: string | null;
+        duration: number | null;
+        quiz: unknown;
+      }>;
+    }>;
+  };
+
   const enrollment = await prisma.enrollment.findUnique({
-    where: { userId_courseId: { userId: session.user.id, courseId: course.id } },
+    where: { userId_courseId: { userId: session.user.id, courseId: typedCourse.id } },
   });
 
   if (!enrollment) redirect(`/cursos/${slug}`);
 
-  const allLessons = course.modules.flatMap((module) => module.lessons);
+  const allLessons = typedCourse.modules.flatMap((module) => module.lessons);
   const currentLesson = aula
     ? allLessons.find((lesson) => lesson.id === aula) ?? allLessons[0]
     : allLessons[0];
 
   const progressRecords = await prisma.progress.findMany({
-    where: { userId: session.user.id, lesson: { module: { courseId: course.id } } },
+    where: { userId: session.user.id, lesson: { module: { courseId: typedCourse.id } } },
   });
 
   const completedIds = new Set(
@@ -140,7 +160,7 @@ export default async function CourseLearnPage({
           >
             Voltar para meus cursos
           </Link>
-          <h1 className="mt-2 text-xl font-bold">{course.title}</h1>
+          <h1 className="mt-2 text-xl font-bold">{typedCourse.title}</h1>
           {quizFeatureError && (
             <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
               {quizFeatureError}
@@ -157,7 +177,7 @@ export default async function CourseLearnPage({
         {currentLesson ? (
           <LessonPlayer
             lesson={currentLesson}
-            courseId={course.id}
+            courseId={typedCourse.id}
             isCompleted={completedIds.has(currentLesson.id)}
             bunnyLibraryId={process.env.BUNNY_STREAM_LIBRARY_ID ?? ""}
           />
@@ -172,7 +192,7 @@ export default async function CourseLearnPage({
       <aside className="w-full flex-shrink-0 lg:w-72">
         <h2 className="mb-3 font-semibold">Conteúdo do curso</h2>
         <div className="overflow-hidden rounded-lg border">
-          {course.modules.map((module) => (
+          {typedCourse.modules.map((module) => (
             <div key={module.id}>
               <div className="border-b bg-muted/50 px-4 py-2 text-sm font-medium">
                 {module.title}
