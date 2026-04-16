@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { VideoUpload } from "@/components/video-upload";
+import { QuizEditor } from "@/components/quiz-editor";
 import { toast } from "sonner";
 import {
   ArrowLeft, PlusCircle, ChevronDown, ChevronUp,
@@ -22,6 +23,25 @@ type Lesson = {
   id: string; title: string; type: string;
   videoUrl: string | null; duration: number | null;
   isFree: boolean; order: number; description: string | null; content: string | null;
+  quiz: {
+    id: string;
+    title: string;
+    description: string | null;
+    passingScore: number;
+    maxAttempts: number | null;
+    isCertificationExam: boolean;
+    questions: {
+      id: string;
+      text: string;
+      order: number;
+      options: {
+        id: string;
+        text: string;
+        order: number;
+        isCorrect: boolean;
+      }[];
+    }[];
+  } | null;
 };
 type Module = { id: string; title: string; order: number; lessons: Lesson[] };
 type Category = { id: string; name: string; slug: string };
@@ -36,11 +56,11 @@ type Tab = "info" | "curriculum";
 export function CourseEditor({
   course: initialCourse,
   categories,
-  bunnyLibraryId,
+  quizFeatureError,
 }: {
   course: Course;
   categories: Category[];
-  bunnyLibraryId: string;
+  quizFeatureError?: string | null;
 }) {
   const router = useRouter();
   const [course, setCourse] = useState(initialCourse);
@@ -133,7 +153,7 @@ export function CourseEditor({
       setCourse((c) => ({
         ...c,
         modules: c.modules.map((m) =>
-          m.id === moduleId ? { ...m, lessons: [...m.lessons, lesson] } : m
+          m.id === moduleId ? { ...m, lessons: [...m.lessons, { ...lesson, quiz: null }] } : m
         ),
       }));
       setNewLesson(null);
@@ -237,6 +257,12 @@ export function CourseEditor({
       </div>
 
       {/* Tabs */}
+      {quizFeatureError && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          {quizFeatureError}
+        </div>
+      )}
+
       <div className="flex border-b gap-1">
         {(["curriculum", "info"] as Tab[]).map((t) => (
           <button
@@ -299,10 +325,13 @@ export function CourseEditor({
                           "flex items-center gap-3 px-4 py-2.5",
                           isEditing && "bg-[#0052ff08] border-l-2 border-[#0052ff]"
                         )}>
-                          {lesson.type === "VIDEO"
-                            ? <Video className={cn("h-4 w-4 flex-shrink-0", hasVideo ? "text-green-500" : "text-yellow-500")} />
-                            : <FileText className="h-4 w-4 flex-shrink-0 text-blue-500" />
-                          }
+                          {lesson.type === "VIDEO" ? (
+                            <Video className={cn("h-4 w-4 flex-shrink-0", hasVideo ? "text-green-500" : "text-yellow-500")} />
+                          ) : lesson.type === "QUIZ" ? (
+                            <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-[#0052ff]" />
+                          ) : (
+                            <FileText className="h-4 w-4 flex-shrink-0 text-blue-500" />
+                          )}
                           <span className="text-sm flex-1 font-medium">{lesson.title}</span>
 
                           {lesson.type === "VIDEO" && (
@@ -311,6 +340,12 @@ export function CourseEditor({
                               className={cn("text-xs flex-shrink-0", hasVideo ? "bg-green-100 text-green-700 border-green-200" : "bg-yellow-100 text-yellow-700 border-yellow-200")}
                             >
                               {hasVideo ? "✓ Vídeo" : "Sem vídeo"}
+                            </Badge>
+                          )}
+
+                          {lesson.type === "QUIZ" && (
+                            <Badge variant="outline" className="text-xs flex-shrink-0">
+                              {lesson.quiz?.isCertificationExam ? "Prova final" : "Quiz"}
                             </Badge>
                           )}
 
@@ -410,6 +445,32 @@ export function CourseEditor({
                                 />
                               </div>
                             )}
+
+                            {lesson.type === "QUIZ" && (
+                              <div>
+                                <Label className="text-xs font-semibold text-foreground">Quiz e prova</Label>
+                                <div className="mt-2">
+                                  <QuizEditor
+                                    lessonId={lesson.id}
+                                    lessonTitle={lesson.title}
+                                    quiz={lesson.quiz}
+                                    onChange={(updatedQuiz) =>
+                                      setCourse((currentCourse) => ({
+                                        ...currentCourse,
+                                        modules: currentCourse.modules.map((module) => ({
+                                          ...module,
+                                          lessons: module.lessons.map((courseLesson) =>
+                                            courseLesson.id === lesson.id
+                                              ? { ...courseLesson, quiz: updatedQuiz }
+                                              : courseLesson
+                                          ),
+                                        })),
+                                      }))
+                                    }
+                                  />
+                                </div>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
@@ -444,6 +505,15 @@ export function CourseEditor({
                         >
                           <FileText className="mr-1.5 h-3.5 w-3.5" />
                           Aula de texto
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={!newLesson.title.trim()}
+                          onClick={() => addLesson(mod.id, newLesson.title, "QUIZ")}
+                        >
+                          <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
+                          Quiz / prova
                         </Button>
                         <Button size="sm" variant="ghost" onClick={() => setNewLesson(null)}>
                           Cancelar

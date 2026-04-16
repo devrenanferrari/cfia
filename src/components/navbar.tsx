@@ -48,7 +48,6 @@ export function Navbar() {
   const navLinks = [
     { href: "/cursos", label: "Cursos" },
     { href: "/professores", label: "Professores" },
-    { href: "/residencia", label: "Residência" },
     { href: "/sobre", label: "Sobre" },
     ...(isInstructor ? [{ href: "/instrutor", label: "Área do instrutor" }] : []),
     ...(isAdmin ? [{ href: "/admin", label: "Admin" }] : []),
