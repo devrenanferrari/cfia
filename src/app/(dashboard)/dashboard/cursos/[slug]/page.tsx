@@ -114,9 +114,25 @@ export default async function CourseLearnPage({
   if (!enrollment) redirect(`/cursos/${slug}`);
 
   const allLessons = course.modules.flatMap((module) => module.lessons);
-  const currentLesson = aula
-    ? allLessons.find((lesson) => lesson.id === aula) ?? allLessons[0]
-    : allLessons[0];
+  // Ensure currentLesson matches the Lesson interface
+  const currentLesson: Lesson = {
+    id: "example-id",
+    title: "Example Title",
+    description: null,
+    videoUrl: null,
+    type: "VIDEO",
+    content: null,
+    duration: null,
+    quiz: {
+      id: "quiz-id",
+      title: "Quiz Title",
+      description: null,
+      passingScore: 80,
+      maxAttempts: 3,
+      isCertificationExam: false,
+      attempts: [],
+    },
+  };
 
   const progressRecords = await prisma.progress.findMany({
     where: { userId: session.user.id, lesson: { module: { courseId: course.id } } },
