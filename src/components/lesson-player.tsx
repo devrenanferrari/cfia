@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { QuizPlayer } from "@/components/quiz-player";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { CheckCircle, FileText, Loader2 } from "lucide-react";
@@ -15,6 +16,21 @@ interface Lesson {
   type: string;
   content: string | null;
   duration: number | null;
+  quiz: {
+    id: string;
+    title: string;
+    description: string | null;
+    passingScore: number;
+    maxAttempts: number | null;
+    isCertificationExam: boolean;
+    attempts: {
+      id: string;
+      score: number;
+      passed: boolean;
+      attemptNumber: number;
+      submittedAt: Date;
+    }[];
+  } | null;
 }
 
 interface LessonPlayerProps {
@@ -158,6 +174,16 @@ export function LessonPlayer({ lesson, courseId, isCompleted, bunnyLibraryId }: 
         </div>
       )}
 
+      {lesson.type === "QUIZ" && lesson.quiz && (
+        <QuizPlayer quizId={lesson.quiz.id} isCompleted={completed} />
+      )}
+
+      {lesson.type === "QUIZ" && !lesson.quiz && (
+        <div className="rounded-xl border p-6 text-sm text-muted-foreground">
+          Este quiz ainda não foi configurado pelo instrutor.
+        </div>
+      )}
+
       {/* Info + botão de conclusão */}
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -175,19 +201,21 @@ export function LessonPlayer({ lesson, courseId, isCompleted, bunnyLibraryId }: 
           </div>
         </div>
 
-        <Button
-          onClick={markAsComplete}
-          disabled={marking || completed}
-          variant={completed ? "secondary" : "default"}
-          className="flex-shrink-0"
-        >
-          {marking ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <CheckCircle className="mr-2 h-4 w-4" />
-          )}
-          {completed ? "Concluída" : marking ? "Salvando..." : "Marcar como concluída"}
-        </Button>
+        {lesson.type !== "QUIZ" && (
+          <Button
+            onClick={markAsComplete}
+            disabled={marking || completed}
+            variant={completed ? "secondary" : "default"}
+            className="flex-shrink-0"
+          >
+            {marking ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <CheckCircle className="mr-2 h-4 w-4" />
+            )}
+            {completed ? "Concluída" : marking ? "Salvando..." : "Marcar como concluída"}
+          </Button>
+        )}
       </div>
     </div>
   );

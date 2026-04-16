@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Award, Download, ExternalLink } from "lucide-react";
+import { Award, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -69,17 +69,24 @@ export default async function CertificadosPage() {
                   <p className="text-xs mt-1 font-mono" style={{ color: "#0052ff" }}>
                     #{cert.code.slice(0, 12).toUpperCase()}
                   </p>
+                  <p className="text-xs mt-2 text-muted-foreground">
+                    Certificado premium disponível para impressão em PDF e link público.
+                  </p>
                 </div>
               </div>
 
               <div className="flex gap-2 mt-4">
-                <Button size="sm" variant="outline" className="rounded-[56px] gap-1.5 text-xs flex-1">
-                  <Download className="h-3 w-3" />
-                  Baixar PDF
+                <Button size="sm" variant="outline" className="rounded-[56px] gap-1.5 text-xs flex-1" asChild>
+                  <Link href={`/dashboard/certificados/${cert.code}`}>
+                    <Award className="h-3 w-3" />
+                    Ver certificado
+                  </Link>
                 </Button>
-                <Button size="sm" variant="outline" className="rounded-[56px] gap-1.5 text-xs flex-1">
-                  <ExternalLink className="h-3 w-3" />
-                  Compartilhar
+                <Button size="sm" variant="outline" className="rounded-[56px] gap-1.5 text-xs flex-1" asChild>
+                  <Link href={`/certificados/${cert.code}`}>
+                    <ExternalLink className="h-3 w-3" />
+                    Link público
+                  </Link>
                 </Button>
               </div>
             </div>

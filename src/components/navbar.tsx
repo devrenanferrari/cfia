@@ -47,6 +47,8 @@ export function Navbar() {
 
   const navLinks = [
     { href: "/cursos", label: "Cursos" },
+    { href: "/professores", label: "Professores" },
+    { href: "/sobre", label: "Sobre" },
     ...(isInstructor ? [{ href: "/instrutor", label: "Área do instrutor" }] : []),
     ...(isAdmin ? [{ href: "/admin", label: "Admin" }] : []),
   ];
@@ -66,7 +68,7 @@ export function Navbar() {
         <div className="flex h-12 items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 font-semibold text-lg shrink-0 text-white">
-            <span className="tracking-tight leading-none" style={{ letterSpacing: "0" }}>cfia</span>
+            <span className="tracking-tight leading-none" style={{ letterSpacing: "0" }}>CFIA</span>
           </Link>
 
           {/* Nav links */}

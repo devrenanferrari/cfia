@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Circle, BookOpen } from "lucide-react";
 import Link from "next/link";
+import { getPrismaErrorMessage } from "@/lib/prisma-errors";
 
 export default async function CourseLearnPage({
   params,
@@ -23,17 +24,86 @@ export default async function CourseLearnPage({
   const { slug } = await params;
   const { aula } = await searchParams;
 
-  const course = await prisma.course.findUnique({
-    where: { slug },
-    include: {
-      modules: {
-        orderBy: { order: "asc" },
-        include: {
-          lessons: { orderBy: { order: "asc" } },
+  let quizFeatureError: string | null = null;
+  let course:
+    | Awaited<ReturnType<typeof prisma.course.findUnique>>
+    | {
+        id: string;
+        title: string;
+        slug: string;
+        modules: Array<{
+          id: string;
+          title: string;
+          lessons: Array<{
+            id: string;
+            title: string;
+            description: string | null;
+            videoUrl: string | null;
+            type: string;
+            content: string | null;
+            duration: number | null;
+            quiz: null;
+          }>;
+        }>;
+      }
+    | null = null;
+
+  try {
+    course = await prisma.course.findUnique({
+      where: { slug },
+      include: {
+        modules: {
+          orderBy: { order: "asc" },
+          include: {
+            lessons: {
+              orderBy: { order: "asc" },
+              include: {
+                quiz: {
+                  include: {
+                    attempts: {
+                      where: { userId: session.user.id },
+                      orderBy: { submittedAt: "desc" },
+                      take: 5,
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
       },
-    },
-  });
+    });
+  } catch (error) {
+    quizFeatureError = getPrismaErrorMessage(error);
+    if (!quizFeatureError) throw error;
+
+    const fallbackCourse = await prisma.course.findUnique({
+      where: { slug },
+      include: {
+        modules: {
+          orderBy: { order: "asc" },
+          include: {
+            lessons: {
+              orderBy: { order: "asc" },
+            },
+          },
+        },
+      },
+    });
+
+    if (fallbackCourse) {
+      course = {
+        ...fallbackCourse,
+        modules: fallbackCourse.modules.map((module) => ({
+          ...module,
+          lessons: module.lessons.map((lesson) => ({
+            ...lesson,
+            quiz: null,
+          })),
+        })),
+      };
+    }
+  }
 
   if (!course) notFound();
 
@@ -43,9 +113,9 @@ export default async function CourseLearnPage({
 
   if (!enrollment) redirect(`/cursos/${slug}`);
 
-  const allLessons = course.modules.flatMap((m) => m.lessons);
+  const allLessons = course.modules.flatMap((module) => module.lessons);
   const currentLesson = aula
-    ? allLessons.find((l) => l.id === aula) ?? allLessons[0]
+    ? allLessons.find((lesson) => lesson.id === aula) ?? allLessons[0]
     : allLessons[0];
 
   const progressRecords = await prisma.progress.findMany({
@@ -53,26 +123,34 @@ export default async function CourseLearnPage({
   });
 
   const completedIds = new Set(
-    progressRecords.filter((p) => p.completed).map((p) => p.lessonId)
+    progressRecords.filter((progress) => progress.completed).map((progress) => progress.lessonId)
   );
 
   const completedCount = completedIds.size;
-  const percentage = allLessons.length > 0
-    ? Math.round((completedCount / allLessons.length) * 100)
-    : 0;
+  const percentage =
+    allLessons.length > 0 ? Math.round((completedCount / allLessons.length) * 100) : 0;
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 h-full">
-      {/* Player principal */}
-      <div className="flex-1 min-w-0">
+    <div className="flex h-full flex-col gap-6 lg:flex-row">
+      <div className="min-w-0 flex-1">
         <div className="mb-4">
-          <Link href="/dashboard/cursos" className="text-sm text-muted-foreground hover:text-foreground">
-            ← Meus cursos
+          <Link
+            href="/dashboard/cursos"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Voltar para meus cursos
           </Link>
-          <h1 className="text-xl font-bold mt-2">{course.title}</h1>
-          <div className="flex items-center gap-3 mt-2">
-            <Progress value={percentage} className="flex-1 h-2" />
-            <span className="text-sm text-muted-foreground whitespace-nowrap">{percentage}% concluído</span>
+          <h1 className="mt-2 text-xl font-bold">{course.title}</h1>
+          {quizFeatureError && (
+            <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+              {quizFeatureError}
+            </div>
+          )}
+          <div className="mt-2 flex items-center gap-3">
+            <Progress value={percentage} className="h-2 flex-1" />
+            <span className="whitespace-nowrap text-sm text-muted-foreground">
+              {percentage}% concluído
+            </span>
           </div>
         </div>
 
@@ -84,44 +162,46 @@ export default async function CourseLearnPage({
             bunnyLibraryId={process.env.BUNNY_STREAM_LIBRARY_ID ?? ""}
           />
         ) : (
-          <div className="border rounded-lg p-12 text-center text-muted-foreground">
-            <BookOpen className="h-12 w-12 mx-auto mb-3 opacity-40" />
+          <div className="rounded-lg border p-12 text-center text-muted-foreground">
+            <BookOpen className="mx-auto mb-3 h-12 w-12 opacity-40" />
             <p>Este curso ainda não tem aulas.</p>
           </div>
         )}
       </div>
 
-      {/* Sidebar com currículo */}
-      <aside className="w-full lg:w-72 flex-shrink-0">
-        <h2 className="font-semibold mb-3">Conteúdo do curso</h2>
-        <div className="border rounded-lg overflow-hidden">
-          {course.modules.map((mod) => (
-            <div key={mod.id}>
-              <div className="bg-muted/50 px-4 py-2 text-sm font-medium border-b">
-                {mod.title}
+      <aside className="w-full flex-shrink-0 lg:w-72">
+        <h2 className="mb-3 font-semibold">Conteúdo do curso</h2>
+        <div className="overflow-hidden rounded-lg border">
+          {course.modules.map((module) => (
+            <div key={module.id}>
+              <div className="border-b bg-muted/50 px-4 py-2 text-sm font-medium">
+                {module.title}
               </div>
               <ul className="divide-y">
-                {mod.lessons.map((lesson) => {
+                {module.lessons.map((lesson) => {
                   const isCompleted = completedIds.has(lesson.id);
                   const isCurrent = lesson.id === currentLesson?.id;
+
                   return (
                     <li key={lesson.id}>
                       <Link
                         href={`/dashboard/cursos/${slug}?aula=${lesson.id}`}
                         className={`flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
-                          isCurrent
-                            ? "bg-[#0052ff0f] text-[#0052ff]"
-                            : "hover:bg-muted/50"
+                          isCurrent ? "bg-[#0052ff0f] text-[#0052ff]" : "hover:bg-muted/50"
                         }`}
                       >
                         {isCompleted ? (
                           <CheckCircle className="h-4 w-4 flex-shrink-0 text-green-500" />
                         ) : (
-                          <Circle className={`h-4 w-4 flex-shrink-0 ${isCurrent ? "text-[#0052ff]" : "text-muted-foreground"}`} />
+                          <Circle
+                            className={`h-4 w-4 flex-shrink-0 ${
+                              isCurrent ? "text-[#0052ff]" : "text-muted-foreground"
+                            }`}
+                          />
                         )}
                         <span className="line-clamp-2">{lesson.title}</span>
                         {lesson.duration && (
-                          <Badge variant="outline" className="ml-auto text-xs flex-shrink-0">
+                          <Badge variant="outline" className="ml-auto flex-shrink-0 text-xs">
                             {lesson.duration}min
                           </Badge>
                         )}
