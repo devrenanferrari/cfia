@@ -122,7 +122,7 @@ export default async function CourseLearnPage({
         type: string;
         content: string | null;
         duration: number | null;
-        quiz: unknown;
+        quiz: { id: string; title: string; description: string | null; passingScore: number; maxAttempts: number | null; isCertificationExam: boolean; attempts: { id: string; score: number; passed: boolean; attemptNumber: number; submittedAt: Date; }[]; } | null;
       }>;
     }>;
   };
