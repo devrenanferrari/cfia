@@ -28,18 +28,32 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) return null;
 
         console.info(`Tentativa de login com: ${credentials.email}`);
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email.toLowerCase().trim() },
-        });
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email.toLowerCase().trim() },
+          });
 
-        if (!user?.password) {
-          console.warn("Usuário não encontrado ou senha não configurada");
-          return null;
-        }
+          if (!user?.password) {
+            console.warn("Usuário não encontrado ou senha não configurada");
+            return null;
+          }
 
-        const valid = await bcrypt.compare(credentials.password, user.password);
-        if (!valid) {
-          console.warn(`Tentativa de login falhou para o usuário: ${credentials.email}`);
+          const valid = await bcrypt.compare(credentials.password, user.password);
+          if (!valid) {
+            console.warn(`Tentativa de login falhou para o usuário: ${credentials.email}`);
+            return null;
+          }
+
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            image: user.image,
+            role: user.role,
+            subscriptionStatus: user.subscriptionStatus,
+          };
+        } catch (error) {
+          console.error(`Erro durante a validação de credenciais: ${error}`);
           return null;
         }
 
