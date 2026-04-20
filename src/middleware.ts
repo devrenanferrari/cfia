@@ -1,8 +1,18 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-// We use NextAuth for authentication, not Supabase Auth.
-// This middleware just passes requests through.
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  if (pathname === "/home") {
+    const token = await getToken({ req: request }).catch(() => null);
+    if (token) {
+      if (token.role === "ADMIN") return NextResponse.redirect(new URL("/admin", request.url));
+      if (token.role === "INSTRUCTOR") return NextResponse.redirect(new URL("/instrutor", request.url));
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+  }
+
   return NextResponse.next();
 }
 
