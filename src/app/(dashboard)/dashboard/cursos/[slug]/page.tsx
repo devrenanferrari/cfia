@@ -122,7 +122,7 @@ export default async function CourseLearnPage({
         type: string;
         content: string | null;
         duration: number | null;
-        quiz: unknown;
+        quiz: { id: string; title: string; description: string | null; passingScore: number; maxAttempts: number | null; isCertificationExam: boolean; attempts: { id: string; score: number; passed: boolean; attemptNumber: number; submittedAt: Date; }[]; } | null;
       }>;
     }>;
   };
@@ -133,33 +133,10 @@ export default async function CourseLearnPage({
 
   if (!enrollment) redirect(`/cursos/${slug}`);
 
-<<<<<<< HEAD
-  const allLessons = course.modules.flatMap((module) => module.lessons);
-  // Ensure currentLesson matches the Lesson interface
-  const currentLesson: Lesson = {
-    id: "example-id",
-    title: "Example Title",
-    description: null,
-    videoUrl: null,
-    type: "VIDEO",
-    content: null,
-    duration: null,
-    quiz: {
-      id: "quiz-id",
-      title: "Quiz Title",
-      description: null,
-      passingScore: 80,
-      maxAttempts: 3,
-      isCertificationExam: false,
-      attempts: [],
-    },
-  };
-=======
   const allLessons = typedCourse.modules.flatMap((module) => module.lessons);
   const currentLesson = aula
     ? allLessons.find((lesson) => lesson.id === aula) ?? allLessons[0]
     : allLessons[0];
->>>>>>> 8a9aa26757aa2ed49bae1e89ac609ec461ab24fb
 
   const progressRecords = await prisma.progress.findMany({
     where: { userId: session.user.id, lesson: { module: { courseId: typedCourse.id } } },
