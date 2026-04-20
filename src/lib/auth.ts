@@ -27,14 +27,21 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
+        console.info(`Tentativa de login com: ${credentials.email}`);
         const user = await prisma.user.findUnique({
           where: { email: credentials.email.toLowerCase().trim() },
         });
 
-        if (!user?.password) return null;
+        if (!user?.password) {
+          console.warn("Usuário não encontrado ou senha não configurada");
+          return null;
+        }
 
         const valid = await bcrypt.compare(credentials.password, user.password);
-        if (!valid) return null;
+        if (!valid) {
+          console.warn(`Tentativa de login falhou para o usuário: ${credentials.email}`);
+          return null;
+        }
 
         return {
           id: user.id,
