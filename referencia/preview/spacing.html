@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Spacing</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 24px; background: #fff; font-family: var(--font-sans); color: #161616; }
+  .row { display: grid; grid-template-columns: 60px 1fr 80px; gap: 12px; align-items: center; padding: 6px 0; }
+  .name { font-family: var(--font-mono); font-size: 11px; color: #525252; }
+  .bar { height: 14px; background: #0f62fe; }
+  .val { font-family: var(--font-mono); font-size: 11px; color: #8d8d8d; text-align: right; }
+  .label { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: #6f6f6f; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+  <div class="label">Spacing · 8px grid</div>
+  <div class="row"><span class="name">space-1</span><div class="bar" style="width:4px"></div><span class="val">4px</span></div>
+  <div class="row"><span class="name">space-2</span><div class="bar" style="width:8px"></div><span class="val">8px</span></div>
+  <div class="row"><span class="name">space-3</span><div class="bar" style="width:12px"></div><span class="val">12px</span></div>
+  <div class="row"><span class="name">space-4</span><div class="bar" style="width:16px"></div><span class="val">16px</span></div>
+  <div class="row"><span class="name">space-6</span><div class="bar" style="width:24px"></div><span class="val">24px</span></div>
+  <div class="row"><span class="name">space-8</span><div class="bar" style="width:32px"></div><span class="val">32px</span></div>
+  <div class="row"><span class="name">space-12</span><div class="bar" style="width:48px"></div><span class="val">48px</span></div>
+  <div class="row"><span class="name">space-16</span><div class="bar" style="width:64px"></div><span class="val">64px</span></div>
+  <div class="row"><span class="name">space-24</span><div class="bar" style="width:96px"></div><span class="val">96px</span></div>
+</body>
+</html>

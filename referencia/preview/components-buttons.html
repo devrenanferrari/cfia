@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Components — Buttons</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 24px; background: #fff; font-family: var(--font-sans); color: #161616; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 20px; }
+  .cell { display: flex; flex-direction: column; gap: 6px; }
+  .lbl { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #8d8d8d;}
+  .btn { display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:14px;padding:10px 16px;cursor:pointer;border:none;transition:background .2s;font-family:inherit;}
+  .btn-primary { background:#0f62fe;color:#fff;}
+  .btn-primary-hover { background:#0353e9;color:#fff;}
+  .btn-primary-active { background:#002d9c;color:#fff;}
+  .btn-secondary { background:#fff;color:#161616;border:1px solid #c6c6c6;}
+  .btn-ghost { background:transparent;color:#0f62fe;border:1px solid #0f62fe;}
+  .btn-danger { background:#da1e28;color:#fff;}
+  .btn-on-blue { background:#fff;color:#0f62fe;}
+  .btn-sm { padding:6px 12px;font-size:12px;}
+  .btn-lg { padding:14px 28px;font-size:16px;}
+  .btn-disabled { background:#c6c6c6;color:#8d8d8d;cursor:not-allowed;}
+  svg { width:16px;height:16px;}
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="cell"><span class="lbl">Primary</span><button class="btn btn-primary">Começar grátis <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+    <div class="cell"><span class="lbl">Primary · hover</span><button class="btn btn-primary-hover">Começar grátis <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+    <div class="cell"><span class="lbl">Primary · active</span><button class="btn btn-primary-active">Começar grátis <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+    <div class="cell"><span class="lbl">Disabled</span><button class="btn btn-disabled">Enviar</button></div>
+
+    <div class="cell"><span class="lbl">Secondary</span><button class="btn btn-secondary">Ver trilhas</button></div>
+    <div class="cell"><span class="lbl">Ghost (bordered)</span><button class="btn btn-ghost">Ver trilha <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+    <div class="cell"><span class="lbl">Danger</span><button class="btn btn-danger">Cancelar assinatura</button></div>
+    <div class="cell"><span class="lbl">On-brand band</span><div style="background:#0f62fe;padding:8px"><button class="btn btn-on-blue">Começar gratuitamente</button></div></div>
+
+    <div class="cell"><span class="lbl">Size · sm</span><button class="btn btn-primary btn-sm">Assinar</button></div>
+    <div class="cell"><span class="lbl">Size · default</span><button class="btn btn-primary">Assinar</button></div>
+    <div class="cell"><span class="lbl">Size · lg</span><button class="btn btn-primary btn-lg">Assinar</button></div>
+    <div class="cell"><span class="lbl">Link</span><a href="#" style="color:#0f62fe;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:6px">Ver todos os cursos <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+  </div>
+</body>
+</html>

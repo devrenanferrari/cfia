@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Brand — Iconography</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 20px 24px; background:#fff; font-family: var(--font-sans); color:#161616;}
+  .row { display:flex; flex-wrap:wrap; gap:14px; margin-bottom:12px;}
+  h4 { font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:#8d8d8d; margin: 14px 0 8px;}
+  .swatch { width:40px; height:40px; background:#edf5ff; color:#0f62fe; display:flex; align-items:center; justify-content:center;}
+  .swatch.big { width:56px; height:56px;}
+  .swatch svg { width:20px; height:20px;}
+  .swatch.big svg { width:28px; height:28px;}
+  .raw { color:#161616;} .raw svg { width:20px; height:20px;}
+  .on-dark { background:#161616; color:#fff;} .on-dark svg { width:20px; height:20px;}
+  .emoji { font-size:24px;}
+  .cap { font-size:11px; color:#525252;}
+  .col { display:flex; flex-direction:column; align-items:center; gap:4px;}
+</style>
+</head>
+<body>
+  <h4>Lucide · 2px stroke · only icon system</h4>
+  <div class="row">
+    <div class="col"><div class="swatch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V6a2 2 0 0 1 2-2h11l3 3v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M9 9h6"/></svg></div><span class="cap">BookOpen</span></div>
+    <div class="col"><div class="swatch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg></div><span class="cap">CheckCircle2</span></div>
+    <div class="col"><div class="swatch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div><span class="cap">ArrowRight</span></div>
+    <div class="col"><div class="swatch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg></div><span class="cap">Clock</span></div>
+    <div class="col"><div class="swatch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></div><span class="cap">Search</span></div>
+    <div class="col"><div class="swatch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15l-3.5 2 1-4L6 10l4-.5L12 6l2 3.5L18 10l-3.5 3 1 4z"/></svg></div><span class="cap">Star</span></div>
+    <div class="col"><div class="swatch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z"/></svg></div><span class="cap">Shield</span></div>
+    <div class="col"><div class="swatch big"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 5 6 1-4.5 4 1 6-5.5-3-5.5 3 1-6L3 8l6-1z"/></svg></div><span class="cap">48px tile · step</span></div>
+  </div>
+
+  <h4>Sizes · 12 / 16 / 20 / 24 / 28</h4>
+  <div class="row" style="align-items:center">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#161616" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#161616" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#161616" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#161616" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#161616" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+  </div>
+
+  <h4>Emoji · content-layer only (hero badges, project cards)</h4>
+  <div class="row" style="align-items:center">
+    <span class="emoji">🤖</span><span class="emoji">🚀</span><span class="emoji">🎓</span><span class="emoji">💼</span>
+    <span class="emoji">💬</span><span class="emoji">🎯</span><span class="emoji">📊</span>
+    <span class="cap" style="margin-left:6px">Never in UI chrome. Never as buttons.</span>
+  </div>
+</body>
+</html>

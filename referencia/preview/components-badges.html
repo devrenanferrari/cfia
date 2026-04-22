@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Components — Badges & Tags</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 24px; background: #fff; font-family: var(--font-sans); color: #161616;}
+  .row { display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; margin-bottom:18px;}
+  .lbl { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing:.08em; color:#8d8d8d; margin-bottom: 6px; width: 100%;}
+  .tag { display:inline-flex; align-items:center; gap:6px; padding: 4px 10px; font-size:12px; font-weight:500; font-family: inherit;}
+  .tag-pill { border-radius: 9999px;}
+  .eyebrow { font-size:14px; font-weight:600; padding: 6px 16px; background:#edf5ff;color:#0043ce;border:1px solid #a6c8ff;}
+</style>
+</head>
+<body>
+  <div class="lbl">Course-level tags (square, Carbon)</div>
+  <div class="row">
+    <span class="tag" style="background:#24a148;color:#fff">Grátis</span>
+    <span class="tag" style="background:#161616;color:#fff">🔒 Premium</span>
+    <span class="tag" style="background:#f4f4f4;color:#525252">INICIANTE</span>
+    <span class="tag" style="background:#f4f4f4;color:#525252">INTERMEDIÁRIO</span>
+    <span class="tag" style="background:#f4f4f4;color:#525252">AVANÇADO</span>
+    <span class="tag" style="background:#edf5ff;color:#0043ce">Machine Learning</span>
+    <span class="tag" style="background:#edf5ff;color:#0043ce">NLP</span>
+  </div>
+  <div class="lbl">Eyebrow pills · section markers</div>
+  <div class="row">
+    <span class="eyebrow">Trilhas de carreira</span>
+    <span class="eyebrow">Como funciona</span>
+    <span class="eyebrow">Projetos reais</span>
+  </div>
+  <div class="lbl">Status pills (rounded exception)</div>
+  <div class="row">
+    <span class="tag tag-pill" style="background:#05966915;color:#059669">✓ Assinante ativo</span>
+    <span class="tag tag-pill" style="background:#f1c21b22;color:#8a6d00">⏱ Pendente</span>
+    <span class="tag tag-pill" style="background:#da1e2815;color:#da1e28">⚠ Expirado</span>
+    <span class="tag tag-pill" style="background:#edf5ff;color:#0043ce">Mais popular</span>
+  </div>
+</body>
+</html>

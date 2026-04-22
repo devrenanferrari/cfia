@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>CFIA · Website UI Kit</title>
+<link rel="stylesheet" href="../../colors_and_type.css" />
+<style>
+  body, html { margin:0; padding:0; background:#fff; font-family: var(--font-sans); color:#161616; min-height:100vh; display:flex; flex-direction:column; }
+  #root { display:flex; flex-direction:column; min-height:100vh; }
+  * { box-sizing: border-box; }
+  main { flex:1; }
+  ::-webkit-scrollbar { width:8px; height:8px; }
+  ::-webkit-scrollbar-track { background:#f4f4f4; }
+  ::-webkit-scrollbar-thumb { background:#8d8d8d; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="Shared.jsx"></script>
+<script type="text/babel" src="Navbar.jsx"></script>
+<script type="text/babel" src="Footer.jsx"></script>
+<script type="text/babel" src="Hero.jsx"></script>
+<script type="text/babel" src="TrackGrid.jsx"></script>
+<script type="text/babel" src="Courses.jsx"></script>
+<script type="text/babel" src="Marketing.jsx"></script>
+<script type="text/babel" src="Dashboard.jsx"></script>
+<script type="text/babel">
+function App() {
+  const [route, setRoute] = React.useState(() => localStorage.getItem("cfia-route") || "/");
+  const onNav = (r) => { setRoute(r); localStorage.setItem("cfia-route", r); window.scrollTo(0, 0); };
+  const user = { name: "Renan Ferrari", initials: "RF" };
+
+  let screen;
+  if (route === "/") {
+    screen = (
+      <>
+        <Hero onNav={onNav}/>
+        <PartnerStrip/>
+        <TrackGrid onNav={onNav}/>
+        <Curriculum/>
+        <Outcomes/>
+        <FeaturedCourses onNav={onNav}/>
+        <InstructorSpotlight onNav={onNav}/>
+        <Testimonials/>
+        <Manifesto/>
+        <FAQ/>
+        <CTABand onNav={onNav}/>
+      </>
+    );
+  } else if (route === "/cursos") {
+    screen = <CoursesCatalog onNav={onNav}/>;
+  } else if (route.startsWith("/cursos/")) {
+    screen = <CourseDetail slug={route.replace("/cursos/","")} onNav={onNav}/>;
+  } else if (route === "/dashboard") {
+    screen = <Dashboard onNav={onNav}/>;
+  } else {
+    screen = (
+      <div style={{ padding:"120px 16px", textAlign:"center" }}>
+        <Eyebrow>Em construção</Eyebrow>
+        <h1 style={{ fontSize:36, fontWeight:700, letterSpacing:"-0.02em" }}>{route}</h1>
+        <p style={{ color:"#525252" }}>Esta tela faz parte do site real, mas não está no kit.</p>
+        <PrimaryBtn onClick={()=>onNav("/")}>Voltar ao início</PrimaryBtn>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <Navbar route={route} onNav={onNav} user={user}/>
+      <main>{screen}</main>
+      <Footer onNav={onNav}/>
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

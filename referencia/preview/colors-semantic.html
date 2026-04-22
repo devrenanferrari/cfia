@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Colors — Semantic</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 24px; background: #fff; font-family: var(--font-sans); color: var(--fg); }
+  .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #e0e0e0; border: 1px solid #e0e0e0; }
+  .sw { padding: 16px; display: flex; flex-direction: column; gap: 10px; min-height: 130px; background: #fff; }
+  .chip { width: 36px; height: 36px; }
+  .name { font-weight: 600; font-size: 13px; color: #161616; }
+  .hex { font-family: var(--font-mono); font-size: 11px; color: #6f6f6f; }
+  .use { font-size: 12px; color: #525252; margin-top: auto; }
+  .label { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: #6f6f6f; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+  <div class="label">Semantic — Status</div>
+  <div class="row">
+    <div class="sw"><div class="chip" style="background:#24a148"></div><div class="name">Success</div><div class="hex">#24a148</div><div class="use">Grátis tag, confirmations</div></div>
+    <div class="sw"><div class="chip" style="background:#f1c21b"></div><div class="name">Warning</div><div class="hex">#f1c21b</div><div class="use">Star ratings, alerts</div></div>
+    <div class="sw"><div class="chip" style="background:#da1e28"></div><div class="name">Error</div><div class="hex">#da1e28</div><div class="use">Destructive, validation</div></div>
+    <div class="sw"><div class="chip" style="background:#0f62fe"></div><div class="name">Info</div><div class="hex">#0f62fe</div><div class="use">Links, CTAs, focus</div></div>
+  </div>
+</body>
+</html>

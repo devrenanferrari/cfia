@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Components — Inputs</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 24px; background: #fff; font-family: var(--font-sans); color: #161616; }
+  .grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 18px 24px; }
+  .field { display: flex; flex-direction: column; gap: 6px;}
+  label { font-size: 12px; font-weight: 600; color: #525252;}
+  .helper { font-size: 11px; color: #6f6f6f;}
+  .input { background: #f4f4f4; border: none; border-bottom: 1px solid #8d8d8d; padding: 10px 12px; font-family: inherit; font-size: 14px; outline: none; color:#161616;}
+  .input:focus { border-bottom: 2px solid #0f62fe; outline: 2px solid #0f62fe; outline-offset: -2px;}
+  .input.focused { border-bottom: 2px solid #0f62fe; outline: 2px solid #0f62fe; outline-offset: -2px;}
+  .input.error { border-bottom: 2px solid #da1e28;}
+  .err { font-size:11px; color:#da1e28;}
+  .checkbox { display:inline-flex; align-items:center; gap:8px; font-size:14px;}
+  .cb { width:18px;height:18px;border:1px solid #8d8d8d;display:inline-flex;align-items:center;justify-content:center;background:#fff;}
+  .cb.checked { background:#0f62fe;border-color:#0f62fe;color:#fff;}
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="field"><label>Email · resting</label><input class="input" placeholder="seu@email.com" /></div>
+    <div class="field"><label>Email · focused</label><input class="input focused" value="renan@cfia.com.br" /></div>
+    <div class="field"><label>Senha · error</label><input class="input error" type="password" value="12345" /><span class="err">Mínimo 8 caracteres</span></div>
+    <div class="field"><label>Filled</label><input class="input" value="Machine Learning" /><span class="helper">Digite para filtrar cursos</span></div>
+    <div class="field"><label>Checkboxes</label>
+      <div style="display:flex;gap:16px;margin-top:4px">
+        <span class="checkbox"><span class="cb checked">✓</span>Iniciante</span>
+        <span class="checkbox"><span class="cb"></span>Intermediário</span>
+        <span class="checkbox"><span class="cb"></span>Avançado</span>
+      </div>
+    </div>
+    <div class="field"><label>Select</label><div style="position:relative"><input class="input" value="Mais populares" style="padding-right:28px;width:calc(100% - 24px)"/><span style="position:absolute;right:10px;top:10px;color:#525252">▾</span></div></div>
+  </div>
+</body>
+</html>

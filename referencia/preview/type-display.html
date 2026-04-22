@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Type — Display</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 24px 28px; background: #fff; font-family: var(--font-sans); color: #161616; }
+  .row { display: flex; align-items: baseline; gap: 16px; padding: 10px 0; border-bottom: 1px solid #e0e0e0; }
+  .row:last-child { border-bottom: none; }
+  .meta { font-family: var(--font-mono); font-size: 11px; color: #8d8d8d; width: 160px; flex-shrink: 0; }
+  .sample { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+</style>
+</head>
+<body>
+  <div class="row"><div class="meta">H1 · 52 / 700 / -0.02em</div><div class="sample" style="font-size:52px;font-weight:700;letter-spacing:-0.02em;line-height:1.1">Torne-se profissional de IA</div></div>
+  <div class="row"><div class="meta">H2 · 36 / 700 / -0.02em</div><div class="sample" style="font-size:36px;font-weight:700;letter-spacing:-0.02em">Um caminho claro</div></div>
+  <div class="row"><div class="meta">H3 · 24 / 600</div><div class="sample" style="font-size:24px;font-weight:600">Trilhas de carreira</div></div>
+  <div class="row"><div class="meta">H4 · 20 / 600</div><div class="sample" style="font-size:20px;font-weight:600">Engenheiro de IA</div></div>
+</body>
+</html>

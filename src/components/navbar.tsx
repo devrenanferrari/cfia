@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   BookOpen,
-  GraduationCap,
   LayoutDashboard,
   LogOut,
   User,
@@ -241,24 +240,20 @@ export function Navbar() {
               </>
             ) : (
               <>
-                <Button
-                  variant="ghost"
-                  className="hidden sm:flex text-sm font-medium h-9 rounded-lg"
-                  style={{ color: "#4b5563" }}
-                  asChild
+                <button
+                  className="hidden sm:flex h-12 px-4 items-center text-sm font-medium transition-colors"
+                  style={{ color: "#c6c6c6", background: "transparent", border: "none", cursor: "pointer" }}
+                  onClick={() => window.location.href = "/entrar"}
                 >
-                  <Link href="/entrar">Entrar</Link>
-                </Button>
-                <Button
-                  className="rounded-lg px-5 font-semibold text-sm h-9"
-                  style={{
-                    background: "linear-gradient(135deg, #0052ff 0%, #1a6bff 100%)",
-                    boxShadow: "0 2px 8px rgba(0,82,255,0.3)",
-                  }}
-                  asChild
+                  Entrar
+                </button>
+                <Link
+                  href="/cadastro"
+                  className="hidden sm:flex h-8 px-4 items-center font-semibold text-xs transition-colors hover:bg-white hover:text-[#0f62fe]"
+                  style={{ background: "#0f62fe", color: "#fff" }}
                 >
-                  <Link href="/cadastro">Começar grátis</Link>
-                </Button>
+                  Começar grátis
+                </Link>
               </>
             )}
           </div>

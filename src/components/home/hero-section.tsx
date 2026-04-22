@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 const STUDENT_AVATARS = [
   "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&q=80",
@@ -9,120 +9,249 @@ const STUDENT_AVATARS = [
   "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=48&h=48&fit=crop&q=80",
 ];
 
+const NEURAL_COLS = 5;
+const NEURAL_ROWS = 7;
+
 export function HeroSection() {
   return (
-    <section
-      className="relative overflow-hidden pt-28 pb-24 px-4 md:px-8"
-      style={{ background: "linear-gradient(140deg, #ffffff 0%, #edf5ff 60%, #f0f4ff 100%)" }}
-    >
-      <div className="mx-auto max-w-7xl">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+    <section className="relative overflow-hidden" style={{ background: "#161616", color: "#fff" }}>
+      {/* Subtle 64px grid pattern */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
+          backgroundSize: "64px 64px",
+        }}
+      />
 
-          {/* ── Left column ── */}
-          <div>
+      <div className="relative mx-auto" style={{ maxWidth: 1440 }}>
+        <div className="grid lg:grid-cols-[1.15fr_1fr]" style={{ borderBottom: "1px solid #393939" }}>
+
+          {/* LEFT: editorial slab */}
+          <div className="px-4 py-20 md:px-16 md:py-24 lg:px-16 lg:py-28" style={{ borderRight: "1px solid #393939" }}>
+            {/* Eyebrow */}
             <div
-              className="inline-flex items-center gap-2 px-4 py-2 mb-7 text-sm font-medium"
-              style={{ backgroundColor: "#edf5ff", color: "#0043ce", border: "1px solid #a6c8ff" }}
+              className="flex flex-wrap items-center gap-3 mb-10 text-xs uppercase"
+              style={{ fontFamily: "var(--font-mono)", color: "#c6c6c6", letterSpacing: "0.14em" }}
             >
-              <span className="h-2 w-2 rounded-full bg-[#0f62fe]" />
-              Plataforma #1 de carreiras em IA do Brasil
+              <span>CFIA</span>
+              <span className="w-6 h-px flex-shrink-0" style={{ background: "#525252" }} />
+              <span>Centro de Formação em IA</span>
+              <span className="hidden sm:block w-6 h-px flex-shrink-0" style={{ background: "#525252" }} />
+              <span className="hidden sm:block">Est. 2024</span>
             </div>
 
+            {/* H1 — IBM Plex Serif 300, italic accent word */}
             <h1
-              className="text-4xl md:text-5xl lg:text-[3.25rem] font-bold leading-[1.1] mb-6"
-              style={{ color: "#161616", letterSpacing: "-0.02em" }}
+              className="mb-7"
+              style={{
+                fontFamily: "var(--font-serif), Georgia, serif",
+                fontWeight: 300,
+                fontSize: "clamp(2.8rem, 6vw, 5.5rem)",
+                letterSpacing: "-0.03em",
+                lineHeight: 0.98,
+                color: "#fff",
+              }}
             >
-              Torne-se um profissional de{" "}
-              <span style={{ color: "#0f62fe" }}>Inteligência Artificial</span>{" "}
-              e mude sua carreira
+              Uma nova<br />
+              geração de<br />
+              <em style={{ fontStyle: "italic", fontWeight: 400, color: "#4589ff" }}>profissionais</em><br />
+              de IA começa aqui.
             </h1>
 
-            <p className="text-xl leading-relaxed mb-8" style={{ color: "#525252" }}>
-              Aprenda do zero ao avançado, construa projetos reais e esteja pronto para trabalhar com IA no mercado.
+            {/* Subheadline */}
+            <p className="text-lg leading-relaxed mb-10 max-w-xl" style={{ color: "#c6c6c6" }}>
+              Trilhas estruturadas, projetos reais e mentoria de quem constrói IA no mercado. Do primeiro modelo ao deploy em produção.
             </p>
 
-            <ul className="space-y-3 mb-10">
-              {[
-                "Trilhas estruturadas para cada carreira em IA",
-                "Projetos reais para construir seu portfólio",
-                "Certificados reconhecidos pelo mercado",
-              ].map((item) => (
-                <li key={item} className="flex items-center gap-3 text-base" style={{ color: "#393939" }}>
-                  <CheckCircle2 className="h-5 w-5 shrink-0" style={{ color: "#0f62fe" }} />
-                  {item}
-                </li>
-              ))}
-            </ul>
-
-            <div className="flex flex-col sm:flex-row gap-4 mb-5">
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-12">
               <Link
                 href="/cadastro"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 font-semibold text-base text-white transition-all hover:bg-[#0353e9] active:scale-[0.98]"
-                style={{ backgroundColor: "#0f62fe" }}
+                className="inline-flex items-center justify-center gap-3 px-7 py-4 font-semibold text-sm transition-colors hover:bg-[#f4f4f4] active:scale-[0.98]"
+                style={{ background: "#fff", color: "#161616" }}
               >
-                Começar gratuitamente
-                <ArrowRight className="h-5 w-5" />
+                Começar gratuitamente <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href="/cursos"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 font-semibold text-base border transition-all hover:bg-[#f4f4f4]"
-                style={{ color: "#161616", borderColor: "#c6c6c6", backgroundColor: "#ffffff" }}
+                className="inline-flex items-center justify-center gap-3 px-7 py-4 font-semibold text-sm transition-colors"
+                style={{ background: "transparent", color: "#fff", border: "1px solid #525252" }}
               >
-                Ver trilhas de carreira
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M10 8l6 4-6 4z" fill="currentColor" />
+                </svg>
+                Ver trilhas · 2 min
               </Link>
             </div>
 
-            <p className="text-sm" style={{ color: "#8d8d8d" }}>
-              Sem cartão&nbsp;•&nbsp;Acesso imediato&nbsp;•&nbsp;Certificado incluso
-            </p>
+            {/* Mini stats strip */}
+            <div className="grid grid-cols-3 pt-7 max-w-sm" style={{ borderTop: "1px solid #393939" }}>
+              {[
+                ["12.400+", "Alunos ativos"],
+                ["97%", "Taxa de conclusão"],
+                ["4,9★", "Avaliação média"],
+              ].map(([value, label], i) => (
+                <div
+                  key={label}
+                  className="pl-5 first:pl-0"
+                  style={{ borderLeft: i > 0 ? "1px solid #393939" : "none" }}
+                >
+                  <div
+                    className="text-3xl mb-1"
+                    style={{
+                      fontFamily: "var(--font-serif), Georgia, serif",
+                      fontWeight: 400,
+                      letterSpacing: "-0.02em",
+                      color: "#fff",
+                    }}
+                  >
+                    {value}
+                  </div>
+                  <div
+                    className="text-xs uppercase mt-1"
+                    style={{ fontFamily: "var(--font-mono)", color: "#8d8d8d", letterSpacing: "0.08em" }}
+                  >
+                    {label}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* ── Right column — Photo + floating badges ── */}
-          <div className="relative hidden lg:block">
-            {/* Badges ficam fora da foto — não sobrepõem o rosto */}
-            <div className="relative w-full" style={{ height: 580 }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/tender-feminine-young-female-student-curly-hairstyle-pointing-left-index-finger-smiling-friendly-asking-which-place-dorm-standing-cheerful-white-wall.jpg"
-                alt="Profissional de IA"
-                className="w-full h-full object-cover"
-                style={{ objectPosition: "center top", boxShadow: "0 24px 64px rgba(15, 98, 254, 0.12)" }}
-              />
-
-              {/* Badge: IA — canto superior, fora da área do rosto */}
-              <div
-                className="absolute top-6 -left-16 bg-white px-4 py-3 flex items-center gap-2.5"
-                style={{ border: "1px solid #e0e0e0", boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}
+          {/* RIGHT: visual panel — desktop only */}
+          <div className="relative hidden lg:block" style={{ minHeight: 700 }}>
+            {/* Blue gradient panel */}
+            <div
+              className="absolute overflow-hidden"
+              style={{
+                inset: "40px 40px 40px 0",
+                background: "linear-gradient(165deg, #0f62fe 0%, #002d9c 50%, #001141 100%)",
+              }}
+            >
+              {/* Neural network SVG */}
+              <svg
+                viewBox="0 0 500 700"
+                width="100%"
+                height="100%"
+                className="absolute inset-0"
+                style={{ opacity: 0.35 }}
+                aria-hidden="true"
               >
-                <span className="text-xl">🤖</span>
-                <span className="font-semibold text-sm" style={{ color: "#161616" }}>Inteligência Artificial</span>
+                {Array.from({ length: NEURAL_COLS }).map((_, col) =>
+                  Array.from({ length: NEURAL_ROWS }).map((_, row) => (
+                    <circle
+                      key={`c-${col}-${row}`}
+                      cx={60 + col * 95}
+                      cy={60 + row * 95}
+                      r="3"
+                      fill="#a6c8ff"
+                    />
+                  ))
+                )}
+                {Array.from({ length: NEURAL_COLS - 1 }).map((_, col) =>
+                  Array.from({ length: NEURAL_ROWS }).flatMap((_, r1) =>
+                    Array.from({ length: NEURAL_ROWS }).map((_, r2) => (
+                      <line
+                        key={`l-${col}-${r1}-${r2}`}
+                        x1={60 + col * 95}
+                        y1={60 + r1 * 95}
+                        x2={60 + (col + 1) * 95}
+                        y2={60 + r2 * 95}
+                        stroke="#a6c8ff"
+                        strokeWidth="0.4"
+                        opacity={((r1 * r2 + col) % 5 === 0) ? 0.6 : 0.1}
+                      />
+                    ))
+                  )
+                )}
+              </svg>
+
+              {/* Training log ticker */}
+              <div
+                className="absolute bottom-8 left-8 right-8 text-xs"
+                style={{ fontFamily: "var(--font-mono)", color: "rgba(255,255,255,0.7)", letterSpacing: "0.12em" }}
+              >
+                <div className="flex justify-between mb-2 uppercase">
+                  <span>LATEST · PROJECT_RUN_OUTPUT</span>
+                  <span style={{ color: "#24a148" }}>● TRAINING</span>
+                </div>
+                <div
+                  className="p-4 leading-loose"
+                  style={{ background: "rgba(0,0,0,0.35)", border: "1px solid rgba(255,255,255,0.1)" }}
+                >
+                  <div>epoch 12/30 · loss 0.142 · val_acc 0.913</div>
+                  <div>epoch 13/30 · loss 0.128 · val_acc 0.924</div>
+                  <div>
+                    epoch 14/30 · loss 0.117 · val_acc{" "}
+                    <span style={{ color: "#f1c21b" }}>0.937</span>
+                  </div>
+                </div>
               </div>
+            </div>
 
-              {/* Badge: Carreira — lado direito, meio */}
+            {/* Floating course preview card */}
+            <div
+              className="absolute top-20 right-8 w-72 p-5 bg-white"
+              style={{ color: "#161616", boxShadow: "0 24px 48px rgba(0,0,0,0.4)" }}
+            >
               <div
-                className="absolute top-40 -right-14 bg-white px-4 py-3 flex items-center gap-2.5"
-                style={{ border: "1px solid #e0e0e0", boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}
+                className="text-xs uppercase tracking-widest mb-2.5"
+                style={{ fontFamily: "var(--font-mono)", color: "#0f62fe", letterSpacing: "0.12em" }}
               >
-                <span className="text-xl">🚀</span>
-                <span className="font-semibold text-sm" style={{ color: "#161616" }}>Nova carreira</span>
+                CURSO EM DESTAQUE
               </div>
-
-              {/* Badge: Certificado — inferior esquerdo */}
-              <div
-                className="absolute bottom-28 -left-14 bg-white px-4 py-3 flex items-center gap-2.5"
-                style={{ border: "1px solid #e0e0e0", boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}
-              >
-                <span className="text-xl">🎓</span>
-                <span className="font-semibold text-sm" style={{ color: "#161616" }}>Certificado</span>
+              <div className="text-base font-semibold leading-snug mb-3">
+                Construindo agentes com LLMs em produção
               </div>
-
-              {/* Badge: Projetos — inferior direito */}
+              <div className="flex items-center gap-2.5 text-sm mb-4" style={{ color: "#525252" }}>
+                <div
+                  className="w-7 h-7 rounded-full flex-shrink-0"
+                  style={{ background: "linear-gradient(135deg,#f4d3b3,#c89474)" }}
+                />
+                Camila Tavares · IBM
+              </div>
               <div
-                className="absolute -bottom-5 right-10 bg-white px-4 py-3 flex items-center gap-2.5"
-                style={{ border: "1px solid #e0e0e0", boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}
+                className="flex justify-between items-center pt-3 text-xs"
+                style={{ borderTop: "1px solid #e0e0e0", color: "#525252" }}
               >
-                <span className="text-xl">💼</span>
-                <span className="font-semibold text-sm" style={{ color: "#161616" }}>Projetos reais</span>
+                <span>8 semanas · Avançado</span>
+                <span className="font-semibold">⭐ 4,9 (487)</span>
+              </div>
+            </div>
+
+            {/* Floating metric tile */}
+            <div
+              className="absolute w-44 bg-white p-5"
+              style={{ bottom: 168, right: 0, color: "#161616", boxShadow: "0 16px 32px rgba(0,0,0,0.2)" }}
+            >
+              <div
+                className="text-xs uppercase mb-2"
+                style={{ fontFamily: "var(--font-mono)", color: "#525252", letterSpacing: "0.12em" }}
+              >
+                Conclusão
+              </div>
+              <div
+                style={{
+                  fontFamily: "var(--font-serif), Georgia, serif",
+                  fontWeight: 400,
+                  fontSize: "3rem",
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1,
+                }}
+              >
+                97<span style={{ color: "#0f62fe" }}>%</span>
+              </div>
+              <div className="flex gap-0.5 mt-3">
+                {Array.from({ length: 20 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex-1 h-5"
+                    style={{ background: i < 19 ? "#0f62fe" : "#e0e0e0" }}
+                  />
+                ))}
               </div>
             </div>
           </div>
@@ -134,17 +263,13 @@ export function HeroSection() {
 }
 
 export function SocialProofBar() {
-  return (
-    <div
-      className="py-10 px-4 md:px-8 border-y"
-      style={{ backgroundColor: "#f4f4f4", borderColor: "#e0e0e0" }}
-    >
-      <div className="mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between gap-8">
+  const companies = ["Google", "IBM", "Microsoft", "Amazon", "Nubank", "iFood", "Stone", "Mercado Livre"];
 
-        <div>
-          <p className="text-sm mb-4" style={{ color: "#8d8d8d" }}>
-            Junte-se a milhares de alunos construindo carreira em tecnologia
-          </p>
+  return (
+    <section style={{ background: "#fff", borderBottom: "1px solid #e0e0e0" }}>
+      <div className="mx-auto max-w-7xl px-4 md:px-8 py-12">
+        {/* Avatar row */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-10">
           <div className="flex items-center gap-4">
             <div className="flex -space-x-3">
               {STUDENT_AVATARS.map((src, i) => (
@@ -163,53 +288,35 @@ export function SocialProofBar() {
               <div className="text-sm" style={{ color: "#525252" }}>já estão aprendendo IA</div>
             </div>
           </div>
-        </div>
-
-        <div>
           <p
-            className="text-xs font-semibold mb-3"
-            style={{ color: "#8d8d8d", textTransform: "uppercase", letterSpacing: "0.1em" }}
+            className="text-xs uppercase"
+            style={{ fontFamily: "var(--font-mono)", color: "#8d8d8d", letterSpacing: "0.14em" }}
           >
-            Alunos trabalhando em empresas como
+            Nossos alunos trabalham em empresas como
           </p>
-          <div className="flex flex-wrap gap-6 items-center">
-            {["Google", "IBM", "Amazon", "Nubank", "iFood"].map((company) => (
-              <span key={company} className="font-bold text-base" style={{ color: "#c6c6c6" }}>
-                {company}
-              </span>
-            ))}
-          </div>
         </div>
 
-      </div>
-    </div>
-  );
-}
-
-export function StatsBar() {
-  const stats = [
-    { value: "+12.000", label: "Alunos ativos" },
-    { value: "97%",     label: "Taxa de conclusão" },
-    { value: "+40",     label: "Cursos disponíveis" },
-    { value: "4.9★",   label: "Avaliação média" },
-  ];
-
-  return (
-    <div className="bg-white border-b" style={{ borderColor: "#e0e0e0" }}>
-      <div className="mx-auto max-w-7xl px-4 md:px-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4">
-          {stats.map(({ value, label }, i) => (
+        {/* Company wordmarks — hairline grid */}
+        <div
+          className="grid grid-cols-4 md:grid-cols-8"
+          style={{ gap: 1, background: "#e0e0e0", border: "1px solid #e0e0e0" }}
+        >
+          {companies.map((name) => (
             <div
-              key={label}
-              className="py-10 px-6 text-center"
-              style={{ borderRight: i < 3 ? "1px solid #e0e0e0" : "none" }}
+              key={name}
+              className="flex items-center justify-center bg-white"
+              style={{ padding: "20px 12px" }}
             >
-              <div className="text-3xl font-bold mb-1" style={{ color: "#0f62fe" }}>{value}</div>
-              <div className="text-sm" style={{ color: "#525252" }}>{label}</div>
+              <span
+                className="text-base font-bold whitespace-nowrap"
+                style={{ color: "#c6c6c6" }}
+              >
+                {name}
+              </span>
             </div>
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 }
