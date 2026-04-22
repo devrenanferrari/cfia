@@ -4,10 +4,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { BookOpen, ArrowRight } from "lucide-react";
+import { BookOpen, ArrowRight, CheckCircle2, Play } from "lucide-react";
 
 async function getEnrollments(userId: string) {
   const enrollments = await prisma.enrollment.findMany({
@@ -40,6 +38,38 @@ async function getEnrollments(userId: string) {
   );
 }
 
+function StatusLabel({ percentage }: { percentage: number }) {
+  if (percentage === 100) {
+    return (
+      <span
+        className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold"
+        style={{ backgroundColor: "#defbe6", color: "#198038" }}
+      >
+        <CheckCircle2 className="h-3 w-3" />
+        Concluído
+      </span>
+    );
+  }
+  if (percentage > 0) {
+    return (
+      <span
+        className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold"
+        style={{ backgroundColor: "#edf5ff", color: "#0043ce" }}
+      >
+        Em progresso
+      </span>
+    );
+  }
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold"
+      style={{ backgroundColor: "#f4f4f4", color: "#525252" }}
+    >
+      Não iniciado
+    </span>
+  );
+}
+
 export default async function MeusCursosPage() {
   const session = await getServerSession(authOptions);
   if (!session) return null;
@@ -47,73 +77,116 @@ export default async function MeusCursosPage() {
   const enrollments = await getEnrollments(session.user.id);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Meus cursos</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          {enrollments.length} curso{enrollments.length !== 1 ? "s" : ""} matriculado{enrollments.length !== 1 ? "s" : ""}
+    <div>
+      {/* Header */}
+      <div className="p-6 md:p-8 bg-white border border-[#e0e0e0] mb-px">
+        <h1
+          className="text-3xl font-light mb-1"
+          style={{ color: "#161616", letterSpacing: "-0.01em" }}
+        >
+          Meus cursos
+        </h1>
+        <p
+          className="text-xs uppercase"
+          style={{ fontFamily: "var(--font-mono)", color: "#8d8d8d", letterSpacing: "0.14em" }}
+        >
+          {enrollments.length} matrícula{enrollments.length !== 1 ? "s" : ""}
         </p>
       </div>
 
       {enrollments.length === 0 ? (
-        <div className="text-center py-20 border rounded-2xl bg-white">
-          <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground/30" />
-          <h2 className="font-semibold mb-2">Você ainda não tem cursos</h2>
-          <p className="text-muted-foreground text-sm mb-6">Explore o catálogo e comece a aprender.</p>
-          <Button style={{ backgroundColor: "#0052ff" }} className="rounded-[56px] px-8" asChild>
-            <Link href="/cursos">Explorar cursos</Link>
-          </Button>
+        <div className="text-center py-20 border border-[#e0e0e0] bg-white">
+          <div
+            className="h-14 w-14 flex items-center justify-center mx-auto mb-5"
+            style={{ backgroundColor: "#f4f4f4" }}
+          >
+            <BookOpen className="h-7 w-7" style={{ color: "#8d8d8d" }} />
+          </div>
+          <h2 className="font-semibold text-lg mb-2" style={{ color: "#161616" }}>
+            Nenhum curso ainda
+          </h2>
+          <p className="text-sm mb-8 max-w-xs mx-auto" style={{ color: "#525252", lineHeight: 1.6 }}>
+            Explore o catálogo e escolha um curso para começar agora mesmo.
+          </p>
+          <Link
+            href="/cursos"
+            className="inline-flex items-center gap-2 px-6 py-3 font-semibold text-sm text-white transition-colors hover:bg-[#0353e9]"
+            style={{ backgroundColor: "#0f62fe" }}
+          >
+            Explorar cursos <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       ) : (
-        <div className="space-y-4">
-          {enrollments.map((e) => (
-            <div key={e.id} className="bg-white border rounded-2xl p-6 flex items-center gap-6">
-              {/* Thumbnail placeholder */}
+        <div className="flex flex-col gap-px bg-[#e0e0e0] border border-[#e0e0e0] border-t-0">
+          {enrollments.map((e) => {
+            const ctaLabel = e.percentage === 0 ? "Começar" : e.percentage === 100 ? "Rever" : "Continuar";
+            return (
               <div
-                className="h-16 w-24 rounded-xl flex-shrink-0 flex items-center justify-center"
-                style={{ backgroundColor: "#0052ff10" }}
+                key={e.id}
+                className="bg-white p-5 md:p-6 flex items-center gap-5 hover:bg-[#f4f4f4] transition-colors group"
               >
-                {e.course.thumbnail ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={e.course.thumbnail} alt={e.course.title} className="h-full w-full object-cover rounded-xl" />
-                ) : (
-                  <BookOpen className="h-6 w-6" style={{ color: "#0052ff55" }} />
-                )}
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-semibold line-clamp-1">{e.course.title}</h3>
-                  {e.percentage === 100 && (
-                    <Badge className="text-xs" style={{ backgroundColor: "#05966920", color: "#059669", border: "none" }}>
-                      Concluído
-                    </Badge>
+                {/* Thumbnail */}
+                <div
+                  className="h-16 w-24 flex-shrink-0 flex items-center justify-center"
+                  style={{ backgroundColor: "#f4f4f4", border: "1px solid #e0e0e0" }}
+                >
+                  {e.course.thumbnail ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={e.course.thumbnail}
+                      alt={e.course.title}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <BookOpen className="h-6 w-6" style={{ color: "#8d8d8d" }} />
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground mb-3">
-                  {e.course.instructor.name} {e.course.category ? `· ${e.course.category.name}` : ""}
-                </p>
-                <div className="flex items-center gap-3">
-                  <Progress value={e.percentage} className="flex-1 h-1.5" />
-                  <span className="text-xs text-muted-foreground whitespace-nowrap">
-                    {e.completedLessons}/{e.totalLessons} aulas ({e.percentage}%)
-                  </span>
-                </div>
-              </div>
 
-              <Button
-                size="sm"
-                className="rounded-[56px] px-5 shrink-0"
-                style={{ backgroundColor: "#0052ff" }}
-                asChild
-              >
-                <Link href={`/dashboard/cursos/${e.course.slug}`}>
-                  {e.percentage === 0 ? "Começar" : e.percentage === 100 ? "Rever" : "Continuar"}
-                  <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <h3 className="font-semibold text-sm line-clamp-1" style={{ color: "#161616" }}>
+                      {e.course.title}
+                    </h3>
+                    <StatusLabel percentage={e.percentage} />
+                  </div>
+                  <p className="text-xs mb-3" style={{ color: "#525252" }}>
+                    {e.course.instructor.name}
+                    {e.course.category ? ` · ${e.course.category.name}` : ""}
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <Progress
+                      value={e.percentage}
+                      className="flex-1 h-1.5 rounded-none bg-[#e0e0e0] [&>div]:bg-[#0f62fe] [&>div]:rounded-none"
+                    />
+                    <span
+                      className="text-xs whitespace-nowrap"
+                      style={{ fontFamily: "var(--font-mono)", color: "#525252" }}
+                    >
+                      {e.completedLessons}/{e.totalLessons}
+                    </span>
+                  </div>
+                </div>
+
+                {/* CTA */}
+                <Link
+                  href={`/dashboard/cursos/${e.course.slug}`}
+                  className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 font-semibold text-xs text-white transition-colors hover:bg-[#0353e9] flex-shrink-0"
+                  style={{ backgroundColor: "#0f62fe" }}
+                >
+                  {e.percentage > 0 && e.percentage < 100 && <Play className="h-3.5 w-3.5" />}
+                  {ctaLabel}
                 </Link>
-              </Button>
-            </div>
-          ))}
+                <Link
+                  href={`/dashboard/cursos/${e.course.slug}`}
+                  className="sm:hidden flex-shrink-0 transition-colors"
+                  style={{ color: "#0f62fe" }}
+                >
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

@@ -4,15 +4,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
   BookOpen, Award, TrendingUp, ArrowRight,
-  Zap, CheckCircle2, Lock, Play, BarChart3, Sparkles,
+  CheckCircle2, Play,
 } from "lucide-react";
 
 async function getStudentData(userId: string) {
-  const [enrollments, certificates, featuredCourses] = await Promise.all([
+  const [enrollments, certificates] = await Promise.all([
     prisma.enrollment.findMany({
       where: { userId },
       include: {
@@ -26,16 +25,6 @@ async function getStudentData(userId: string) {
       orderBy: { enrolledAt: "desc" },
     }),
     prisma.certificate.count({ where: { userId } }),
-    prisma.course.findMany({
-      where: { isPublished: true },
-      take: 6,
-      orderBy: { createdAt: "desc" },
-      include: {
-        instructor: { select: { name: true } },
-        category: { select: { name: true } },
-        _count: { select: { enrollments: true } },
-      },
-    }),
   ]);
 
   const progressData = await Promise.all(
@@ -56,235 +45,164 @@ async function getStudentData(userId: string) {
   const inProgress = progressData.filter((p) => p.percentage > 0 && p.percentage < 100).length;
   const completed = progressData.filter((p) => p.percentage === 100).length;
 
-  return { progressData, certificates, totalEnrollments: enrollments.length, inProgress, completed, featuredCourses };
+  return { progressData, certificates, totalEnrollments: enrollments.length, inProgress, completed };
 }
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session) return null;
 
-  const { progressData, certificates, totalEnrollments, inProgress, completed, featuredCourses } =
+  const { progressData, certificates, totalEnrollments, inProgress, completed } =
     await getStudentData(session.user.id);
   const firstName = session.user.name?.split(" ")[0] ?? "aluno";
   const isSubscribed = session.user.subscriptionStatus === "ACTIVE";
 
-  const statCards = [
-    { label: "Matrículas", value: totalEnrollments, icon: BookOpen },
-    { label: "Em progresso", value: inProgress, icon: TrendingUp },
-    { label: "Concluídos", value: completed, icon: CheckCircle2 },
-    { label: "Certificados", value: certificates, icon: Award },
-  ];
+  const inProgressCourses = progressData.filter((p) => p.percentage > 0 && p.percentage < 100).slice(0, 4);
+  const notStarted = progressData.filter((p) => p.percentage === 0).slice(0, 4);
+  const continueCourses = inProgressCourses.length > 0 ? inProgressCourses : notStarted;
 
-  // ─── ALUNO ASSINANTE ───────────────────────────────────────────────────────
-  if (isSubscribed) {
-    const inProgressCourses = progressData.filter((p) => p.percentage > 0 && p.percentage < 100).slice(0, 3);
-    const notStarted = progressData.filter((p) => p.percentage === 0).slice(0, 3);
-    const continueCourses = inProgressCourses.length > 0 ? inProgressCourses : notStarted;
-
-    return (
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-light tracking-tight" style={{ color: "var(--cds-text-primary)" }}>
-              Olá, {firstName}
-            </h1>
-            <p className="text-sm mt-1" style={{ color: "var(--cds-text-secondary)" }}>
-              Seu acesso está ativo. O que vamos aprender hoje?
-            </p>
-          </div>
-          <span
-            className="hidden sm:flex items-center gap-2 text-xs font-semibold px-4 py-2"
-            style={{ backgroundColor: "var(--cds-support-success)", color: "#ffffff" }}
-          >
-            <CheckCircle2 className="h-4 w-4" />
-            Assinante ativo
-          </span>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-[1px] bg-[var(--cds-border-subtle)] border border-[var(--cds-border-subtle)]">
-          {statCards.map(({ label, value, icon: Icon }) => (
-            <div
-              key={label}
-              className="bg-white p-6"
-            >
-              <div className="flex flex-col gap-4">
-                <Icon className="h-6 w-6" style={{ color: "var(--cds-text-secondary)" }} />
-                <div>
-                  <div className="text-4xl font-light tracking-tight" style={{ color: "var(--cds-text-primary)", letterSpacing: "0" }}>{value}</div>
-                  <div className="text-sm mt-1" style={{ color: "var(--cds-text-secondary)" }}>{label}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Continue learning */}
-        <div className="border border-[var(--cds-border-subtle)] p-6 bg-white mt-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="font-semibold text-lg" style={{ color: "var(--cds-text-primary)" }}>Continue aprendendo</h2>
-            <Link 
-              href="/dashboard/cursos"
-              className="text-sm font-semibold flex items-center transition-colors hover:underline"
-              style={{ color: "var(--cds-interactive)" }}
-            >
-              Ver todos <ArrowRight className="ml-1 h-4 w-4" />
-            </Link>
-          </div>
-
-          {progressData.length === 0 ? (
-            <div
-              className="text-center py-16"
-              style={{ backgroundColor: "var(--cds-layer-01)" }}
-            >
-              <div className="h-12 w-12 flex items-center justify-center mx-auto mb-4 bg-white border border-[var(--cds-border-subtle)]">
-                <BookOpen className="h-6 w-6" style={{ color: "var(--cds-text-secondary)" }} />
-              </div>
-              <h3 className="font-semibold mb-1" style={{ color: "var(--cds-text-primary)" }}>Nenhum curso em andamento</h3>
-              <p className="text-sm px-4 max-w-sm mx-auto" style={{ color: "var(--cds-text-secondary)", lineHeight: "1.5" }}>
-                Você ainda não começou nenhum curso. Explore o catálogo para iniciar sua jornada.
-              </p>
-              <Button
-                className="mt-6 rounded-none font-semibold px-6 h-12"
-                style={{ backgroundColor: "var(--cds-button-primary)", color: "#ffffff" }}
-                asChild
-              >
-                <Link href="/cursos">Explorar catálogo</Link>
-              </Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-[1px] bg-[var(--cds-border-subtle)] border border-[var(--cds-border-subtle)]">
-              {continueCourses.map(({ enrollment, percentage }) => (
-                <div
-                  key={enrollment.id}
-                  className="bg-white p-6 flex flex-col justify-between group transition-colors hover:bg-[var(--cds-layer-01)]"
-                >
-                  <div className="flex gap-4">
-                    <div
-                      className="h-16 w-24 flex items-center justify-center shrink-0 border border-[var(--cds-border-subtle)] bg-[var(--cds-layer-01)]"
-                    >
-                      {enrollment.course.thumbnail ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={enrollment.course.thumbnail}
-                          alt={enrollment.course.title}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <BookOpen className="h-6 w-6" style={{ color: "var(--cds-text-secondary)" }} />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-base line-clamp-1 mb-1" style={{ color: "var(--cds-text-primary)" }}>
-                        {enrollment.course.title}
-                      </p>
-                      <p className="text-sm mb-3" style={{ color: "var(--cds-text-secondary)" }}>
-                        {enrollment.course.instructor.name}
-                      </p>
-                      <div className="flex items-center gap-3">
-                        <Progress value={percentage} className="flex-1 h-2 rounded-none bg-[var(--cds-layer-02)] [&>div]:bg-[var(--cds-interactive)]" />
-                        <span className="text-xs font-mono tracking-widest uppercase" style={{ color: "var(--cds-text-primary)" }}>
-                          {percentage}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <Link 
-                    href={`/dashboard/cursos/${enrollment.course.slug}`}
-                    className="mt-6 flex justify-between items-center text-sm font-semibold transition-colors group-hover:underline"
-                    style={{ color: "var(--cds-interactive)" }}
-                  >
-                    {percentage === 0 ? "Começar aula" : "Continuar assistindo"} <Play className="h-4 w-4" />
-                  </Link>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // ─── ALUNO GRATUITO (NÃO ASSINANTE) ────────────────────────────────────────
   return (
-    <div className="space-y-8">
-      {/* Upgrade Banner (Carbon Style) */}
+    <div className="space-y-0">
+
+      {/* ── Header ──────────────────────────────────────────────── */}
       <div
-        className="p-8 md:p-10 flex flex-col md:flex-row md:items-center justify-between gap-6"
-        style={{
-          backgroundColor: "var(--cds-text-primary)",
-          color: "#ffffff"
-        }}
+        className="flex items-start justify-between p-6 md:p-8 bg-white border border-[#e0e0e0] mb-px"
       >
-        <div className="max-w-xl">
-          <div
-            className="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold uppercase tracking-widest mb-4"
-            style={{ backgroundColor: "rgba(255,255,255,0.15)", color: "#ffffff" }}
+        <div>
+          <p
+            className="text-xs uppercase mb-2"
+            style={{ fontFamily: "var(--font-mono)", color: "#8d8d8d", letterSpacing: "0.14em" }}
           >
-            Acesso Limitado
-          </div>
-          <h2 className="text-3xl font-light mb-3" style={{ letterSpacing: "0" }}>
-            Acesso Ilimitado ao Conhecimento
-          </h2>
-          <p style={{ color: "var(--cds-text-secondary)", lineHeight: "1.5" }}>
-            Desbloqueie todos os cursos de nível avançado, emita certificados válidos e alcance a excelência técnica.
+            {isSubscribed ? "Assinante" : "Plano gratuito"}
+          </p>
+          <h1
+            className="text-3xl font-light"
+            style={{ color: "#161616", letterSpacing: "-0.01em" }}
+          >
+            Olá, {firstName}
+          </h1>
+          <p className="text-sm mt-1" style={{ color: "#525252" }}>
+            {isSubscribed
+              ? "Seu acesso está ativo. O que vamos aprender hoje?"
+              : "Continue explorando cursos gratuitos."}
           </p>
         </div>
-        <Button
-          className="shrink-0 rounded-none h-12 px-6 font-semibold"
-          style={{ backgroundColor: "var(--cds-interactive)", color: "#ffffff" }}
-          asChild
+        {isSubscribed && (
+          <span
+            className="hidden sm:flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white"
+            style={{ backgroundColor: "#24a148" }}
+          >
+            <CheckCircle2 className="h-3.5 w-3.5" />
+            Assinante ativo
+          </span>
+        )}
+      </div>
+
+      {/* ── Stats grid ──────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-[#e0e0e0] border border-[#e0e0e0] border-t-0">
+        {[
+          { label: "Matrículas", value: totalEnrollments, icon: BookOpen },
+          { label: "Em progresso", value: inProgress, icon: TrendingUp },
+          { label: "Concluídos", value: completed, icon: CheckCircle2 },
+          { label: "Certificados", value: certificates, icon: Award },
+        ].map(({ label, value, icon: Icon }) => (
+          <div key={label} className="bg-white p-6 flex flex-col gap-4">
+            <Icon className="h-5 w-5" style={{ color: "#8d8d8d" }} />
+            <div>
+              <div
+                className="text-4xl font-light mb-1"
+                style={{
+                  fontFamily: "var(--font-serif), Georgia, serif",
+                  color: "#161616",
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                {value}
+              </div>
+              <div className="text-xs" style={{ color: "#525252" }}>{label}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Upgrade banner (free users) ─────────────────────────── */}
+      {!isSubscribed && (
+        <div
+          className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 p-8 mt-px border border-[#e0e0e0] border-t-0"
+          style={{ backgroundColor: "#161616" }}
         >
-          <Link href="/assinar">
-            Atualizar para Premium <ArrowRight className="ml-2 h-4 w-4" />
+          <div>
+            <p
+              className="text-xs uppercase mb-2"
+              style={{ fontFamily: "var(--font-mono)", color: "#4589ff", letterSpacing: "0.14em" }}
+            >
+              Acesso limitado
+            </p>
+            <h2
+              className="text-xl font-light text-white mb-2"
+              style={{ letterSpacing: "-0.01em" }}
+            >
+              Desbloqueie todos os cursos de IA
+            </h2>
+            <p className="text-sm" style={{ color: "#c6c6c6" }}>
+              Certificados válidos, trilhas completas e mentoria semanal.
+            </p>
+          </div>
+          <Link
+            href="/assinar"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 font-semibold text-sm whitespace-nowrap transition-colors hover:bg-[#f4f4f4] active:scale-[0.98] flex-shrink-0"
+            style={{ backgroundColor: "#fff", color: "#0f62fe" }}
+          >
+            Assinar agora <ArrowRight className="h-4 w-4" />
           </Link>
-        </Button>
-      </div>
-
-      <div className="flex items-start justify-between mt-2">
-        <div>
-          <h1 className="text-3xl font-light tracking-tight" style={{ color: "var(--cds-text-primary)" }}>
-            Painel do aluno
-          </h1>
         </div>
-      </div>
+      )}
 
-      {/* Progress / My Courses Grid */}
-      <div>
-        <h2 className="font-semibold text-lg mb-6" style={{ color: "var(--cds-text-primary)" }}>
-          Meus cursos gratuitos
-        </h2>
+      {/* ── Continue aprendendo ─────────────────────────────────── */}
+      <div className="mt-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-semibold text-base" style={{ color: "#161616" }}>
+            Continue aprendendo
+          </h2>
+          <Link
+            href="/dashboard/cursos"
+            className="text-sm flex items-center gap-1 transition-colors hover:text-[#0043ce]"
+            style={{ color: "#0f62fe" }}
+          >
+            Ver todos <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
 
         {progressData.length === 0 ? (
           <div
-            className="text-center py-16"
-            style={{ backgroundColor: "var(--cds-layer-01)" }}
+            className="text-center py-16 border border-[#e0e0e0] bg-white"
           >
-            <BookOpen className="mx-auto h-8 w-8 mb-4" style={{ color: "var(--cds-text-secondary)" }} />
-            <h3 className="font-semibold mb-2" style={{ color: "var(--cds-text-primary)" }}>Nenhum curso iniciado</h3>
-            <p className="text-sm max-w-sm mx-auto mb-6" style={{ color: "var(--cds-text-secondary)", lineHeight: "1.5" }}>
-              Acesse o catálogo e escolha um curso gratuito para começar agora mesmo.
+            <div className="h-12 w-12 flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: "#f4f4f4" }}>
+              <BookOpen className="h-6 w-6" style={{ color: "#8d8d8d" }} />
+            </div>
+            <h3 className="font-semibold mb-2" style={{ color: "#161616" }}>Nenhum curso em andamento</h3>
+            <p className="text-sm mb-6 max-w-xs mx-auto" style={{ color: "#525252", lineHeight: 1.5 }}>
+              Explore o catálogo e comece sua jornada em IA.
             </p>
-            <Button
-              className="rounded-none font-semibold h-12 px-6"
-              style={{ backgroundColor: "var(--cds-button-secondary)", color: "#ffffff" }}
-              asChild
+            <Link
+              href="/cursos"
+              className="inline-flex items-center gap-2 px-6 py-3 font-semibold text-sm text-white transition-colors hover:bg-[#0353e9]"
+              style={{ backgroundColor: "#0f62fe" }}
             >
-              <Link href="/cursos">Explorar catálogo</Link>
-            </Button>
+              Explorar catálogo <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-[1px] bg-[var(--cds-border-subtle)] border border-[var(--cds-border-subtle)]">
-            {progressData.slice(0, 4).map(({ enrollment, percentage }) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-[#e0e0e0] border border-[#e0e0e0]">
+            {continueCourses.map(({ enrollment, percentage }) => (
               <div
                 key={enrollment.id}
-                className="bg-white p-6 flex items-center justify-between group transition-colors hover:bg-[var(--cds-layer-01)]"
+                className="bg-white p-5 flex flex-col justify-between hover:bg-[#f4f4f4] transition-colors"
               >
-                <div className="flex items-center gap-4">
+                <div className="flex gap-4">
                   <div
-                    className="h-12 w-16 flex items-center justify-center shrink-0 border border-[var(--cds-border-subtle)] bg-[var(--cds-layer-01)]"
+                    className="h-16 w-24 flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: "#f4f4f4", border: "1px solid #e0e0e0" }}
                   >
                     {enrollment.course.thumbnail ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -294,31 +212,45 @@ export default async function DashboardPage() {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <BookOpen className="h-5 w-5" style={{ color: "var(--cds-text-secondary)" }} />
+                      <BookOpen className="h-6 w-6" style={{ color: "#8d8d8d" }} />
                     )}
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-base line-clamp-1 mb-1" style={{ color: "var(--cds-text-primary)" }}>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm line-clamp-2 mb-1" style={{ color: "#161616" }}>
                       {enrollment.course.title}
-                    </h3>
-                    <div className="flex items-center gap-2">
-                       <span className="text-xs font-mono uppercase tracking-widest font-semibold" style={{ color: "var(--cds-text-primary)" }}>
-                        {percentage}% Completo
+                    </p>
+                    <p className="text-xs mb-3" style={{ color: "#525252" }}>
+                      {enrollment.course.instructor.name}
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <Progress
+                        value={percentage}
+                        className="flex-1 h-1.5 rounded-none bg-[#e0e0e0] [&>div]:bg-[#0f62fe] [&>div]:rounded-none"
+                      />
+                      <span
+                        className="text-xs"
+                        style={{ fontFamily: "var(--font-mono)", color: "#525252" }}
+                      >
+                        {percentage}%
                       </span>
                     </div>
                   </div>
                 </div>
-                <Link 
-                  href={`/dashboard/cursos/${enrollment.course.slug}`} className="transition-colors group-hover:text-[var(--cds-interactive)]"
-                  style={{ color: "var(--cds-text-secondary)" }}
+
+                <Link
+                  href={`/dashboard/cursos/${enrollment.course.slug}`}
+                  className="mt-5 flex justify-between items-center text-sm font-semibold transition-colors border-t border-[#e0e0e0] pt-4 hover:text-[#0043ce]"
+                  style={{ color: "#0f62fe" }}
                 >
-                  <ArrowRight className="h-5 w-5" />
+                  <span>{percentage === 0 ? "Começar" : "Continuar"}</span>
+                  <Play className="h-3.5 w-3.5" />
                 </Link>
               </div>
             ))}
           </div>
         )}
       </div>
+
     </div>
   );
 }
