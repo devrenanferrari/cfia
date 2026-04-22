@@ -1,5 +1,11 @@
 import { prisma } from "@/lib/prisma";
 
+export function toCamelCase(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/(?:^|\s)\S/g, (char) => char.toUpperCase());
+}
+
 function isQuiz<T>(value: T | null): value is T {
   return value !== null;
 }

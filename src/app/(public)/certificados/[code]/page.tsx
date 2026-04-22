@@ -32,8 +32,24 @@ export default async function PublicCertificatePage({
   if (!certificate) notFound();
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
-      <CertificateView certificate={certificate} />
+    <div
+      className="min-h-screen py-8 px-4 sm:px-6"
+      style={{ backgroundColor: "#0a0a0a" }}
+    >
+      <div className="mx-auto max-w-2xl">
+        <div className="mb-6 flex items-center justify-between">
+          <p
+            className="text-xs font-semibold uppercase tracking-[0.32em]"
+            style={{ color: "#4589ff", fontFamily: "var(--font-mono, monospace)" }}
+          >
+            CFIA — Certificado Público
+          </p>
+          <p className="text-xs" style={{ color: "#6f6f6f" }}>
+            Verificação de autenticidade
+          </p>
+        </div>
+        <CertificateView certificate={certificate} />
+      </div>
     </div>
   );
 }
