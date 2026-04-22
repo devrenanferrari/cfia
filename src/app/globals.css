@@ -242,7 +242,7 @@
 ::-webkit-scrollbar-thumb { background: var(--cds-border-strong); }
 ::-webkit-scrollbar-thumb:hover { background: var(--cds-text-secondary); }
 
-/* Animations - Keeping simple fades, removing orbs */
+/* ── Animations ─────────────────────────────────────────────────────────────── */
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -251,6 +251,58 @@
 .delay-100 { animation-delay: 0.1s; }
 .delay-200 { animation-delay: 0.2s; }
 .delay-300 { animation-delay: 0.3s; }
+
+/* Neural network node pulse */
+@keyframes nn-pulse {
+  0%, 100% { opacity: 0.18; }
+  50%       { opacity: 0.72; }
+}
+
+/* Neural network line data-flow */
+@keyframes nn-flow {
+  0%   { stroke-dashoffset: 180; opacity: 0; }
+  8%   { opacity: 0.55; }
+  88%  { opacity: 0.55; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* Hero floating elements entrance */
+@keyframes float-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes float-in-left {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.animate-float-in-right { animation: float-in-right 0.6s ease-out both; }
+.animate-float-in-left  { animation: float-in-left 0.6s ease-out both; }
+
+/* ── Hover glows (bypass the shadow-* removal rule) ────────────────────────── */
+.btn-glow:hover {
+  box-shadow: 0 0 24px rgba(15, 98, 254, 0.4);
+}
+.btn-glow-white:hover {
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.22);
+}
+
+/* ── Track cards hover lift ─────────────────────────────────────────────────── */
+.track-card {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  will-change: transform;
+}
+.track-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(15, 98, 254, 0.12);
+}
+
+/* ── Stat cards micro-hover ─────────────────────────────────────────────────── */
+.stat-card {
+  transition: background-color 0.15s ease-out;
+}
+.stat-card:hover {
+  background-color: #f4f4f4;
+}
 
 /* Custom Inputs - Bottom border only */
 input, select, textarea {
