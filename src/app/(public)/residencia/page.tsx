@@ -82,7 +82,7 @@ export default function ResidenciaPage() {
               </h2>
               <p className="text-[#525252] leading-relaxed mb-6">
                 A Residência em IA da CFIA foi desenhada a partir de modelos como os programas
-                de pós-graduação executiva do MIT e Harvard Business School. O foco é na
+                de treinamento executivo intensivo. O foco é na
                 aplicação real, mentoria individual e construção de uma rede profissional de alto nível.
               </p>
               <p className="text-[#525252] leading-relaxed">
@@ -250,7 +250,7 @@ export default function ResidenciaPage() {
                 photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=48&h=48&fit=crop&q=80",
               },
               {
-                quote: "Não é um curso. É uma aceleração de carreira. A mentoria e a rede que construí valem mais do que qualquer MBA que eu poderia ter feito.",
+                quote: "Não é um curso. É uma aceleração de carreira. A mentoria e a rede que construí valem mais do que qualquer outra formação que eu poderia ter feito.",
                 name: "Fernanda Lima",
                 title: "Cientista de Dados Sênior · Turma 2023",
                 photo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&q=80",

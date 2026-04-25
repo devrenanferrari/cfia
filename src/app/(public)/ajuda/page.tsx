@@ -32,7 +32,7 @@ const faqs = [
     items: [
       {
         q: "Os certificados são reconhecidos pelo MEC?",
-        a: "Nossos certificados são de cursos livres de capacitação profissional e aperfeiçoamento. Eles são amplamente reconhecidos pelo mercado corporativo, válidos legalmente em todo o território nacional, mas não são diplomas de graduação ou pós pelo MEC."
+        a: "Nossos certificados são de cursos livres de capacitação profissional e aperfeiçoamento. Eles são amplamente reconhecidos pelo mercado corporativo, válidos legalmente em todo o território nacional, atestando suas habilidades sem conferir titulação acadêmica vinculada ao MEC."
       },
       {
         q: "Como eu emito meu certificado?",

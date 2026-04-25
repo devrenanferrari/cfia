@@ -243,7 +243,7 @@ export default function TrilhasPage() {
               Acesso total com a Assinatura CFIA
             </h2>
             <p className="text-[#525252] text-lg max-w-2xl mx-auto mb-10">
-              Faça a assinatura e tenha acesso imediato a todas as trilhas, cursos avulsos, laboratórios práticos e materiais de apoio. O seu MBA em formato de streaming.
+              Faça a assinatura e tenha acesso imediato a todas as trilhas, cursos avulsos, laboratórios práticos e materiais de apoio. A sua formação completa em formato de streaming.
             </p>
             <Link
               href="/assinar"
