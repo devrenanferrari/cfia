@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import {
   ArrowLeft, PlusCircle, ChevronDown, ChevronUp,
   Pencil, Trash2, Eye, EyeOff, Video, FileText,
-  CheckCircle2, AlertCircle, Loader2,
+  CheckCircle2, AlertCircle, Loader2, Code2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -329,6 +329,8 @@ export function CourseEditor({
                             <Video className={cn("h-4 w-4 flex-shrink-0", hasVideo ? "text-green-500" : "text-yellow-500")} />
                           ) : lesson.type === "QUIZ" ? (
                             <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-[#0052ff]" />
+                          ) : lesson.type === "NOTEBOOK" ? (
+                            <Code2 className="h-4 w-4 flex-shrink-0 text-[#0f62fe]" />
                           ) : (
                             <FileText className="h-4 w-4 flex-shrink-0 text-blue-500" />
                           )}
@@ -346,6 +348,12 @@ export function CourseEditor({
                           {lesson.type === "QUIZ" && (
                             <Badge variant="outline" className="text-xs flex-shrink-0">
                               {lesson.quiz?.isCertificationExam ? "Prova final" : "Quiz"}
+                            </Badge>
+                          )}
+
+                          {lesson.type === "NOTEBOOK" && (
+                            <Badge variant="outline" className="text-xs flex-shrink-0 bg-[#0f62fe]/10 text-[#0f62fe] border-[#0f62fe]/20">
+                              Notebook
                             </Badge>
                           )}
 
@@ -446,6 +454,39 @@ export function CourseEditor({
                               </div>
                             )}
 
+                            {lesson.type === "NOTEBOOK" && (
+                              <div>
+                                <Label className="text-xs font-semibold text-foreground">Arquivo Jupyter Notebook (.ipynb)</Label>
+                                <div className="mt-2 flex flex-col gap-3">
+                                  <Input 
+                                    type="file" 
+                                    accept=".ipynb" 
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      if (!file) return;
+                                      const reader = new FileReader();
+                                      reader.onload = (event) => {
+                                        try {
+                                          const jsonStr = event.target?.result as string;
+                                          JSON.parse(jsonStr); // validate JSON
+                                          updateLesson(lesson.id, { content: jsonStr });
+                                          toast.success("Notebook anexado com sucesso!");
+                                        } catch (err) {
+                                          toast.error("O arquivo fornecido não é um JSON Jupyter válido.");
+                                        }
+                                      };
+                                      reader.readAsText(file);
+                                    }}
+                                  />
+                                  {lesson.content && (
+                                    <div className="text-xs text-green-700 bg-green-50 p-2 rounded-md border border-green-200">
+                                      ✓ Arquivo carregado! O aluno poderá alterar e executar as células na aula.
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+
                             {lesson.type === "QUIZ" && (
                               <div>
                                 <Label className="text-xs font-semibold text-foreground">Quiz e prova</Label>
@@ -514,6 +555,15 @@ export function CourseEditor({
                         >
                           <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
                           Quiz / prova
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={!newLesson.title.trim()}
+                          onClick={() => addLesson(mod.id, newLesson.title, "NOTEBOOK")}
+                        >
+                          <Code2 className="mr-1.5 h-3.5 w-3.5" />
+                          Notebook interativo
                         </Button>
                         <Button size="sm" variant="ghost" onClick={() => setNewLesson(null)}>
                           Cancelar

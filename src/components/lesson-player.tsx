@@ -4,9 +4,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { QuizPlayer } from "@/components/quiz-player";
+import { NotebookPlayer } from "@/components/notebook-player";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { CheckCircle, FileText, Loader2 } from "lucide-react";
+import { CheckCircle, FileText, Loader2, Code2 } from "lucide-react";
 
 interface Lesson {
   id: string;
@@ -174,6 +175,11 @@ export function LessonPlayer({ lesson, courseId, isCompleted, bunnyLibraryId }: 
         </div>
       )}
 
+      {/* Jupyter Notebook interativo */}
+      {lesson.type === "NOTEBOOK" && lesson.content && (
+        <NotebookPlayer content={lesson.content} />
+      )}
+
       {lesson.type === "QUIZ" && lesson.quiz && (
         <QuizPlayer quizId={lesson.quiz.id} isCompleted={completed} />
       )}
@@ -193,7 +199,7 @@ export function LessonPlayer({ lesson, courseId, isCompleted, bunnyLibraryId }: 
           )}
           <div className="flex items-center gap-2 mt-2">
             <Badge variant="outline" className="text-xs">
-              {lesson.type === "VIDEO" ? "Vídeo" : lesson.type === "TEXT" ? "Texto" : "Quiz"}
+              {lesson.type === "VIDEO" ? "Vídeo" : lesson.type === "TEXT" ? "Texto" : lesson.type === "NOTEBOOK" ? "Notebook" : "Quiz"}
             </Badge>
             {lesson.duration && (
               <Badge variant="outline" className="text-xs">{lesson.duration} min</Badge>

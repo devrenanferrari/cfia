@@ -209,6 +209,7 @@ enum LessonType {
   VIDEO
   TEXT
   QUIZ
+  NOTEBOOK
 }
 
 // ─── Quizzes ───────────────────────────────────────────────────────────────────
