@@ -47,6 +47,7 @@ export function Navbar() {
   const navLinks = [
     { href: "/trilhas", label: "Trilhas" },
     { href: "/cursos", label: "Cursos" },
+    { href: "/laboratorio", label: "Laboratório" },
     { href: "/para-empresas", label: "Para Empresas" },
     { href: "/professores", label: "Professores" },
     { href: "/sobre", label: "Sobre" },
