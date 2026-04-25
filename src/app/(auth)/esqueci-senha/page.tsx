@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { Loader2, ArrowRight, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { AuthShell } from "@/components/auth-shell";
 
 export default function EsqueciSenhaPage() {
   const [email, setEmail] = useState("");
@@ -15,86 +13,134 @@ export default function EsqueciSenhaPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    // Simula envio — em produção integrar com email provider
     await new Promise((r) => setTimeout(r, 800));
     setSent(true);
     setLoading(false);
   }
 
-  if (sent) {
-    return (
-      <div className="w-full max-w-sm">
-        <div className="bg-white rounded-2xl border p-8 shadow-sm text-center">
+  return (
+    <AuthShell
+      eyebrow="Suporte ao acesso"
+      heading="Recuperar acesso."
+      description="Enviaremos um link de redefinição diretamente para o seu email em segundos."
+    >
+      {sent ? (
+        <div className="text-center">
           <div
-            className="h-14 w-14 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ backgroundColor: "#0052ff15" }}
+            className="inline-flex items-center justify-center mb-6"
+            style={{
+              width: 56,
+              height: 56,
+              backgroundColor: "#edf5ff",
+              border: "1px solid #0f62fe",
+            }}
           >
-            <CheckCircle2 className="h-7 w-7" style={{ color: "#0052ff" }} />
+            <CheckCircle2 className="h-6 w-6" style={{ color: "#0f62fe" }} />
           </div>
-          <h1 className="text-xl font-bold mb-2" style={{ color: "#0a0b0d" }}>
-            Verifique seu email
-          </h1>
-          <p className="text-sm mb-6" style={{ color: "#5b616e" }}>
-            Se existir uma conta com <strong>{email}</strong>, você receberá instruções para redefinir sua senha em breve.
+          <h2
+            className="text-xl font-light mb-3"
+            style={{ color: "#161616", letterSpacing: 0 }}
+          >
+            Email enviado!
+          </h2>
+          <p className="text-sm leading-7 mb-8" style={{ color: "#525252" }}>
+            Se existe uma conta associada a{" "}
+            <span className="font-medium" style={{ color: "#161616" }}>
+              {email}
+            </span>
+            , você receberá as instruções em breve. Verifique também a caixa de
+            spam.
           </p>
           <Link
             href="/entrar"
-            className="text-sm font-semibold hover:opacity-80 transition-opacity"
-            style={{ color: "#0052ff" }}
+            className="text-sm font-medium hover:underline transition-colors"
+            style={{ color: "#0f62fe" }}
           >
-            Voltar para o login
+            ← Voltar para o login
           </Link>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="w-full max-w-sm">
-      <div className="bg-white rounded-2xl border p-8 shadow-sm">
-        <h1 className="text-2xl font-bold mb-1" style={{ color: "#0a0b0d" }}>
-          Esqueci minha senha
-        </h1>
-        <p className="text-sm mb-7" style={{ color: "#5b616e" }}>
-          Informe seu email e enviaremos instruções para redefinir sua senha.
-        </p>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-sm font-medium" style={{ color: "#0a0b0d" }}>
-              Email
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-              className="h-11 rounded-xl border-[#e4e7ec] bg-[#f7f8fa] focus:bg-white"
-            />
+      ) : (
+        <>
+          <div className="mb-10">
+            <h1
+              className="text-2xl font-light mb-2"
+              style={{ color: "#161616", letterSpacing: 0 }}
+            >
+              Redefinir senha
+            </h1>
+            <p className="text-sm" style={{ color: "#525252" }}>
+              Informe seu email e enviaremos o link de acesso.
+            </p>
           </div>
-          <Button
-            type="submit"
-            className="w-full h-11 rounded-[56px] font-semibold text-sm"
-            style={{ backgroundColor: "#0052ff" }}
-            disabled={loading || !email}
-          >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enviar instruções"}
-          </Button>
-        </form>
-      </div>
 
-      <p className="text-center text-sm mt-5">
-        <Link
-          href="/entrar"
-          className="font-semibold hover:opacity-80 transition-opacity"
-          style={{ color: "#0052ff" }}
-        >
-          ← Voltar para o login
-        </Link>
-      </p>
-    </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-1.5">
+              <label
+                htmlFor="email"
+                className="block text-xs font-semibold uppercase tracking-[0.16em]"
+                style={{ color: "#525252" }}
+              >
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                placeholder="seu@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                className="w-full h-12 px-4"
+                style={{ color: "#161616" }}
+              />
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={loading || !email}
+                className="w-full h-14 flex items-center justify-between px-6 font-semibold text-sm disabled:opacity-60"
+                style={{
+                  backgroundColor: "#0f62fe",
+                  color: "#ffffff",
+                  border: "none",
+                  cursor: loading || !email ? "not-allowed" : "pointer",
+                  letterSpacing: "0.01em",
+                  transition: "background-color 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading && email)
+                    (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                      "#0353e9";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                    "#0f62fe";
+                }}
+              >
+                {loading ? (
+                  <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+                ) : (
+                  <>
+                    <span>Enviar instruções</span>
+                    <ArrowRight className="h-5 w-5" />
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+
+          <div className="mt-8 pt-6 border-t" style={{ borderColor: "#e0e0e0" }}>
+            <Link
+              href="/entrar"
+              className="text-sm font-medium hover:underline transition-colors"
+              style={{ color: "#0f62fe" }}
+            >
+              ← Voltar para o login
+            </Link>
+          </div>
+        </>
+      )}
+    </AuthShell>
   );
 }

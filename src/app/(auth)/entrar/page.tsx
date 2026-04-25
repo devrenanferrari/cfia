@@ -3,10 +3,10 @@
 import { Suspense, useState } from "react";
 import { signIn, getSession } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Link from "next/link";
 import { Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
+import { AuthShell } from "@/components/auth-shell";
 
 function getRedirectByRole(role?: string) {
   if (role === "ADMIN") return "/admin";
@@ -52,145 +52,164 @@ function LoginForm() {
   }
 
   return (
-    <div className="w-full max-w-[480px]">
-      <div className="mb-12">
-        <h1 className="text-4xl font-light mb-4" style={{ color: "var(--cds-text-primary)", letterSpacing: "0" }}>
-          Acesso à plataforma
+    <>
+      <div className="mb-10">
+        <h1
+          className="text-2xl font-light mb-2"
+          style={{ color: "#161616", letterSpacing: 0 }}
+        >
+          Entre na sua conta
         </h1>
-        <p className="text-base" style={{ color: "var(--cds-text-secondary)" }}>
-          Entre com suas credenciais para continuar recebendo conhecimento avançado na CFIA.
+        <p className="text-sm" style={{ color: "#525252" }}>
+          Continue de onde parou. Todo seu progresso está aqui.
         </p>
       </div>
 
-      <div 
-        className="bg-white p-8 md:p-10 border" 
-        style={{ borderColor: "var(--cds-border-subtle)" }}
-      >
-        <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-xs font-semibold" style={{ color: "var(--cds-text-secondary)" }}>
-              Endereço de Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-              className="w-full h-12 px-4 transition-colors focus:outline-none"
-              style={{ 
-                backgroundColor: "var(--cds-field)", 
-                borderBottom: "1px solid var(--cds-border-strong)",
-                color: "var(--cds-text-primary)"
-              }}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label htmlFor="password" className="text-xs font-semibold" style={{ color: "var(--cds-text-secondary)" }}>
-                Senha de Acesso
-              </label>
-            </div>
-            <div className="relative">
-              <input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Insira sua senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-                className="w-full h-12 px-4 pr-12 transition-colors focus:outline-none"
-                style={{ 
-                  backgroundColor: "var(--cds-field)", 
-                  borderBottom: "1px solid var(--cds-border-strong)",
-                  color: "var(--cds-text-primary)"
-                }}
-              />
-              <button
-                type="button"
-                className="absolute right-0 top-0 h-12 w-12 flex items-center justify-center transition-colors hover:bg-[var(--cds-layer-02)]"
-                style={{ color: "var(--cds-text-secondary)" }}
-                onClick={() => setShowPassword((v) => !v)}
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </div>
-            <div className="pt-2">
-              <Link
-                href="/esqueci-senha"
-                className="text-sm font-medium transition-colors hover:underline"
-                style={{ color: "var(--cds-interactive)" }}
-              >
-                Esqueceu a senha?
-              </Link>
-            </div>
-          </div>
-
-          <div className="pt-4">
-            <Button
-              type="submit"
-              className="w-full h-14 rounded-none font-semibold text-base flex justify-between px-6 transition-colors"
-              style={{
-                backgroundColor: "var(--cds-interactive)",
-                color: "#ffffff"
-              }}
-              disabled={loading || !email || !password}
-            >
-              {loading ? (
-                <Loader2 className="h-5 w-5 animate-spin mx-auto" />
-              ) : (
-                <>
-                  <span>Entrar no sistema</span>
-                  <ArrowRight className="h-5 w-5" />
-                </>
-              )}
-            </Button>
-          </div>
-        </form>
-
-        <div className="mt-8 pt-8 border-t" style={{ borderColor: "var(--cds-border-subtle)" }}>
-          <p className="text-sm" style={{ color: "var(--cds-text-secondary)" }}>
-            Ainda não possui credenciais ativas?{" "}
-            <Link
-              href="/cadastro"
-              className="font-medium hover:underline transition-colors block mt-2"
-              style={{ color: "var(--cds-interactive)" }}
-            >
-              Criar uma nova conta <ArrowRight className="h-3 w-3 inline ml-1" />
-            </Link>
-          </p>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-1.5">
+          <label
+            htmlFor="email"
+            className="block text-xs font-semibold uppercase tracking-[0.16em]"
+            style={{ color: "#525252" }}
+          >
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            placeholder="seu@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+            className="w-full h-12 px-4"
+            style={{ color: "#161616" }}
+          />
         </div>
+
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between mb-1.5">
+            <label
+              htmlFor="password"
+              className="block text-xs font-semibold uppercase tracking-[0.16em]"
+              style={{ color: "#525252" }}
+            >
+              Senha
+            </label>
+            <Link
+              href="/esqueci-senha"
+              className="text-xs transition-colors hover:underline"
+              style={{ color: "#0f62fe" }}
+            >
+              Esqueceu a senha?
+            </Link>
+          </div>
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Sua senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+              className="w-full h-12 px-4 pr-12"
+              style={{ color: "#161616" }}
+            />
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-0 top-0 h-12 w-12 flex items-center justify-center transition-colors hover:bg-[#f4f4f4]"
+              style={{
+                color: "#8d8d8d",
+                backgroundColor: "transparent",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        <div className="pt-2">
+          <button
+            type="submit"
+            disabled={loading || !email || !password}
+            className="w-full h-14 flex items-center justify-between px-6 font-semibold text-sm disabled:opacity-60"
+            style={{
+              backgroundColor: "#0f62fe",
+              color: "#ffffff",
+              border: "none",
+              cursor: loading || !email || !password ? "not-allowed" : "pointer",
+              letterSpacing: "0.01em",
+              transition: "background-color 0.15s ease",
+            }}
+            onMouseEnter={(e) => {
+              if (!loading && email && password)
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#0353e9";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#0f62fe";
+            }}
+          >
+            {loading ? (
+              <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+            ) : (
+              <>
+                <span>Entrar na plataforma</span>
+                <ArrowRight className="h-5 w-5" />
+              </>
+            )}
+          </button>
+        </div>
+      </form>
+
+      <div className="mt-8 pt-6 border-t" style={{ borderColor: "#e0e0e0" }}>
+        <p className="text-sm" style={{ color: "#525252" }}>
+          Ainda não tem conta?{" "}
+          <Link
+            href="/cadastro"
+            className="font-medium hover:underline transition-colors"
+            style={{ color: "#0f62fe" }}
+          >
+            Criar conta <ArrowRight className="h-3 w-3 inline ml-0.5" />
+          </Link>
+        </p>
       </div>
-    </div>
+    </>
   );
 }
 
 export default function LoginPage() {
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-4 md:p-8"
-      style={{ backgroundColor: "var(--cds-layer-01)" }}
+    <AuthShell
+      eyebrow="Acesso seguro"
+      heading="Bem-vindo de volta."
+      description="Retome de onde parou. Todo seu progresso, certificados e conquistas estão sincronizados."
+      features={[
+        "Certificados verificáveis e compartilháveis",
+        "Progresso salvo automaticamente",
+        "Suporte especializado em IA",
+      ]}
     >
-      <div className="absolute top-8 left-8">
-        <Link href="/" className="flex items-center gap-2 font-semibold text-xl" style={{ color: "var(--cds-text-primary)" }}>
-          <span className="tracking-tight leading-none" style={{ letterSpacing: "0" }}>CFIA</span>
-        </Link>
-      </div>
-      
       <Suspense
         fallback={
-          <div className="flex h-32 items-center justify-center w-full max-w-[480px]">
-            <Loader2 className="h-6 w-6 animate-spin" style={{ color: "var(--cds-interactive)" }} />
+          <div className="flex h-32 items-center justify-center">
+            <Loader2
+              className="h-6 w-6 animate-spin"
+              style={{ color: "#0f62fe" }}
+            />
           </div>
         }
       >
         <LoginForm />
       </Suspense>
-    </div>
+    </AuthShell>
   );
 }
