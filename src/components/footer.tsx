@@ -46,7 +46,9 @@ export function Footer() {
             </h3>
             <ul className="space-y-3 text-sm">
               {[
+                { href: "/trilhas", label: "Trilhas de carreira" },
                 { href: "/cursos", label: "Todos os cursos" },
+                { href: "/para-empresas", label: "Para Empresas" },
                 { href: "/assinar", label: "Planos e preços" },
                 { href: "/seja-instrutor", label: "Seja instrutor" },
               ].map(({ href, label }) => (

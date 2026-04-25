@@ -45,7 +45,9 @@ export function Navbar() {
     .toUpperCase();
 
   const navLinks = [
+    { href: "/trilhas", label: "Trilhas" },
     { href: "/cursos", label: "Cursos" },
+    { href: "/para-empresas", label: "Para Empresas" },
     { href: "/professores", label: "Professores" },
     { href: "/sobre", label: "Sobre" },
     ...(isInstructor ? [{ href: "/instrutor", label: "Área do instrutor" }] : []),
