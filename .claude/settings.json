@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const {prisma} = require\\('./src/lib/prisma'\\); console.log\\(Object.keys\\(prisma\\)\\)\")"
+    ]
+  }
+}
