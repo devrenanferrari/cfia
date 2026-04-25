@@ -304,6 +304,19 @@
   background-color: #f4f4f4;
 }
 
+/* Hero search bar — white bg, overrides the global input rule */
+.search-field {
+  border: none !important;
+  border-bottom: 2px solid #c6c6c6 !important;
+  background-color: #ffffff !important;
+  outline: none !important;
+  transition: border-color 0.2s ease;
+}
+.search-field:focus {
+  border-bottom: 2px solid #0f62fe !important;
+  outline: none !important;
+}
+
 /* Custom Inputs - Bottom border only */
 input, select, textarea {
   border: none !important;

@@ -36,5 +36,9 @@ export default async function CertificateDetailPage({
 
   if (!certificate || certificate.userId !== session.user.id) notFound();
 
-  return <CertificateView certificate={certificate} showDashboardLink />;
+  return (
+    <div className="p-4 sm:p-6 lg:p-8">
+      <CertificateView certificate={certificate} showDashboardLink />
+    </div>
+  );
 }

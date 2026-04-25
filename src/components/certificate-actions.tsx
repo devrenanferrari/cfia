@@ -60,32 +60,38 @@ export function CertificateActions({
       const { default: html2canvas } = await import("html2canvas");
       const { jsPDF } = await import("jspdf");
 
-      const canvas = await html2canvas(element, {
+      // Clone at full 1060×750 size so the PDF is always full-resolution,
+      // regardless of the CSS scale applied for the responsive viewer.
+      const clone = element.cloneNode(true) as HTMLElement;
+      clone.style.transform = "none";
+      clone.style.position = "fixed";
+      clone.style.top = "-9999px";
+      clone.style.left = "-9999px";
+      clone.style.width = "1060px";
+      clone.style.height = "750px";
+      clone.style.opacity = "1";
+      document.body.appendChild(clone);
+
+      const canvas = await html2canvas(clone, {
         scale: 2,
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff",
+        width: 1060,
+        height: 750,
       });
+
+      document.body.removeChild(clone);
 
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
-        orientation: "portrait",
+        orientation: "landscape",
         unit: "mm",
         format: "a4",
       });
 
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgRatio = canvas.height / canvas.width;
-      const imgHeight = pageWidth * imgRatio;
-
-      if (imgHeight <= pageHeight) {
-        const yOffset = (pageHeight - imgHeight) / 2;
-        pdf.addImage(imgData, "PNG", 0, yOffset, pageWidth, imgHeight);
-      } else {
-        pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeight);
-      }
-
+      // A4 landscape: 297 × 210 mm
+      pdf.addImage(imgData, "PNG", 0, 0, 297, 210);
       pdf.save(`certificado-cfia-${code}.pdf`);
       toast.success("Certificado baixado com sucesso.");
     } catch (err) {

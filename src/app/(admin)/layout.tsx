@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { GraduationCap, LayoutDashboard, Users, BookOpen, UserCheck, LogOut } from "lucide-react";
+import { GraduationCap, LayoutDashboard, Users, BookOpen, UserCheck, Megaphone } from "lucide-react";
 import { SignOutButton } from "@/components/sign-out-button";
 
 const NAV = [
@@ -10,6 +10,7 @@ const NAV = [
   { href: "/admin/alunos", label: "Alunos", icon: Users },
   { href: "/admin/instrutores", label: "Instrutores", icon: UserCheck },
   { href: "/admin/cursos", label: "Cursos", icon: BookOpen },
+  { href: "/admin/banners", label: "Banners", icon: Megaphone },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

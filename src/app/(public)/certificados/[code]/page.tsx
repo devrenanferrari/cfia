@@ -36,7 +36,7 @@ export default async function PublicCertificatePage({
       className="min-h-screen py-8 px-4 sm:px-6"
       style={{ backgroundColor: "#0a0a0a" }}
     >
-      <div className="mx-auto max-w-2xl">
+      <div className="mx-auto w-full" style={{ maxWidth: 1100 }}>
         <div className="mb-6 flex items-center justify-between">
           <p
             className="text-xs font-semibold uppercase tracking-[0.32em]"

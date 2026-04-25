@@ -346,6 +346,23 @@ model Certificate {
   @@unique([userId, courseId])
 }
 
+// ─── Banners ───────────────────────────────────────────────────────────────────
+
+model Banner {
+  id        String   @id @default(cuid())
+  title     String
+  subtitle  String?
+  ctaText   String?
+  ctaUrl    String   @default("/cursos")
+  imageUrl  String?
+  bgColor   String   @default("#edf5ff")
+  textColor String   @default("#161616")
+  isActive  Boolean  @default(true)
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 // ─── Notícias (News) ───────────────────────────────────────────────────────────
 
 model News {
