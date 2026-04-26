@@ -66,7 +66,7 @@ export function NotebookPlayer({ content }: { content: string }) {
     }
   }, [content]);
 
-  // Inicialização do Pyodide
+  // Inicialização do Pyodide e Pré-instalação de dependências
   useEffect(() => {
     const loadPyodideScript = () => {
       if ((window as any).loadPyodide) {
@@ -80,20 +80,73 @@ export function NotebookPlayer({ content }: { content: string }) {
       document.body.appendChild(script);
     };
 
+    /** Extrai pacotes únicos dos imports e de comandos pip ocultos */
+    const getRequiredPackages = (cellsList: CellData[]) => {
+      const packages = new Set<string>();
+      const importRegex = /^(?:import|from)\s+([a-zA-Z0-9_]+)/gm;
+      
+      cellsList.forEach(cell => {
+        if (cell.type === "code") {
+            let match;
+            while ((match = importRegex.exec(cell.source)) !== null) {
+                const pkg = match[1];
+                // Ignorar bibliotecas padrão óbvias (opcional mas bom)
+                if (!["os", "sys", "math", "random", "datetime", "json", "re"].includes(pkg)) {
+                    packages.add(pkg);
+                }
+            }
+        }
+      });
+      return Array.from(packages);
+    };
+
     async function initPyodide() {
       try {
         setKernelStatus("loading");
-        setInitialLoadingProgress(20);
+        setInitialLoadingProgress(10);
         
         const py = await (window as any).loadPyodide({
           indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/",
         });
         
-        setInitialLoadingProgress(60);
+        setInitialLoadingProgress(40);
         
-        // Carrega micropip para permitir instalação de pacotes
+        // Carrega micropip
         await py.loadPackage("micropip");
         const micropip = py.pyimport("micropip");
+        
+        setInitialLoadingProgress(60);
+
+        // Detecta o que o instrutor usou e pré-instala
+        // OBS: O efeito de content parsing ocorre no outro useEffect, 
+        // então precisamos pegar as células do estado atual ou do content string
+        let currentCells: any[] = [];
+        try {
+            const data = JSON.parse(content);
+            currentCells = data.cells || [];
+        } catch(e) {}
+
+        const detectedPackages = getRequiredPackages(currentCells.map((c: any) => ({
+            type: c.cell_type,
+            source: Array.isArray(c.source) ? c.source.join("") : (c.source || "")
+        })));
+
+        if (detectedPackages.length > 0) {
+            console.log("Pré-instalando dependências detectadas:", detectedPackages);
+            setInitialLoadingProgress(75);
+            try {
+                // Instala bibliotecas pesadas conhecidas primeiro (loadPackage é mais rápido para o que é nativo do Pyodide)
+                const nativePackages = ["pandas", "numpy", "matplotlib", "scipy", "scikit-learn"].filter(p => detectedPackages.includes(p));
+                if (nativePackages.length > 0) {
+                   await py.loadPackage(nativePackages);
+                }
+                
+                // Instala o restante via micropip
+                await micropip.install(detectedPackages);
+            } catch (installError) {
+                console.warn("Falha ao instalar alguns pacotes automaticamente:", installError);
+            }
+        }
         
         setInitialLoadingProgress(100);
         pyodideInstance.current = py;
@@ -102,12 +155,13 @@ export function NotebookPlayer({ content }: { content: string }) {
       } catch (e) {
         console.error("Pyodide Load Error:", e);
         setKernelStatus("error");
-        toast.error("Falha ao inicializar motor Python.");
       }
     }
 
-    loadPyodideScript();
-  }, []);
+    if (content) {
+        loadPyodideScript();
+    }
+  }, [content]);
 
   const runCell = async (cellId: string) => {
     const cell = cells.find(c => c.id === cellId);
@@ -141,9 +195,29 @@ export function NotebookPlayer({ content }: { content: string }) {
       executionCounter.current += 1;
       const count = executionCounter.current;
       
-      // Suporte para instalação automática de pacotes via código (micropip)
-      // Se o código tiver 'pip install' ou 'import', tentamos rodar async
-      const result = await py.runPythonAsync(cell.source);
+      let finalCode = cell.source;
+
+      // Suporte a "pip install" direto na célula
+      if (finalCode.includes("pip install")) {
+          const lines = finalCode.split("\n");
+          for (const line of lines) {
+              if (line.trim().startsWith("pip install") || line.trim().startsWith("!pip install")) {
+                  const pkg = line.replace("!pip install", "").replace("pip install", "").trim();
+                  if (pkg) {
+                      setCells(prev => prev.map(c => c.id === cellId ? { 
+                        ...c, 
+                        outputs: [...c.outputs, { text: `Instalando ${pkg}...`, type: "stdout" }] 
+                      } : c));
+                      await py.runPythonAsync(`import micropip\nawait micropip.install("${pkg}")`);
+                  }
+              }
+          }
+          // Remove as linhas de pip para não darem erro de sintaxe no python puro
+          finalCode = lines.filter(l => !l.trim().startsWith("pip install") && !l.trim().startsWith("!pip install")).join("\n");
+      }
+
+      // Executa o código (com suporte a await top-level)
+      const result = await py.runPythonAsync(finalCode);
       
       if (result !== undefined) {
         currentOutputs.push({ text: String(result), type: "result" });
