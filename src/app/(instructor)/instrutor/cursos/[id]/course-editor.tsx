@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { VideoUpload } from "@/components/video-upload";
 import { QuizEditor } from "@/components/quiz-editor";
+import { NotebookEditor } from "@/components/admin/notebook-editor";
 import { toast } from "sonner";
 import {
   ArrowLeft, PlusCircle, ChevronDown, ChevronUp,
@@ -456,33 +457,12 @@ export function CourseEditor({
 
                             {lesson.type === "NOTEBOOK" && (
                               <div>
-                                <Label className="text-xs font-semibold text-foreground">Arquivo Jupyter Notebook (.ipynb)</Label>
-                                <div className="mt-2 flex flex-col gap-3">
-                                  <Input 
-                                    type="file" 
-                                    accept=".ipynb" 
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0];
-                                      if (!file) return;
-                                      const reader = new FileReader();
-                                      reader.onload = (event) => {
-                                        try {
-                                          const jsonStr = event.target?.result as string;
-                                          JSON.parse(jsonStr); // validate JSON
-                                          updateLesson(lesson.id, { content: jsonStr });
-                                          toast.success("Notebook anexado com sucesso!");
-                                        } catch (err) {
-                                          toast.error("O arquivo fornecido não é um JSON Jupyter válido.");
-                                        }
-                                      };
-                                      reader.readAsText(file);
-                                    }}
+                                <Label className="text-xs font-semibold text-foreground">Laboratório / Exercício Prático</Label>
+                                <div className="mt-2">
+                                  <NotebookEditor 
+                                    initialContent={lesson.content}
+                                    onChange={(jsonStr) => updateLesson(lesson.id, { content: jsonStr })}
                                   />
-                                  {lesson.content && (
-                                    <div className="text-xs text-green-700 bg-green-50 p-2 rounded-md border border-green-200">
-                                      ✓ Arquivo carregado! O aluno poderá alterar e executar as células na aula.
-                                    </div>
-                                  )}
                                 </div>
                               </div>
                             )}

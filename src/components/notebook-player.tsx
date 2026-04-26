@@ -44,7 +44,7 @@ export function NotebookPlayer({ content }: { content: string }) {
   }, [content]);
 
   useEffect(() => {
-    if (window.loadPyodide) {
+    if (typeof (window as any).loadPyodide === "function") {
       initPyodide();
       return;
     }
@@ -56,7 +56,7 @@ export function NotebookPlayer({ content }: { content: string }) {
 
     async function initPyodide() {
       try {
-        const py = await window.loadPyodide({
+        const py = await (window as any).loadPyodide({
           indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/",
         });
         pyodideInstance.current = py;
