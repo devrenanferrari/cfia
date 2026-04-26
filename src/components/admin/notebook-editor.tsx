@@ -42,8 +42,12 @@ export function NotebookEditor({ initialContent, onChange }: NotebookEditorProps
   const [executingCellId, setExecutingCellId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
   const pyodideInstance = useRef<any>(null);
+  
+  // Refs para controle de sincronização
+  const hasLoadedInitial = useRef(false);
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
-  // Inicializa Pyodide apenas para teste opcional pelo instrutor
+  // Inicializa Pyodide (mesma lógica)
   useEffect(() => {
     const loadPyodide = async () => {
         if (typeof (window as any).loadPyodide === "function") {
@@ -56,79 +60,85 @@ export function NotebookEditor({ initialContent, onChange }: NotebookEditorProps
             document.body.appendChild(script);
         }
     };
-
     async function initPyodide() {
       try {
-        const py = await (window as any).loadPyodide({
-          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/",
-        });
+        const py = await (window as any).loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/" });
         pyodideInstance.current = py;
         setPyodideReady(true);
-      } catch (e) {
-        console.error("Pyodide Editor Load Error", e);
-      }
+      } catch (e) {}
     }
     loadPyodide();
   }, []);
 
+  // Carregar conteúdo inicial APENAS UMA VEZ
   useEffect(() => {
-    if (initialContent) {
+    if (initialContent && !hasLoadedInitial.current) {
       try {
         const data = JSON.parse(initialContent);
         if (data && Array.isArray(data.cells)) {
           const loadedCells = data.cells.map((c: any) => ({
-            id: generateId(),
+            id: c.id || generateId(), // Tenta manter o ID original se existir
             cell_type: c.cell_type === "markdown" ? "markdown" : "code",
             source: Array.isArray(c.source) ? c.source.join("") : (c.source || ""),
           }));
           setCells(loadedCells);
+          hasLoadedInitial.current = true;
         }
       } catch (e) {
         console.error("Erro ao carregar notebook inicial", e);
       }
-    } else {
+    } else if (!initialContent && !hasLoadedInitial.current) {
       setCells([{ id: generateId(), cell_type: "markdown", source: "### Instruções do Exercício\nDescreva o que o aluno deve fazer." }]);
+      hasLoadedInitial.current = true;
     }
   }, [initialContent]);
 
-  const saveChanges = (newCells: Cell[]) => {
-    setCells(newCells);
-    const payload = {
-      cells: newCells.map((c) => ({
-        id: c.id,
-        cell_type: c.cell_type,
-        source: c.source
-      }))
-    };
-    onChange(JSON.stringify(payload, null, 2));
+  // Função de salvamento com Debounce para não travar a UI/Foco
+  const debouncedSave = (newCells: Cell[]) => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    
+    debounceTimer.current = setTimeout(() => {
+      const payload = {
+        cells: newCells.map((c) => ({
+          id: c.id,
+          cell_type: c.cell_type,
+          source: c.source
+        }))
+      };
+      onChange(JSON.stringify(payload));
+    }, 1500); // Salva após 1.5s sem digitar
   };
 
   const addCell = (type: "markdown" | "code") => {
-    saveChanges([...cells, { id: generateId(), cell_type: type, source: type === "code" ? "# Escreva o código base aqui\n" : "" }]);
+    const newCells = [...cells, { id: generateId(), cell_type: type, source: type === "code" ? "# Escreva o código base aqui\n" : "" }];
+    setCells(newCells);
+    debouncedSave(newCells);
     toast.success(`${type === "code" ? "Código" : "Texto"} adicionado`);
   };
 
   const updateCellSource = (id: string, newSource: string) => {
-    setCells(prev => prev.map((c) => c.id === id ? { ...c, source: newSource } : c));
-    // Notifica o formulário pai com debounce ou após edição manual
-    const updated = cells.map((c) => c.id === id ? { ...c, source: newSource } : c);
-    const payload = { cells: updated };
-    onChange(JSON.stringify(payload));
+    setCells(prev => {
+      const updated = prev.map((c) => c.id === id ? { ...c, source: newSource } : c);
+      debouncedSave(updated);
+      return updated;
+    });
   };
 
   const removeCell = (id: string) => {
-    saveChanges(cells.filter(c => c.id !== id));
+    const filtered = cells.filter(c => c.id !== id);
+    setCells(filtered);
+    debouncedSave(filtered);
   };
 
   const moveCell = (index: number, direction: "up" | "down") => {
     const newCells = [...cells];
     if (direction === "up" && index > 0) {
       [newCells[index - 1], newCells[index]] = [newCells[index], newCells[index - 1]];
-      saveChanges(newCells);
     } else if (direction === "down" && index < newCells.length - 1) {
       [newCells[index + 1], newCells[index]] = [newCells[index], newCells[index + 1]];
-      saveChanges(newCells);
     }
+    setCells(newCells);
+    debouncedSave(newCells);
   };
 
   const testCell = async (id: string, code: string) => {
