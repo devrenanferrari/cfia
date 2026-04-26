@@ -1,20 +1,30 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { PlusCircle, Trash2, Code2, FileText, Upload, ChevronUp, ChevronDown } from "lucide-react";
+import { 
+  PlusCircle, 
+  Trash2, 
+  Code2, 
+  FileText, 
+  Upload, 
+  ChevronUp, 
+  ChevronDown, 
+  Play, 
+  Loader2,
+  Terminal,
+  Save,
+  Layout
+} from "lucide-react";
 import { toast } from "sonner";
 import Editor from "@monaco-editor/react";
+import { cn } from "@/lib/utils";
+import ReactMarkdown from "react-markdown";
 
 interface Cell {
   id: string;
   cell_type: "markdown" | "code";
   source: string;
-}
-
-interface NotebookData {
-  cells: Cell[];
 }
 
 interface NotebookEditorProps {
@@ -28,8 +38,39 @@ function generateId() {
 
 export function NotebookEditor({ initialContent, onChange }: NotebookEditorProps) {
   const [cells, setCells] = useState<Cell[]>([]);
+  const [pyodideReady, setPyodideReady] = useState(false);
+  const [executingCellId, setExecutingCellId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
+  const pyodideInstance = useRef<any>(null);
 
-  // Carregar conteúdo inicial
+  // Inicializa Pyodide apenas para teste opcional pelo instrutor
+  useEffect(() => {
+    const loadPyodide = async () => {
+        if (typeof (window as any).loadPyodide === "function") {
+            initPyodide();
+        } else {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js";
+            script.async = true;
+            script.onload = initPyodide;
+            document.body.appendChild(script);
+        }
+    };
+
+    async function initPyodide() {
+      try {
+        const py = await (window as any).loadPyodide({
+          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/",
+        });
+        pyodideInstance.current = py;
+        setPyodideReady(true);
+      } catch (e) {
+        console.error("Pyodide Editor Load Error", e);
+      }
+    }
+    loadPyodide();
+  }, []);
+
   useEffect(() => {
     if (initialContent) {
       try {
@@ -46,15 +87,13 @@ export function NotebookEditor({ initialContent, onChange }: NotebookEditorProps
         console.error("Erro ao carregar notebook inicial", e);
       }
     } else {
-      // Começa com uma célula de markdown padrão se vazio
-      setCells([{ id: generateId(), cell_type: "markdown", source: "### Novo Exercício Prático\n\nDescreva as instruções aqui." }]);
+      setCells([{ id: generateId(), cell_type: "markdown", source: "### Instruções do Exercício\nDescreva o que o aluno deve fazer." }]);
     }
   }, [initialContent]);
 
-  // Salva no objeto pai sempre que 'cells' mudar
   const saveChanges = (newCells: Cell[]) => {
     setCells(newCells);
-    const payload: NotebookData = {
+    const payload = {
       cells: newCells.map((c) => ({
         id: c.id,
         cell_type: c.cell_type,
@@ -65,11 +104,16 @@ export function NotebookEditor({ initialContent, onChange }: NotebookEditorProps
   };
 
   const addCell = (type: "markdown" | "code") => {
-    saveChanges([...cells, { id: generateId(), cell_type: type, source: type === "code" ? "# Escreva seu código Python aqui\n" : "" }]);
+    saveChanges([...cells, { id: generateId(), cell_type: type, source: type === "code" ? "# Escreva o código base aqui\n" : "" }]);
+    toast.success(`${type === "code" ? "Código" : "Texto"} adicionado`);
   };
 
   const updateCellSource = (id: string, newSource: string) => {
-    saveChanges(cells.map((c) => c.id === id ? { ...c, source: newSource } : c));
+    setCells(prev => prev.map((c) => c.id === id ? { ...c, source: newSource } : c));
+    // Notifica o formulário pai com debounce ou após edição manual
+    const updated = cells.map((c) => c.id === id ? { ...c, source: newSource } : c);
+    const payload = { cells: updated };
+    onChange(JSON.stringify(payload));
   };
 
   const removeCell = (id: string) => {
@@ -87,132 +131,205 @@ export function NotebookEditor({ initialContent, onChange }: NotebookEditorProps
     }
   };
 
+  const testCell = async (id: string, code: string) => {
+    if (!pyodideInstance.current) return;
+    setExecutingCellId(id);
+    try {
+      await pyodideInstance.current.runPythonAsync(code);
+      toast.success("Código executado sem erros!");
+    } catch (err: any) {
+      toast.error(`Erro no código: ${err.message}`);
+    } finally {
+      setExecutingCellId(null);
+    }
+  };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        const jsonStr = event.target?.result as string;
-        JSON.parse(jsonStr); // Valida JSON
-        onChange(jsonStr);
-        // Atualiza a visualização localmente
-        const data = JSON.parse(jsonStr);
+        const data = JSON.parse(event.target?.result as string);
         if (data.cells) {
             const loadedCells = data.cells.map((c: any) => ({
                 id: generateId(),
                 cell_type: c.cell_type === "markdown" ? "markdown" : "code",
                 source: Array.isArray(c.source) ? c.source.join("") : (c.source || ""),
             }));
-            setCells(loadedCells);
+            saveChanges(loadedCells);
+            toast.success("Notebook importado!");
         }
-        toast.success("Notebook (.ipynb) importado com sucesso!");
       } catch (err) {
-        toast.error("O arquivo fornecido não é um JSON Jupyter válido.");
+        toast.error("Erro ao ler .ipynb");
       }
     };
     reader.readAsText(file);
-    // Limpar input
     e.target.value = "";
   };
 
   return (
-    <div className="space-y-4">
-      {/* Botões Superiores */}
-      <div className="flex items-center gap-2 mb-4 bg-muted/50 p-2 rounded-lg border">
-        <Button size="sm" variant="outline" onClick={() => addCell("markdown")}>
-          <FileText className="w-4 h-4 mr-2 text-blue-600" />
-          Adicionar Texto
-        </Button>
-        <Button size="sm" variant="outline" onClick={() => addCell("code")}>
-          <Code2 className="w-4 h-4 mr-2 text-green-600" />
-          Adicionar Código
-        </Button>
+    <div className="border rounded-xl bg-[#f4f4f4] overflow-hidden flex flex-col min-h-[500px]">
+      
+      {/* Toolbar Superior */}
+      <div className="bg-[#161616] border-b border-[#393939] px-4 py-2 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+            <Layout className="w-4 h-4 text-[#4589ff]" />
+            <span className="text-[#f4f4f4] text-xs font-bold uppercase tracking-wider">Construtor de Exercícios</span>
+        </div>
         
-        <div className="ml-auto relative">
-          <input 
-            type="file" 
-            accept=".ipynb" 
-            onChange={handleFileUpload}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            title="Importar .ipynb"
-          />
-          <Button size="sm" variant="secondary" className="pointer-events-none">
-            <Upload className="w-4 h-4 mr-2" />
-            Importar .ipynb
-          </Button>
+        <div className="flex items-center gap-2">
+            <div className="bg-[#262626] rounded-md p-0.5 flex">
+                <button 
+                  onClick={() => setActiveTab("edit")}
+                  className={cn(
+                    "px-3 py-1 text-[10px] font-bold uppercase rounded-sm transition-all",
+                    activeTab === "edit" ? "bg-[#393939] text-white" : "text-[#a8a8a8] hover:text-white"
+                  )}
+                >Editar</button>
+                <button 
+                  onClick={() => setActiveTab("preview")}
+                  className={cn(
+                    "px-3 py-1 text-[10px] font-bold uppercase rounded-sm transition-all",
+                    activeTab === "preview" ? "bg-[#393939] text-white" : "text-[#a8a8a8] hover:text-white"
+                  )}
+                >Visualizar</button>
+            </div>
+            
+            <div className="w-px h-6 bg-[#393939] mx-2" />
+            
+            <Button size="sm" variant="ghost" className="h-8 text-[#f4f4f4] hover:bg-[#393939] px-2 text-xs gap-2" onClick={() => addCell("markdown")}>
+                <FileText className="w-3 h-3" /> Texto
+            </Button>
+            <Button size="sm" variant="ghost" className="h-8 text-[#f4f4f4] hover:bg-[#393939] px-2 text-xs gap-2" onClick={() => addCell("code")}>
+                <Code2 className="w-3 h-3" /> Código
+            </Button>
+            
+            <div className="relative">
+                <input type="file" accept=".ipynb" onChange={handleFileUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
+                <Button size="sm" variant="ghost" className="h-8 text-[#f4f4f4] hover:bg-[#393939] px-2 text-xs gap-2">
+                    <Upload className="w-3 h-3" /> Importar
+                </Button>
+            </div>
         </div>
       </div>
 
-      {/* Lista de Células */}
-      <div className="space-y-3">
-        {cells.map((cell, index) => (
-          <div key={cell.id} className="relative group border rounded-lg overflow-hidden bg-background shadow-sm hover:shadow-md transition-shadow">
-            
-            {/* Action Bar */}
-            <div className="flex items-center justify-between bg-muted/50 px-3 py-1.5 border-b">
-              <div className="flex items-center gap-2">
-                {cell.cell_type === "markdown" ? (
-                  <><FileText className="w-4 h-4 text-blue-600" /> <span className="text-xs font-semibold uppercase text-muted-foreground">Texto (Markdown)</span></>
-                ) : (
-                  <><Code2 className="w-4 h-4 text-green-600" /> <span className="text-xs font-semibold uppercase text-muted-foreground">Código (Python)</span></>
-                )}
-              </div>
-              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => moveCell(index, "up")} disabled={index === 0}>
-                  <ChevronUp className="w-4 h-4" />
-                </Button>
-                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => moveCell(index, "down")} disabled={index === cells.length - 1}>
-                  <ChevronDown className="w-4 h-4" />
-                </Button>
-                <div className="w-px h-4 bg-border mx-1"></div>
-                <Button size="icon" variant="ghost" className="h-6 w-6 text-destructive hover:bg-destructive/10" onClick={() => removeCell(cell.id)}>
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-
-            {/* Editor de Célula */}
-            <div className="p-0">
-              {cell.cell_type === "markdown" ? (
-                <Textarea 
-                  value={cell.source} 
-                  onChange={(e) => updateCellSource(cell.id, e.target.value)} 
-                  className="w-full border-0 resize-y min-h-[100px] rounded-none focus-visible:ring-0 p-4 font-mono text-sm bg-muted/10 placeholder:text-muted-foreground/50"
-                  placeholder="Escreva em markdown (ex: # Título, **Negrito**)"
-                />
-              ) : (
-                <div className="h-[150px] resize-y overflow-hidden border-t-0 p-2 bg-[#1e1e1e]">
-                   <Editor
-                     height="100%"
-                     defaultLanguage="python"
-                     value={cell.source}
-                     theme="vs-dark"
-                     onChange={(val) => updateCellSource(cell.id, val || "")}
-                     options={{
-                       minimap: { enabled: false },
-                       fontSize: 14,
-                       fontFamily: 'var(--font-mono, monospace)',
-                       lineNumbers: "on",
-                       scrollBeyondLastLine: false,
-                       padding: { top: 8, bottom: 8 },
-                     }}
-                   />
+      <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
+        {activeTab === "edit" ? (
+          <div className="max-w-4xl mx-auto space-y-4">
+            {cells.map((cell, index) => (
+              <div key={cell.id} className="group relative bg-white border border-[#e0e0e0] rounded-lg shadow-sm hover:border-[#0f62fe] transition-all overflow-hidden flex">
+                
+                {/* Drag / Indexer Handle */}
+                <div className="w-8 bg-[#f4f4f4] border-r flex flex-col items-center py-4 gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                    <button className="p-1 hover:bg-[#e0e0e0] rounded" onClick={() => moveCell(index, "up")} disabled={index === 0}>
+                        <ChevronUp className="w-3 h-3" />
+                    </button>
+                    <span className="text-[10px] font-mono font-bold">{index}</span>
+                    <button className="p-1 hover:bg-[#e0e0e0] rounded" onClick={() => moveCell(index, "down")} disabled={index === cells.length - 1}>
+                        <ChevronDown className="w-3 h-3" />
+                    </button>
                 </div>
-              )}
-            </div>
 
+                <div className="flex-1 flex flex-col">
+                    {/* Inner Toolbar */}
+                    <div className="bg-white px-4 py-2 border-b flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            {cell.cell_type === "markdown" ? <FileText className="w-4 h-4 text-blue-600" /> : <Code2 className="w-4 h-4 text-green-600" />}
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#525252]">
+                                {cell.cell_type === "markdown" ? "Markdown" : "Python Code"}
+                            </span>
+                        </div>
+                        
+                        <div className="flex items-center gap-1">
+                             {cell.cell_type === "code" && (
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-7 px-2 text-[#24a148] hover:bg-[#24a148]/10 text-[10px] font-bold uppercase gap-1.5"
+                                  onClick={() => testCell(cell.id, cell.source)}
+                                  disabled={executingCellId !== null}
+                                >
+                                    {executingCellId === cell.id ? <Loader2 className="w-3 h-3 animate-spin"/> : <Play className="w-3 h-3 fill-current" />}
+                                    Testar
+                                </Button>
+                             )}
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-7 w-7 text-[#da1e28] hover:bg-[#da1e28]/10"
+                              onClick={() => removeCell(cell.id)}
+                            >
+                                <Trash2 className="w-3 h-3" />
+                            </Button>
+                        </div>
+                    </div>
+
+                    {/* Editor Space */}
+                    {cell.cell_type === "markdown" ? (
+                        <textarea 
+                          className="w-full p-4 font-mono text-sm min-h-[100px] outline-none border-b focus:bg-[#f4faff] transition-colors resize-y"
+                          placeholder="# Título do Bloco"
+                          value={cell.source}
+                          onChange={(e) => updateCellSource(cell.id, e.target.value)}
+                        />
+                    ) : (
+                        <div className="h-[200px] border-b">
+                            <Editor
+                                height="100%"
+                                defaultLanguage="python"
+                                value={cell.source}
+                                onChange={(val) => updateCellSource(cell.id, val || "")}
+                                options={{
+                                    minimap: { enabled: false },
+                                    fontSize: 14,
+                                    fontFamily: "'IBM Plex Mono', monospace",
+                                    lineNumbers: "on",
+                                    padding: { top: 12, bottom: 12 },
+                                    scrollBeyondLastLine: false,
+                                    automaticLayout: true,
+                                }}
+                            />
+                        </div>
+                    )}
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-        {cells.length === 0 && (
-          <div className="text-center py-10 border-2 border-dashed rounded-lg text-muted-foreground">
-             <Code2 className="w-8 h-8 opacity-20 mx-auto mb-2" />
-             <p className="text-sm">Nenhuma célula neste exercício prático.</p>
-             <p className="text-xs opacity-70">Adicione código ou texto acima, ou importe um notebook .ipynb</p>
+        ) : (
+          <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl border shadow-sm min-h-[400px]">
+             <div className="space-y-6">
+                {cells.map((cell) => (
+                    <div key={cell.id}>
+                        {cell.cell_type === "markdown" ? (
+                            <div className="prose prose-slate max-w-none">
+                                <ReactMarkdown>{cell.source}</ReactMarkdown>
+                            </div>
+                        ) : (
+                            <div className="bg-[#f4f4f4] border p-4 rounded-md font-mono text-sm whitespace-pre-wrap border-l-4 border-l-green-600">
+                                {cell.source}
+                            </div>
+                        )}
+                    </div>
+                ))}
+             </div>
           </div>
         )}
+      </div>
+
+      <div className="bg-white border-t px-4 py-3 flex items-center justify-between text-[11px] text-[#525252]">
+          <div className="flex items-center gap-4">
+              <span>Total de Células: <strong>{cells.length}</strong></span>
+              <span>•</span>
+              <span className="flex items-center gap-1">
+                  <div className={cn("w-1.5 h-1.5 rounded-full", pyodideReady ? "bg-[#24a148]" : "bg-[#f1c21b]")} />
+                  Execução: {pyodideReady ? "Disponível para Teste" : "Carregando Python..."}
+              </span>
+          </div>
+          <p className="italic opacity-50">Dica: Arraste a borda inferior das células de texto para redimensionar.</p>
       </div>
 
     </div>
   );
 }
+
