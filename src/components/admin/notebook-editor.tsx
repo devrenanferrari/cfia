@@ -167,7 +167,8 @@ export function NotebookEditor({ initialContent, onChange }: NotebookEditorProps
                 cell_type: c.cell_type === "markdown" ? "markdown" : "code",
                 source: Array.isArray(c.source) ? c.source.join("") : (c.source || ""),
             }));
-            saveChanges(loadedCells);
+            setCells(loadedCells);
+            debouncedSave(loadedCells);
             toast.success("Notebook importado!");
         }
       } catch (err) {
