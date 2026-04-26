@@ -81,7 +81,7 @@ export function NotebookPlayer({ content }: { content: string }) {
     };
 
     /** Extrai pacotes únicos dos imports e de comandos pip ocultos */
-    const getRequiredPackages = (cellsList: CellData[]) => {
+    const getRequiredPackages = (cellsList: { type: string; source: string }[]) => {
       const packages = new Set<string>();
       const importRegex = /^(?:import|from)\s+([a-zA-Z0-9_]+)/gm;
       
