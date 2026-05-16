@@ -147,10 +147,14 @@ export function SocialPostCard({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ toId: post.author.id }),
     });
-    if (res.ok || res.status === 409) {
+    if (res.ok) {
+      setConnecting("done");
+      toast.success(`Pedido enviado para ${post.author.name?.split(" ")[0] ?? "usuário"}`);
+    } else if (res.status === 409) {
       setConnecting("done");
     } else {
       setConnecting("idle");
+      toast.error("Não foi possível enviar o pedido");
     }
   }
 
@@ -160,23 +164,25 @@ export function SocialPostCard({
     <div className="bg-white border border-[#e0e0e0] overflow-hidden">
       {/* Cabeçalho do post */}
       <div className="flex items-start justify-between gap-3 px-4 pt-4 pb-3">
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-3 min-w-0">
           <Avatar name={post.author.name} size={44} />
-          <div>
-            <p className="text-sm font-semibold leading-tight" style={{ color: "#161616" }}>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold leading-tight truncate" style={{ color: "#161616" }}>
               {post.author.name ?? "Anônimo"}
             </p>
             <p className="text-xs flex items-center gap-1" style={{ color: "#8d8d8d" }}>
-              <Clock className="h-3 w-3" />
+              <Clock className="h-3 w-3 shrink-0" />
               {timeAgo(post.createdAt)}
             </p>
           </div>
         </div>
 
-        {/* Ações para outros usuários */}
         {session && !isOwnPost && (
           <div className="flex items-center gap-1.5 shrink-0">
-            <QuickChatButton toId={post.author.id} />
+            {/* Chat só aparece em telas maiores para não abarrotar mobile */}
+            <span className="hidden sm:flex">
+              <QuickChatButton toId={post.author.id} />
+            </span>
             <button
               onClick={connect}
               disabled={connecting !== "idle"}
@@ -252,7 +258,7 @@ export function SocialPostCard({
         </div>
       )}
 
-      {/* Barra de ações */}
+      {/* Barra de ações — 2 botões, mais espaço em mobile */}
       <div className="flex items-center border-t border-[#e0e0e0] px-2">
         <button
           onClick={toggleLike}
@@ -274,14 +280,6 @@ export function SocialPostCard({
           <MessageSquare className="h-4 w-4" />
           Comentar
         </button>
-
-        <Link
-          href={`/comunidade/${post.id}`}
-          className="flex flex-1 items-center justify-center gap-2 h-10 text-sm font-medium transition-colors hover:bg-[#f4f4f4]"
-          style={{ color: "#525252" }}
-        >
-          Ver post
-        </Link>
       </div>
 
       {/* Área de comentários */}

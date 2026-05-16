@@ -2,20 +2,27 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { ArrowRight, MapPin, Users, Zap, BookOpen, MessageSquare } from "lucide-react";
+import { ArrowRight, PenLine, Users, Zap, BookOpen, MessageSquare } from "lucide-react";
 import { SocialPostCard, type SocialPostData } from "@/components/community/social-post-card";
 import { CreatePostBox } from "@/components/community/create-post-box";
 import { SuggestConnectButtonClient } from "@/components/community/suggest-connect-button";
+import { TagFilter } from "@/components/community/tag-filter";
 
 export const metadata = { title: "Comunidade | CFIA" };
 
-export default async function ComunidadePage() {
+export default async function ComunidadePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tag?: string }>;
+}) {
+  const { tag } = await searchParams;
   const session = await getServerSession(authOptions);
 
   const [posts, totalUsers, xpData, connectionCount] = await Promise.all([
     prisma.post.findMany({
       take: 30,
       orderBy: { createdAt: "desc" },
+      where: tag ? { tags: { has: tag } } : undefined,
       include: {
         author: { select: { id: true, name: true, image: true } },
         _count: { select: { comments: true } },
@@ -34,7 +41,6 @@ export default async function ComunidadePage() {
       : 0,
   ]);
 
-  // Sugestões de conexão: outros usuários que o user atual não conectou
   const suggestions = session
     ? await prisma.user.findMany({
         where: {
@@ -66,9 +72,7 @@ export default async function ComunidadePage() {
           {/* ── Sidebar Esquerda ─────────────────────────────────────────── */}
           <aside className="lg:col-span-3 space-y-3 hidden lg:block">
 
-            {/* Card de perfil */}
             <div className="bg-white border border-[#e0e0e0] overflow-hidden">
-              {/* Capa */}
               <div className="h-14" style={{ backgroundColor: "#0f62fe" }} />
               <div className="px-4 pb-4">
                 <div
@@ -87,7 +91,6 @@ export default async function ComunidadePage() {
                     </p>
 
                     <div className="mt-3 pt-3 border-t border-[#e0e0e0]">
-                      {/* XP */}
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs font-mono" style={{ color: "#525252" }}>
                           Nível {level} — {xp} XP
@@ -138,7 +141,7 @@ export default async function ComunidadePage() {
                     </p>
                     <Link
                       href="/cadastro"
-                      className="block text-center text-xs font-semibold h-8 flex items-center justify-center"
+                      className="flex items-center justify-center text-xs font-semibold h-8"
                       style={{ backgroundColor: "#0f62fe", color: "#ffffff" }}
                     >
                       Criar conta grátis
@@ -148,7 +151,6 @@ export default async function ComunidadePage() {
               </div>
             </div>
 
-            {/* Links rápidos */}
             <div className="bg-white border border-[#e0e0e0] p-4">
               <p className="text-[10px] uppercase tracking-widest font-mono mb-3" style={{ color: "#8d8d8d" }}>
                 Descobrir
@@ -178,14 +180,17 @@ export default async function ComunidadePage() {
           <main className="lg:col-span-6 space-y-3">
             <CreatePostBox />
 
+            {/* Filtro por tag */}
+            <TagFilter />
+
             {posts.length === 0 ? (
               <div className="bg-white border border-[#e0e0e0] p-12 text-center">
-                <MapPin className="h-10 w-10 mx-auto mb-3" style={{ color: "#c6c6c6" }} />
+                <PenLine className="h-10 w-10 mx-auto mb-3" style={{ color: "#c6c6c6" }} />
                 <p className="text-base font-light mb-1" style={{ color: "#161616" }}>
-                  Ninguém publicou ainda.
+                  {tag ? `Nenhum post com a tag "${tag}" ainda.` : "Ninguém publicou ainda."}
                 </p>
                 <p className="text-sm" style={{ color: "#8d8d8d" }}>
-                  Seja o primeiro a compartilhar algo.
+                  {tag ? "Tente outra tag ou escreva o primeiro." : "Seja o primeiro a compartilhar algo."}
                 </p>
               </div>
             ) : (
@@ -202,7 +207,6 @@ export default async function ComunidadePage() {
           {/* ── Sidebar Direita ───────────────────────────────────────────── */}
           <aside className="lg:col-span-3 space-y-3 hidden lg:block">
 
-            {/* Sugestões de pessoas */}
             {suggestions.length > 0 && (
               <div className="bg-white border border-[#e0e0e0] p-4">
                 <p className="text-[10px] uppercase tracking-widest font-mono mb-3" style={{ color: "#8d8d8d" }}>
@@ -232,7 +236,6 @@ export default async function ComunidadePage() {
               </div>
             )}
 
-            {/* Stats da comunidade */}
             <div className="bg-white border border-[#e0e0e0] p-4">
               <p className="text-[10px] uppercase tracking-widest font-mono mb-3" style={{ color: "#8d8d8d" }}>
                 Comunidade
@@ -255,7 +258,6 @@ export default async function ComunidadePage() {
               </div>
             </div>
 
-            {/* Regras */}
             <div className="bg-white border border-[#e0e0e0] p-4">
               <p className="text-[10px] uppercase tracking-widest font-mono mb-3" style={{ color: "#8d8d8d" }}>
                 Regras
@@ -277,4 +279,3 @@ export default async function ComunidadePage() {
     </div>
   );
 }
-

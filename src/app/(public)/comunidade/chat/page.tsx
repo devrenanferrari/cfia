@@ -5,6 +5,18 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { ArrowLeft, MessageSquare, ArrowRight } from "lucide-react";
 
+function timeAgo(date: Date) {
+  const diff = Date.now() - date.getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "agora";
+  if (m < 60) return `${m}min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h`;
+  const d = Math.floor(h / 24);
+  if (d < 7) return `${d}d`;
+  return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
+}
+
 export const metadata = { title: "Chat | Comunidade CFIA" };
 
 export default async function ChatPage() {
@@ -95,7 +107,14 @@ export default async function ChatPage() {
                       </p>
                     )}
                   </div>
-                  <ArrowRight className="h-4 w-4 shrink-0" style={{ color: "#8d8d8d" }} />
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    {lastMsg && (
+                      <span className="text-[10px]" style={{ color: "#8d8d8d" }}>
+                        {timeAgo(lastMsg.createdAt)}
+                      </span>
+                    )}
+                    <ArrowRight className="h-4 w-4" style={{ color: "#8d8d8d" }} />
+                  </div>
                 </Link>
               );
             })}

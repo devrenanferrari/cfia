@@ -15,6 +15,18 @@ type Notification = {
   createdAt: string;
 };
 
+function timeAgo(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "agora";
+  if (m < 60) return `${m}min atrás`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h atrás`;
+  const d = Math.floor(h / 24);
+  if (d < 7) return `${d}d atrás`;
+  return new Date(dateStr).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
+}
+
 export function NotificationBell() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -24,7 +36,6 @@ export function NotificationBell() {
 
   const unread = notifications.filter((n) => !n.read).length;
 
-  // Fetch initial notifications
   useEffect(() => {
     if (!session?.user?.id) return;
     fetch("/api/notifications")
@@ -33,7 +44,6 @@ export function NotificationBell() {
       .catch(() => {});
   }, [session?.user?.id]);
 
-  // Real-time via Pusher
   useEffect(() => {
     if (!session?.user?.id) return;
     const pusher = getPusherClient();
@@ -47,7 +57,6 @@ export function NotificationBell() {
     };
   }, [session?.user?.id]);
 
-  // Close on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -75,16 +84,12 @@ export function NotificationBell() {
     if (n.link) router.push(n.link);
   }
 
-  function toggleOpen() {
-    setOpen((v) => !v);
-  }
-
   if (!session) return null;
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        onClick={toggleOpen}
+        onClick={() => setOpen((v) => !v)}
         className="relative flex h-12 w-10 items-center justify-center transition-colors hover:text-white"
         style={{ color: "#8d8d8d", backgroundColor: "transparent" }}
         aria-label="Notificações"
@@ -105,7 +110,6 @@ export function NotificationBell() {
           className="absolute right-0 top-full mt-1 w-80 max-w-[calc(100vw-1rem)] rounded border shadow-lg z-50"
           style={{ backgroundColor: "#ffffff", borderColor: "#e0e0e0" }}
         >
-          {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: "#e0e0e0" }}>
             <span className="text-sm font-semibold" style={{ color: "#161616" }}>Notificações</span>
             {unread > 0 && (
@@ -119,7 +123,6 @@ export function NotificationBell() {
             )}
           </div>
 
-          {/* List */}
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
               <p className="px-4 py-6 text-center text-sm" style={{ color: "#8d8d8d" }}>
@@ -139,9 +142,10 @@ export function NotificationBell() {
                       style={{ backgroundColor: "#0f62fe" }}
                     />
                   )}
-                  <span className="text-sm leading-snug" style={{ color: "#161616", marginLeft: n.read ? "1rem" : undefined }}>
-                    {n.message}
-                  </span>
+                  <div style={{ marginLeft: n.read ? "1rem" : undefined }}>
+                    <p className="text-sm leading-snug" style={{ color: "#161616" }}>{n.message}</p>
+                    <p className="text-[11px] mt-0.5" style={{ color: "#8d8d8d" }}>{timeAgo(n.createdAt)}</p>
+                  </div>
                 </button>
               ))
             )}
