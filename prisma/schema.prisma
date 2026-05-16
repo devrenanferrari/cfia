@@ -79,6 +79,17 @@ model User {
   quizAttempts QuizAttempt[]
   certificates Certificate[]
   news         News[]        @relation("NewsAuthor")
+
+  posts           Post[]        @relation("PostAuthor")
+  postComments    PostComment[] @relation("CommentAuthor")
+  postVotes       PostVote[]    @relation("PostVotes")
+  commentVotes    CommentVote[] @relation("CommentVotes")
+  connectionsFrom Connection[]  @relation("ConnectionsFrom")
+  connectionsTo   Connection[]  @relation("ConnectionsTo")
+  chatMembers     ChatMember[]
+  chatMessages    ChatMessage[] @relation("ChatMessageAuthor")
+  xp              UserXP?
+  badges          UserBadge[]
 }
 
 enum Role {
@@ -388,4 +399,162 @@ model InterestLead {
   source    String?
   message   String?  @db.Text
   createdAt DateTime @default(now())
+}
+
+// ─── Comunidade ────────────────────────────────────────────────────────────────
+
+model Post {
+  id        String     @id @default(cuid())
+  title     String
+  body      String?    @db.Text
+  type      PostType   @default(TEXT)
+  tags      String[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  authorId  String
+  author    User       @relation("PostAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  comments  PostComment[]
+  votes     PostVote[]
+}
+
+enum PostType {
+  TEXT
+  LINK
+  CODE
+  REPO
+}
+
+model PostComment {
+  id        String   @id @default(cuid())
+  body      String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  authorId  String
+  author    User     @relation("CommentAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  parentId  String?
+  parent    PostComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   PostComment[] @relation("CommentReplies")
+
+  votes     CommentVote[]
+}
+
+model PostVote {
+  id     String @id @default(cuid())
+  value  Int
+  userId String
+  postId String
+
+  user   User   @relation("PostVotes", fields: [userId], references: [id], onDelete: Cascade)
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+}
+
+model CommentVote {
+  id        String      @id @default(cuid())
+  value     Int
+  userId    String
+  commentId String
+
+  user      User        @relation("CommentVotes", fields: [userId], references: [id], onDelete: Cascade)
+  comment   PostComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, commentId])
+}
+
+// ─── Conexões ──────────────────────────────────────────────────────────────────
+
+model Connection {
+  id        String           @id @default(cuid())
+  fromId    String
+  toId      String
+  status    ConnectionStatus @default(PENDING)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  from      User             @relation("ConnectionsFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to        User             @relation("ConnectionsTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@unique([fromId, toId])
+}
+
+enum ConnectionStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+// ─── Chat ──────────────────────────────────────────────────────────────────────
+
+model ChatRoom {
+  id        String        @id @default(cuid())
+  name      String?
+  isGroup   Boolean       @default(false)
+  createdAt DateTime      @default(now())
+
+  members   ChatMember[]
+  messages  ChatMessage[]
+}
+
+model ChatMember {
+  roomId   String
+  userId   String
+  joinedAt DateTime  @default(now())
+
+  room     ChatRoom  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([roomId, userId])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  body      String   @db.Text
+  roomId    String
+  authorId  String
+  createdAt DateTime @default(now())
+
+  room      ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  author    User     @relation("ChatMessageAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+// ─── Gamificação ───────────────────────────────────────────────────────────────
+
+model UserXP {
+  id     String @id @default(cuid())
+  userId String @unique
+  xp     Int    @default(0)
+  level  Int    @default(1)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Badge {
+  id          String      @id @default(cuid())
+  slug        String      @unique
+  name        String
+  description String?
+  icon        String
+  xpValue     Int         @default(0)
+
+  userBadges  UserBadge[]
+}
+
+model UserBadge {
+  id       String   @id @default(cuid())
+  userId   String
+  badgeId  String
+  earnedAt DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge    Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
 }

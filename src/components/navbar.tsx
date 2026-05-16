@@ -18,6 +18,7 @@ import {
   Heart,
   LayoutDashboard,
   LogOut,
+  MessageSquare,
   Search,
   Shield,
   User,
@@ -42,6 +43,7 @@ export function Navbar() {
   const navLinks = [
     { href: "/trilhas", label: "Trilhas" },
     { href: "/cursos", label: "Cursos" },
+    { href: "/comunidade", label: "Comunidade" },
     { href: "/laboratorio", label: "Laboratorio" },
     { href: "/apoie", label: "Apoie" },
     { href: "/professores", label: "Professores" },
@@ -150,6 +152,10 @@ export function Navbar() {
                           Painel admin
                         </DropdownMenuItem>
                       )}
+                      <DropdownMenuItem onClick={() => router.push("/comunidade")} className="cursor-pointer">
+                        <MessageSquare className="mr-2.5 h-4 w-4 text-muted-foreground" />
+                        Comunidade
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => router.push("/perfil")} className="cursor-pointer">
                         <User className="mr-2.5 h-4 w-4 text-muted-foreground" />
                         Meu perfil
