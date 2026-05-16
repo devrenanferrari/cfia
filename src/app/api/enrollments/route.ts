@@ -5,31 +5,24 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  if (!session) return NextResponse.json({ error: "Nao autorizado" }, { status: 401 });
 
   const { courseId } = await req.json();
-  if (!courseId) return NextResponse.json({ error: "courseId é obrigatório" }, { status: 400 });
+  if (!courseId) return NextResponse.json({ error: "courseId e obrigatorio" }, { status: 400 });
 
   const course = await prisma.course.findUnique({ where: { id: courseId, isPublished: true } });
-  if (!course) return NextResponse.json({ error: "Curso não encontrado" }, { status: 404 });
+  if (!course) return NextResponse.json({ error: "Curso nao encontrado" }, { status: 404 });
 
   const existing = await prisma.enrollment.findUnique({
     where: { userId_courseId: { userId: session.user.id, courseId } },
   });
-  if (existing) return NextResponse.json({ error: "Já matriculado neste curso" }, { status: 409 });
+  if (existing) return NextResponse.json({ error: "Ja matriculado neste curso" }, { status: 409 });
 
   if (!course.isFree) {
-    // Permite matrícula se o aluno tiver assinatura ativa
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { subscriptionStatus: true },
-    });
-    if (user?.subscriptionStatus !== "ACTIVE") {
-      return NextResponse.json(
-        { error: "Assinatura necessária para acessar este curso." },
-        { status: 402 }
-      );
-    }
+    return NextResponse.json(
+      { error: "Este curso ainda nao esta com acesso gratuito liberado." },
+      { status: 403 }
+    );
   }
 
   const enrollment = await prisma.enrollment.create({

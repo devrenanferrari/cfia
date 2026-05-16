@@ -1,11 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { Loader2, Mail } from "lucide-react";
 import { toast } from "sonner";
-import { Loader2, Lock } from "lucide-react";
-import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface EnrollButtonProps {
   courseId: string;
@@ -46,7 +46,7 @@ export function EnrollButton({
         throw new Error(data.error ?? "Erro ao matricular");
       }
 
-      toast.success("Matrícula realizada com sucesso!");
+      toast.success("Matricula realizada com sucesso.");
       router.push(`/dashboard/cursos/${courseSlug}`);
       router.refresh();
     } catch (err) {
@@ -56,44 +56,33 @@ export function EnrollButton({
     }
   }
 
-  // Already enrolled
   if (isEnrolled) {
     return (
-      <Button
-        className="w-full h-12 rounded-[56px] font-semibold text-sm"
-        style={{ backgroundColor: "#0052ff" }}
-        asChild
-      >
+      <Button className="h-12 w-full rounded-[56px] text-sm font-semibold" style={{ backgroundColor: "#0052ff" }} asChild>
         <a href={`/dashboard/cursos/${courseSlug}`}>Continuar aprendendo</a>
       </Button>
     );
   }
 
-  // Paid course — not subscribed
   if (!isFree && !isSubscribed) {
     return (
       <div className="space-y-3">
-        <Button
-          className="w-full h-12 rounded-[56px] font-bold text-sm gap-2"
-          style={{ backgroundColor: "#0052ff" }}
-          asChild
-        >
-          <Link href={isLoggedIn ? "/assinar" : `/entrar?callbackUrl=/assinar`}>
-            <Lock className="h-4 w-4" />
-            Assinar para acessar
+        <Button className="h-12 w-full gap-2 rounded-[56px] text-sm font-bold" style={{ backgroundColor: "#0052ff" }} asChild>
+          <Link href="/apoie">
+            <Mail className="h-4 w-4" />
+            Entrar na lista de interesse
           </Link>
         </Button>
         <p className="text-center text-xs" style={{ color: "#5b616e" }}>
-          A partir de R$99,90/mês · Cancele quando quiser
+          Este curso ainda nao esta com acesso gratuito liberado.
         </p>
       </div>
     );
   }
 
-  // Free course OR subscribed user — can enroll
   return (
     <Button
-      className="w-full h-12 rounded-[56px] font-semibold text-sm"
+      className="h-12 w-full rounded-[56px] text-sm font-semibold"
       style={{ backgroundColor: "#0052ff" }}
       onClick={handleEnroll}
       disabled={loading}
@@ -101,9 +90,9 @@ export function EnrollButton({
       {loading ? (
         <Loader2 className="h-4 w-4 animate-spin" />
       ) : isFree ? (
-        "Matricular-se grátis"
+        "Matricular-se gratis"
       ) : (
-        "Começar agora"
+        "Comecar agora"
       )}
     </Button>
   );

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { ScrollReveal, StaggerReveal, StaggerItem } from "@/components/home/scroll-reveal";
 import { RoadmapVisual } from "@/components/trilhas/roadmap-visual";
+import { InterestForm } from "@/components/interest-form";
 
 export const metadata = {
   title: "Trilhas de Carreira | CFIA",
@@ -93,21 +94,38 @@ export default function TrilhasPage() {
       {/* ── Nota de honestidade ── */}
       <section className="py-12 px-4 md:px-8 border-b border-[#e0e0e0]" style={{ backgroundColor: "#f4f4f4" }}>
         <div className="mx-auto max-w-[1584px]">
-          <div
-            className="p-6 border-l-4 max-w-2xl"
-            style={{ borderColor: "#0f62fe", backgroundColor: "#ffffff" }}
-          >
-            <p
-              className="text-[10px] uppercase tracking-widest mb-2"
-              style={{ color: "#8d8d8d", fontFamily: "var(--font-mono, monospace)" }}
+          <div className="grid gap-6 lg:grid-cols-2 lg:items-center">
+            <div
+              className="p-6 border-l-4"
+              style={{ borderColor: "#0f62fe", backgroundColor: "#ffffff" }}
             >
-              Transparência
-            </p>
-            <p className="text-sm text-[#525252] leading-relaxed">
-              Esses roadmaps foram desenhados com base no que o mercado de tecnologia realmente pede.
-              Os cursos estão em construção — a maioria dos nós ainda aparece como "em breve".
-              Isso é honesto: é melhor mostrar o caminho completo do que fingir que temos mais do que temos.
-            </p>
+              <p
+                className="text-[10px] uppercase tracking-widest mb-2"
+                style={{ color: "#8d8d8d", fontFamily: "var(--font-mono, monospace)" }}
+              >
+                Transparência
+              </p>
+              <p className="text-sm text-[#525252] leading-relaxed">
+                Esses roadmaps foram desenhados com base no que o mercado de tecnologia realmente pede.
+                Os cursos estão em construção. A maioria dos nós ainda aparece como em breve.
+                Isso é honesto: é melhor mostrar o caminho completo do que fingir que temos mais do que temos.
+              </p>
+            </div>
+            <div className="p-6 bg-white border border-[#e0e0e0]">
+              <p
+                className="text-[10px] uppercase tracking-widest mb-2"
+                style={{ color: "#0f62fe", fontFamily: "var(--font-mono, monospace)" }}
+              >
+                Lista de interesse
+              </p>
+              <h2 className="text-xl font-semibold mb-2 text-[#161616]">
+                Avise-me quando as trilhas forem liberadas.
+              </h2>
+              <p className="text-sm text-[#525252] leading-relaxed mb-5">
+                Voce recebe um aviso quando novos cursos, trilhas e projetos praticos forem publicados.
+              </p>
+              <InterestForm source="trilhas" />
+            </div>
           </div>
         </div>
       </section>

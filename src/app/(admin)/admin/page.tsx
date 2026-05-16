@@ -40,7 +40,7 @@ export default async function AdminDashboard() {
     { label: "Instrutores", value: stats.totalInstructors, icon: UserCheck, href: "/admin/instrutores", color: "#7c3aed" },
     { label: "Cursos publicados", value: stats.totalCourses, icon: BookOpen, href: "/admin/cursos", color: "#059669" },
     { label: "Matrículas", value: stats.totalEnrollments, icon: TrendingUp, href: "/admin/alunos", color: "#d97706" },
-    { label: "Assinaturas ativas", value: stats.activeSubscriptions, icon: TrendingUp, href: "/admin/alunos", color: "#0891b2" },
+    { label: "Apoiadores ativos", value: stats.activeSubscriptions, icon: TrendingUp, href: "/admin/alunos", color: "#0891b2" },
   ];
 
   return (

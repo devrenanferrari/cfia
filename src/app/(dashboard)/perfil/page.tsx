@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { LogOut, User, CreditCard } from "lucide-react";
+import { Heart, LogOut, User } from "lucide-react";
 
 export default function PerfilPage() {
   const { data: session, update } = useSession();
@@ -12,7 +12,6 @@ export default function PerfilPage() {
   const [name, setName] = useState(session?.user?.name ?? "");
   const [bio, setBio] = useState("");
   const [loading, setLoading] = useState(false);
-  const [portalLoading, setPortalLoading] = useState(false);
 
   const initials = session?.user?.name
     ?.split(" ")
@@ -46,17 +45,7 @@ export default function PerfilPage() {
     }
   }
 
-  async function handlePortal() {
-    setPortalLoading(true);
-    const res = await fetch("/api/stripe/portal", { method: "POST" });
-    const d = await res.json();
-    if (d.url) window.location.href = d.url;
-    setPortalLoading(false);
-  }
-
   if (!session) return null;
-
-  const isSubscribed = session.user?.subscriptionStatus === "ACTIVE";
 
   return (
     <div className="max-w-xl">
@@ -104,11 +93,11 @@ export default function PerfilPage() {
             <span
               className="px-2.5 py-1 text-xs font-semibold"
               style={{
-                backgroundColor: isSubscribed ? "#defbe6" : "#f4f4f4",
-                color: isSubscribed ? "#198038" : "#525252",
+                backgroundColor: "#f4f4f4",
+                color: "#525252",
               }}
             >
-              {isSubscribed ? "Assinatura ativa" : "Plano gratuito"}
+              Projeto gratuito
             </span>
           </div>
         </div>
@@ -198,39 +187,21 @@ export default function PerfilPage() {
         </button>
       </form>
 
-      {/* Assinatura */}
-      {!isSubscribed ? (
-        <div className="p-6 bg-white border border-[#e0e0e0] border-t-0 mb-px">
-          <h2 className="font-semibold mb-2" style={{ color: "#161616" }}>Assinatura</h2>
-          <p className="text-sm mb-5" style={{ color: "#525252", lineHeight: 1.6 }}>
-            Assine para acessar todos os cursos, trilhas completas e emitir certificados.
-          </p>
-          <a
-            href="/assinar"
-            className="inline-flex items-center gap-2 px-6 py-3 font-semibold text-sm text-white transition-colors hover:bg-[#0353e9]"
-            style={{ backgroundColor: "#0f62fe" }}
-          >
-            <CreditCard className="h-4 w-4" />
-            Ver planos
-          </a>
-        </div>
-      ) : (
-        <div className="p-6 bg-white border border-[#e0e0e0] border-t-0 mb-px">
-          <h2 className="font-semibold mb-2" style={{ color: "#161616" }}>Assinatura ativa</h2>
-          <p className="text-sm mb-5" style={{ color: "#525252", lineHeight: 1.6 }}>
-            Gerencie seu plano, altere a forma de pagamento ou cancele pelo portal do cliente.
-          </p>
-          <button
-            onClick={handlePortal}
-            disabled={portalLoading}
-            className="inline-flex items-center gap-2 px-6 py-3 font-semibold text-sm transition-colors border border-[#c6c6c6] hover:bg-[#f4f4f4] disabled:opacity-50"
-            style={{ color: "#161616", backgroundColor: "#fff" }}
-          >
-            <CreditCard className="h-4 w-4" />
-            {portalLoading ? "Abrindo portal..." : "Gerenciar assinatura"}
-          </button>
-        </div>
-      )}
+      <div className="p-6 bg-white border border-[#e0e0e0] border-t-0 mb-px">
+        <h2 className="font-semibold mb-2" style={{ color: "#161616" }}>Apoie o projeto</h2>
+        <p className="text-sm mb-5" style={{ color: "#525252", lineHeight: 1.6 }}>
+          Os cursos do CFIA sao gratuitos. Se o projeto te ajudar, voce pode acompanhar novidades
+          ou demonstrar interesse em apoiar a manutencao da plataforma.
+        </p>
+        <a
+          href="/apoie"
+          className="inline-flex items-center gap-2 px-6 py-3 font-semibold text-sm text-white transition-colors hover:bg-[#0353e9]"
+          style={{ backgroundColor: "#0f62fe" }}
+        >
+          <Heart className="h-4 w-4" />
+          Apoiar o projeto
+        </a>
+      </div>
 
       {/* Sair */}
       <div className="p-6 bg-white border border-[#e0e0e0] border-t-0">

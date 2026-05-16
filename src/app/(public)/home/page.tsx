@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { CourseCard } from "@/components/course-card";
 import { HeroSection, SocialProofBar } from "@/components/home/hero-section";
 import { ScrollReveal, StaggerReveal, StaggerItem } from "@/components/home/scroll-reveal";
+import { InterestForm } from "@/components/interest-form";
 import {
   ArrowRight,
   BookOpen,
@@ -60,7 +61,7 @@ export default async function HomePage() {
             {[
               { Icon: TrendingUp, title: "Aprender do zero", desc: "Cursos livres e gratuitos para quem está começando.", href: "/cursos", color: "#0f62fe" },
               { Icon: GraduationCap, title: "Obter certificado", desc: "Certificado de conclusão verificável ao finalizar.", href: "/cursos", color: "#0f62fe" },
-              { Icon: Building2, title: "Apoiar o projeto", desc: "Saiba como ajudar este projeto de extensão a crescer.", href: "/sobre", color: "#0f62fe" },
+              { Icon: Building2, title: "Apoiar o projeto", desc: "Saiba como ajudar este projeto de extensão a crescer.", href: "/apoie", color: "#0f62fe" },
             ].map(({ Icon, title, desc, href, color }) => (
               <Link
                 key={title}
@@ -85,6 +86,26 @@ export default async function HomePage() {
               </Link>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="py-10 px-4 md:px-8 border-b" style={{ borderColor: "#e0e0e0", backgroundColor: "#ffffff" }}>
+        <div className="mx-auto max-w-7xl grid gap-6 md:grid-cols-2 md:items-center">
+          <div>
+            <p
+              className="text-[11px] uppercase tracking-[0.24em] mb-2"
+              style={{ color: "#0f62fe", fontFamily: "var(--font-mono, monospace)" }}
+            >
+              Novos cursos em breve
+            </p>
+            <h2 className="text-2xl font-light mb-2" style={{ color: "#161616" }}>
+              Quer ser avisado quando uma trilha abrir?
+            </h2>
+            <p className="text-sm leading-relaxed" style={{ color: "#525252" }}>
+              Deixe seu email para receber novidades do projeto, cursos publicados e bastidores da plataforma.
+            </p>
+          </div>
+          <InterestForm source="home" />
         </div>
       </section>
 

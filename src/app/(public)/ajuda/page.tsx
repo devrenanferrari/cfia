@@ -1,163 +1,154 @@
 import Link from "next/link";
-import { ArrowRight, MessageCircleQuestion, GraduationCap, CreditCard, ShieldAlert, FileText, Lock } from "lucide-react";
-import { ScrollReveal, StaggerReveal, StaggerItem } from "@/components/home/scroll-reveal";
+import { ArrowRight, BookOpen, GraduationCap, HelpCircle, Mail, ShieldCheck, UserRound } from "lucide-react";
 
 export const metadata = {
-  title: "Central de Ajuda | CFIA",
-  description: "Encontre respostas para as perguntas mais comuns sobre a plataforma CFIA.",
+  title: "Ajuda | CFIA",
+  description: "Perguntas frequentes sobre os cursos gratuitos, certificados e o projeto CFIA.",
 };
 
 const faqs = [
   {
-    category: "Assinatura e Pagamentos",
-    icon: CreditCard,
+    category: "Cursos gratuitos",
+    icon: BookOpen,
     items: [
       {
-        q: "Como cancelar minha assinatura?",
-        a: "Você pode cancelar a qualquer momento acessando seu menu superior direito -> Gerenciar plano -> Cancelar assinatura. O acesso permanecerá ativo até o final do período faturado."
+        q: "Os cursos do CFIA sao gratuitos?",
+        a: "Sim. A proposta do projeto e manter o acesso ao conteudo gratuito. Voce pode criar uma conta, se matricular nos cursos publicados e estudar sem assinatura mensal.",
       },
       {
-        q: "Quais são as formas de pagamento aceitas?",
-        a: "Aceitamos cartão de crédito (parcelamento disponível dependendo do plano) e PIX. Não trabalhamos com boletos."
+        q: "O CFIA e uma faculdade ou pos-graduacao?",
+        a: "Nao. O CFIA oferece cursos livres como projeto de extensao. Nao e pos-graduacao, MBA, curso tecnico ou instituicao regulamentada pelo MEC.",
       },
       {
-        q: "O que acontece quando meu plano acaba?",
-        a: "Para planos anuais (Assinatura), a renovação é automática. Caso opte por não renovar, você perderá acesso aos conteúdos."
-      }
-    ]
+        q: "Por que alguns cursos aparecem como em breve?",
+        a: "Porque a plataforma esta em construcao. Preferimos mostrar o caminho com transparencia em vez de fingir que ja existe um catalogo enorme.",
+      },
+    ],
   },
   {
-    category: "Cursos e Certificados",
+    category: "Certificados",
     icon: GraduationCap,
     items: [
       {
-        q: "Os certificados são reconhecidos pelo MEC?",
-        a: "Nossos certificados são de cursos livres de capacitação profissional e aperfeiçoamento. Eles são amplamente reconhecidos pelo mercado corporativo, válidos legalmente em todo o território nacional, atestando suas habilidades sem conferir titulação acadêmica vinculada ao MEC."
+        q: "O certificado e valido?",
+        a: "O certificado e de conclusao de curso livre. Ele serve como comprovante de participacao e aprendizado, com verificacao online, mas nao substitui diploma, pos-graduacao ou certificacao oficial.",
       },
       {
-        q: "Como eu emito meu certificado?",
-        a: "Após concluir 100% das aulas e avaliações de um curso, você poderá emitir o certificado diretamente no seu painel do aluno, na aba 'Certificados'."
+        q: "Como emito meu certificado?",
+        a: "Depois de concluir as aulas e avaliacoes exigidas por um curso, o certificado aparece no painel do aluno, na area de certificados.",
       },
       {
-        q: "Posso compartilhar os certificados no LinkedIn?",
-        a: "Sim. Nossos certificados possuem uma URL única e verificável, com integração direta de 1 clique para adicionar ao seu perfil do LinkedIn."
-      }
-    ]
+        q: "O certificado tem verificacao publica?",
+        a: "Sim. Cada certificado possui um codigo unico e uma pagina publica de verificacao.",
+      },
+    ],
   },
   {
-    category: "Acesso e Conta",
-    icon: Lock,
+    category: "Conta e acesso",
+    icon: UserRound,
     items: [
       {
-        q: "Esqueci minha senha, como recuperar?",
-        a: "Na página de login inicial, clique em 'Esqueci minha senha'. Enviaremos um link temporário para o seu e-mail cadastrado."
+        q: "Preciso criar conta para estudar?",
+        a: "Sim. A conta permite salvar matriculas, progresso, respostas de quizzes e certificados.",
       },
       {
-        q: "Posso acessar pelo celular?",
-        a: "Nosso ambiente Web é 100% responsivo e otimizado para celulares e tablets. Você não precisa baixar um app para assistir às aulas onde estiver."
-      }
-    ]
-  }
+        q: "Esqueci minha senha. O que faco?",
+        a: "Use a pagina de recuperacao de senha em /esqueci-senha. Se algo falhar, entre em contato pela pagina de contato.",
+      },
+    ],
+  },
 ];
 
 export default function HelpPage() {
   return (
     <div className="flex flex-col bg-white">
-      {/* Header */}
-      <section className="bg-[#f4f4f4] py-16 px-4 md:px-8 border-b border-[#e0e0e0]">
-        <div className="mx-auto max-w-[1584px] text-center max-w-3xl">
-          <ScrollReveal>
-            <div className="w-16 h-16 bg-white border border-[#e0e0e0] flex items-center justify-center mx-auto mb-6">
-              <MessageCircleQuestion className="w-8 h-8 text-[#0f62fe]" />
+      <section className="border-b border-[#e0e0e0] px-4 py-16 md:px-8" style={{ backgroundColor: "#f4f4f4" }}>
+        <div className="mx-auto max-w-[1584px]">
+          <div className="max-w-3xl">
+            <div className="mb-6 flex h-16 w-16 items-center justify-center bg-white border border-[#e0e0e0]">
+              <HelpCircle className="h-8 w-8" style={{ color: "#0f62fe" }} />
             </div>
-            <h1
-              className="text-4xl md:text-5xl font-light mb-4 text-[#161616] tracking-tight"
-            >
-              Central de Ajuda
+            <h1 className="mb-4 text-4xl font-light md:text-5xl" style={{ color: "#161616" }}>
+              Ajuda
             </h1>
-            <p className="text-lg text-[#525252]">
-              Tire suas dúvidas sobre pagamentos, certificados, acesso às aulas e mais.
+            <p className="text-base leading-relaxed" style={{ color: "#525252" }}>
+              Respostas diretas sobre cursos gratuitos, certificados, conta e o funcionamento do CFIA como projeto de extensao.
             </p>
-          </ScrollReveal>
+          </div>
         </div>
       </section>
 
-      {/* Main content */}
-      <section className="py-20 px-4 md:px-8">
-        <div className="mx-auto max-w-[1584px]">
-          <div className="grid lg:grid-cols-12 gap-12 lg:gap-24">
-            
-            {/* Sidebar nav / Contact */}
-            <div className="lg:col-span-4 space-y-12">
-              <ScrollReveal>
-                <div className="bg-[#edf5ff] p-8">
-                  <h3 className="text-lg font-bold text-[#161616] mb-3">Ainda precisa de ajuda?</h3>
-                  <p className="text-[#525252] text-sm mb-6 leading-relaxed">
-                    Não encontrou a resposta para a sua dúvida? Nossa equipe de suporte está à disposição.
-                  </p>
-                  <Link
-                    href="/contato"
-                    className="inline-flex items-center gap-2 bg-[#0f62fe] text-white px-6 py-3 font-semibold text-sm transition-colors hover:bg-[#0353e9]"
-                  >
-                    Fale com nosso Suporte <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </ScrollReveal>
+      <section className="px-4 py-20 md:px-8">
+        <div className="mx-auto grid max-w-[1584px] gap-12 lg:grid-cols-12">
+          <aside className="lg:col-span-4">
+            <div className="sticky top-20 space-y-6">
+              <div className="bg-[#edf5ff] p-8">
+                <h2 className="mb-3 text-lg font-semibold" style={{ color: "#161616" }}>
+                  Ainda ficou alguma duvida?
+                </h2>
+                <p className="mb-6 text-sm leading-relaxed" style={{ color: "#525252" }}>
+                  Mande uma mensagem. Como o projeto ainda e pequeno, o contato e direto e sem central corporativa.
+                </p>
+                <Link
+                  href="/contato"
+                  className="inline-flex items-center gap-2 px-5 py-3 text-sm font-semibold text-white"
+                  style={{ backgroundColor: "#0f62fe" }}
+                >
+                  Entrar em contato <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
 
-              <ScrollReveal delay={0.1}>
-                <div className="border border-[#e0e0e0] p-8">
-                  <h3 className="text-lg font-bold text-[#161616] mb-4">Políticas e Termos</h3>
-                  <ul className="space-y-4">
-                    <li>
-                      <Link href="/termos" className="flex items-center gap-2 text-sm text-[#0f62fe] hover:underline">
-                        <FileText className="w-4 h-4" /> Termos de Uso
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/privacidade" className="flex items-center gap-2 text-sm text-[#0f62fe] hover:underline">
-                        <ShieldAlert className="w-4 h-4" /> Política de Privacidade
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </ScrollReveal>
-            </div>
-
-            {/* FAQs Accordion */}
-            <div className="lg:col-span-8">
-              <div className="space-y-16">
-                {faqs.map((category, i) => (
-                  <div key={i} className="scroll-mt-32" id={`cat-${i}`}>
-                    <StaggerReveal className="mb-8">
-                      <div className="flex items-center gap-3 mb-6">
-                        <category.icon className="w-6 h-6 text-[#161616]" />
-                        <h2 className="text-2xl font-bold text-[#161616]">{category.category}</h2>
-                      </div>
-                    </StaggerReveal>
-
-                    <div className="space-y-4">
-                      {category.items.map((item, j) => (
-                        <div key={j} className="border border-[#e0e0e0] bg-white group">
-                          {/* We use Details/Summary for native Accordion with IBM Carbon stylings */}
-                          <details className="cursor-pointer peer group-open:bg-[#f8faff]">
-                            <summary className="p-6 font-semibold text-[#161616] select-none list-none flex justify-between items-center outline-none">
-                              {item.q}
-                              <span className="text-2xl font-light text-[#0f62fe] transition-transform group-open:rotate-45 leading-none">
-                                +
-                              </span>
-                            </summary>
-                            <div className="px-6 pb-6 pt-0 text-[#525252] text-sm leading-relaxed border-t border-[#e0e0e0] mt-0 pt-4 cursor-text">
-                              {item.a}
-                            </div>
-                          </details>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+              <div className="border border-[#e0e0e0] p-8">
+                <ShieldCheck className="mb-4 h-6 w-6" style={{ color: "#0f62fe" }} />
+                <h2 className="mb-3 text-lg font-semibold" style={{ color: "#161616" }}>
+                  Transparencia antes de marketing
+                </h2>
+                <p className="text-sm leading-relaxed" style={{ color: "#525252" }}>
+                  O CFIA nao promete emprego, diploma oficial ou mentoria 24h. Promete conteudo livre,
+                  feito com cuidado, e uma plataforma crescendo em publico.
+                </p>
               </div>
             </div>
+          </aside>
 
+          <div className="lg:col-span-8">
+            <div className="space-y-14">
+              {faqs.map((category) => (
+                <section key={category.category} className="scroll-mt-20">
+                  <div className="mb-6 flex items-center gap-3">
+                    <category.icon className="h-6 w-6" style={{ color: "#161616" }} />
+                    <h2 className="text-2xl font-semibold" style={{ color: "#161616" }}>{category.category}</h2>
+                  </div>
+
+                  <div className="space-y-3">
+                    {category.items.map((item) => (
+                      <details key={item.q} className="border border-[#e0e0e0] bg-white">
+                        <summary className="flex cursor-pointer list-none items-center justify-between p-5 text-sm font-semibold" style={{ color: "#161616" }}>
+                          {item.q}
+                          <span className="text-xl font-light" style={{ color: "#0f62fe" }}>+</span>
+                        </summary>
+                        <div className="border-t border-[#e0e0e0] px-5 py-4 text-sm leading-relaxed" style={{ color: "#525252" }}>
+                          {item.a}
+                        </div>
+                      </details>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+
+            <div className="mt-14 border-l-4 bg-[#f4f4f4] p-6" style={{ borderColor: "#0f62fe" }}>
+              <div className="mb-2 flex items-center gap-2">
+                <Mail className="h-4 w-4" style={{ color: "#0f62fe" }} />
+                <h2 className="text-sm font-semibold" style={{ color: "#161616" }}>Contato direto</h2>
+              </div>
+              <p className="text-sm leading-relaxed" style={{ color: "#525252" }}>
+                Para parcerias, apoio, sugestoes ou problemas tecnicos:{" "}
+                <a href="mailto:contato@cfia.com.br" className="font-semibold" style={{ color: "#0f62fe" }}>
+                  contato@cfia.com.br
+                </a>
+              </p>
+            </div>
           </div>
         </div>
       </section>

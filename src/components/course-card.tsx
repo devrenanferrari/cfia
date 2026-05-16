@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { BookOpen, Users, ArrowRight, Star, Lock, Play } from "lucide-react";
+import { BookOpen, Users, ArrowRight, Star, Clock } from "lucide-react";
 
 type Course = {
   id: string;
@@ -85,15 +85,15 @@ export function CourseCard({ course, index = 0 }: { course: Course; index?: numb
                   className="text-xs font-semibold px-2 py-1 flex items-center gap-1"
                   style={{ backgroundColor: "var(--cds-support-success)", color: "white" }}
                 >
-                  Grátis
+                  Gratis
                 </span>
               ) : (
                 <span
                   className="text-xs font-semibold px-2 py-1 flex items-center gap-1"
                   style={{ backgroundColor: "var(--cds-text-primary)", color: "white" }}
                 >
-                  <Lock className="h-3 w-3" />
-                  Premium
+                  <Clock className="h-3 w-3" />
+                  Em breve
                 </span>
               )}
             </div>
@@ -155,7 +155,7 @@ export function CourseCard({ course, index = 0 }: { course: Course; index?: numb
                 className="text-base font-semibold"
                 style={{ color: "var(--cds-text-primary)" }}
               >
-                {course.isFree ? "Acesso Livre" : `R$ ${course.price.toFixed(0)}`}
+                {course.isFree ? "Acesso livre" : "Em breve"}
               </span>
             </div>
           </div>

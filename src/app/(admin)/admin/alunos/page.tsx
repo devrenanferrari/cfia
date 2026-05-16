@@ -80,7 +80,7 @@ export default function AdminAlunosPage() {
             <tr style={{ backgroundColor: "#f7f8fa" }}>
               <th className="text-left px-6 py-4 font-semibold text-muted-foreground">Nome</th>
               <th className="text-left px-6 py-4 font-semibold text-muted-foreground">Email</th>
-              <th className="text-left px-6 py-4 font-semibold text-muted-foreground">Assinatura</th>
+              <th className="text-left px-6 py-4 font-semibold text-muted-foreground">Apoio</th>
               <th className="text-left px-6 py-4 font-semibold text-muted-foreground">Matrículas</th>
               <th className="text-left px-6 py-4 font-semibold text-muted-foreground">Cadastro</th>
             </tr>

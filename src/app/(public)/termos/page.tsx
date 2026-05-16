@@ -2,84 +2,84 @@ export default function TermosPage() {
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-3xl px-4 py-16">
-        <h1 className="text-3xl font-bold mb-2">Termos de Uso</h1>
-        <p className="text-muted-foreground mb-10 text-sm">Última atualização: abril de 2025</p>
+        <h1 className="mb-2 text-3xl font-bold">Termos de Uso</h1>
+        <p className="mb-10 text-sm text-muted-foreground">Ultima atualizacao: maio de 2026</p>
 
         <div className="prose prose-gray max-w-none space-y-8 text-sm leading-relaxed text-muted-foreground">
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-3">1. Aceitação dos Termos</h2>
+            <h2 className="mb-3 text-lg font-semibold text-foreground">1. Aceitacao dos termos</h2>
             <p>
-              Ao acessar ou utilizar a plataforma cfia (Centro de Formação em Inteligência Artificial),
-              você concorda em cumprir estes Termos de Uso. Se você não concorda com qualquer parte destes
-              termos, não poderá acessar o serviço.
+              Ao acessar ou utilizar o CFIA, voce concorda com estes Termos de Uso. Se nao concordar
+              com alguma parte, recomendamos nao utilizar a plataforma.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-3">2. Descrição do Serviço</h2>
+            <h2 className="mb-3 text-lg font-semibold text-foreground">2. Descricao do projeto</h2>
             <p>
-              O cfia é uma plataforma de educação online especializada em Inteligência Artificial, que oferece
-              cursos em vídeo, materiais de apoio e certificados de conclusão mediante assinatura mensal ou anual.
+              O CFIA e uma plataforma de cursos livres em programacao e inteligencia artificial,
+              criada como projeto de extensao universitario. O acesso aos cursos publicados e gratuito.
+            </p>
+            <p className="mt-3">
+              O CFIA nao e uma instituicao de ensino regulamentada pelo MEC e nao oferece pos-graduacao,
+              MBA, curso tecnico ou diploma academico.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-3">3. Conta de Usuário</h2>
+            <h2 className="mb-3 text-lg font-semibold text-foreground">3. Conta de usuario</h2>
             <p>
-              Você é responsável por manter a confidencialidade de suas credenciais de acesso e por todas as
-              atividades realizadas em sua conta. Notifique-nos imediatamente sobre qualquer uso não autorizado.
+              Voce e responsavel por manter a confidencialidade das suas credenciais e por todas as
+              atividades realizadas na sua conta. Notifique-nos se perceber qualquer uso indevido.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-3">4. Assinaturas e Pagamentos</h2>
+            <h2 className="mb-3 text-lg font-semibold text-foreground">4. Certificados</h2>
             <p>
-              Os planos de assinatura são cobrados antecipadamente (mensal ou anualmente). Você pode cancelar
-              a qualquer momento pelo portal do cliente. Após o cancelamento, seu acesso continua ativo até o
-              fim do período já pago. Não realizamos reembolsos de períodos não utilizados.
+              Os certificados emitidos pelo CFIA sao certificados de conclusao de cursos livres. Eles
+              comprovam participacao e progresso dentro da plataforma, mas nao substituem diplomas,
+              titulos academicos ou certificacoes oficiais.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-3">5. Propriedade Intelectual</h2>
+            <h2 className="mb-3 text-lg font-semibold text-foreground">5. Apoio ao projeto</h2>
             <p>
-              Todo o conteúdo disponibilizado na plataforma (vídeos, textos, imagens, código) é protegido por
-              direitos autorais. Você não está autorizado a copiar, distribuir, vender ou criar obras derivadas
-              do conteúdo sem autorização expressa.
+              O CFIA pode receber manifestacoes de interesse, apoio, patrocinio ou contribuicoes para
+              manter o projeto. Qualquer modalidade paga, se existir, sera comunicada de forma clara
+              antes de qualquer cobranca.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-3">6. Conduta do Usuário</h2>
+            <h2 className="mb-3 text-lg font-semibold text-foreground">6. Propriedade intelectual</h2>
             <p>
-              Você concorda em não usar a plataforma para fins ilegais, não compartilhar suas credenciais de
-              acesso, não tentar acessar sistemas ou dados não autorizados, e não publicar conteúdo ofensivo
-              ou inadequado.
+              O conteudo da plataforma e protegido por direitos autorais. Voce nao deve copiar,
+              vender, redistribuir ou criar obras derivadas sem autorizacao expressa.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-3">7. Limitação de Responsabilidade</h2>
+            <h2 className="mb-3 text-lg font-semibold text-foreground">7. Conduta do usuario</h2>
             <p>
-              O cfia não se responsabiliza por danos indiretos, incidentais ou consequentes decorrentes do
-              uso da plataforma. Nosso conteúdo é fornecido para fins educacionais e não constitui consultoria
-              profissional em nenhuma área.
+              Voce concorda em nao usar a plataforma para fins ilegais, nao compartilhar credenciais,
+              nao tentar acessar sistemas nao autorizados e nao publicar conteudo ofensivo ou inadequado.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-3">8. Alterações nos Termos</h2>
+            <h2 className="mb-3 text-lg font-semibold text-foreground">8. Limitacao de responsabilidade</h2>
             <p>
-              Reservamo-nos o direito de modificar estes termos a qualquer momento. As alterações entrarão
-              em vigor após publicação na plataforma. O uso continuado do serviço constitui aceitação dos
-              novos termos.
+              O conteudo do CFIA e educacional. Nao prometemos emprego, renda, certificacao oficial
+              ou resultado profissional especifico.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-foreground mb-3">9. Contato</h2>
+            <h2 className="mb-3 text-lg font-semibold text-foreground">9. Contato</h2>
             <p>
-              Para dúvidas sobre estes termos, entre em contato pelo email:{" "}
+              Para duvidas sobre estes termos, entre em contato pelo email:{" "}
               <a href="mailto:contato@cfia.com.br" style={{ color: "#0052ff" }}>
                 contato@cfia.com.br
               </a>

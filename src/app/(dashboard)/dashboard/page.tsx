@@ -73,7 +73,7 @@ export default async function DashboardPage() {
             className="text-xs uppercase mb-2"
             style={{ fontFamily: "var(--font-mono)", color: "#8d8d8d", letterSpacing: "0.14em" }}
           >
-            {isSubscribed ? "Assinante" : "Plano gratuito"}
+            {isSubscribed ? "Apoiador" : "Aluno"}
           </p>
           <h1
             className="text-3xl font-light"
@@ -93,7 +93,7 @@ export default async function DashboardPage() {
             style={{ backgroundColor: "#24a148" }}
           >
             <CheckCircle2 className="h-3.5 w-3.5" />
-            Assinante ativo
+            Apoiador ativo
           </span>
         )}
       </div>
@@ -136,24 +136,24 @@ export default async function DashboardPage() {
               className="text-xs uppercase mb-2"
               style={{ fontFamily: "var(--font-mono)", color: "#4589ff", letterSpacing: "0.14em" }}
             >
-              Acesso limitado
+              Projeto gratuito
             </p>
             <h2
               className="text-xl font-light text-white mb-2"
               style={{ letterSpacing: "-0.01em" }}
             >
-              Desbloqueie todos os cursos de IA
+              Ajude o CFIA a continuar gratuito
             </h2>
             <p className="text-sm" style={{ color: "#c6c6c6" }}>
-              Certificados válidos, trilhas completas e mentoria semanal.
+              O acesso aos cursos publicados e gratuito. Apoios ajudam a manter infraestrutura, gravacao e melhorias.
             </p>
           </div>
           <Link
-            href="/assinar"
+            href="/apoie"
             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 font-semibold text-sm whitespace-nowrap transition-colors hover:bg-[#f4f4f4] active:scale-[0.98] flex-shrink-0"
             style={{ backgroundColor: "#fff", color: "#0f62fe" }}
           >
-            Assinar agora <ArrowRight className="h-4 w-4" />
+            Apoiar projeto <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       )}

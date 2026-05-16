@@ -226,14 +226,14 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                     className="text-sm font-semibold px-3 py-1.5 rounded-full"
                     style={{ backgroundColor: "#05966915", color: "#059669" }}
                   >
-                    ✓ Incluído no seu plano
+                    Acesso liberado
                   </span>
                 </div>
               ) : (
                 <div>
-                  <span className="text-2xl font-bold">R$ {course.price.toFixed(2).replace(".", ",")}</span>
+                  <span className="text-2xl font-bold">Em breve</span>
                   <p className="text-xs mt-1" style={{ color: "#5b616e" }}>
-                    Ou acesse com uma assinatura a partir de R$99,90/mês
+                    Este curso ainda nao esta com acesso gratuito liberado.
                   </p>
                 </div>
               )}

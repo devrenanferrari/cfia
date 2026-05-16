@@ -380,3 +380,12 @@ model News {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model InterestLead {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  source    String?
+  message   String?  @db.Text
+  createdAt DateTime @default(now())
+}
