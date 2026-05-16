@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -15,6 +14,7 @@ import {
 import {
   BookMarked,
   BookOpen,
+  GraduationCap,
   Heart,
   LayoutDashboard,
   LogOut,
@@ -22,6 +22,7 @@ import {
   Search,
   Shield,
   User,
+  Users,
 } from "lucide-react";
 
 export function Navbar() {
@@ -35,165 +36,182 @@ export function Navbar() {
 
   const initials = session?.user?.name
     ?.split(" ")
-    .map((name) => name[0])
+    .map((n) => n[0])
     .slice(0, 2)
     .join("")
     .toUpperCase();
 
-  const navLinks = [
-    { href: "/trilhas", label: "Trilhas" },
+  // Nav para quem está logado — só o que faz sentido
+  const authLinks = [
+    { href: "/dashboard", label: "Início" },
     { href: "/cursos", label: "Cursos" },
     { href: "/comunidade", label: "Comunidade" },
-    { href: "/laboratorio", label: "Laboratorio" },
-    { href: "/apoie", label: "Apoie" },
-    { href: "/professores", label: "Professores" },
-    { href: "/sobre", label: "Sobre" },
-    ...(isInstructor ? [{ href: "/instrutor", label: "Area do instrutor" }] : []),
+    { href: "/trilhas", label: "Trilhas" },
+    ...(isInstructor ? [{ href: "/instrutor", label: "Instrutor" }] : []),
     ...(isAdmin ? [{ href: "/admin", label: "Admin" }] : []),
   ];
 
+  // Nav pública — marketing + descoberta
+  const publicLinks = [
+    { href: "/trilhas", label: "Trilhas" },
+    { href: "/cursos", label: "Cursos" },
+    { href: "/comunidade", label: "Comunidade" },
+    { href: "/laboratorio", label: "Laboratório" },
+    { href: "/apoie", label: "Apoie" },
+    { href: "/professores", label: "Professores" },
+    { href: "/sobre", label: "Sobre" },
+  ];
+
+  const navLinks = session ? authLinks : publicLinks;
+
   return (
-    <header className="sticky top-0 z-50 w-full" style={{ backgroundColor: "var(--cds-text-primary)" }}>
+    <header className="sticky top-0 z-50 w-full" style={{ backgroundColor: "#161616" }}>
       <div className="mx-auto max-w-[1584px] px-4 md:px-8">
         <div className="flex h-12 items-center justify-between gap-4">
-          <Link href="/" className="flex shrink-0 items-center gap-2 text-lg font-semibold text-white">
-            <span className="leading-none" style={{ letterSpacing: "0" }}>CFIA</span>
+
+          {/* Logo */}
+          <Link
+            href={session ? "/dashboard" : "/"}
+            className="flex shrink-0 items-center gap-2 text-lg font-semibold text-white"
+          >
+            CFIA
           </Link>
 
+          {/* Nav central */}
           <nav className="hidden h-full items-center md:flex">
             {navLinks.map((link) => {
-              const active = pathname?.startsWith(link.href);
+              const active = pathname === link.href || (link.href !== "/dashboard" && pathname?.startsWith(link.href));
               return (
                 <Link
                   key={link.href}
                   href={link.href}
                   className="relative flex h-full items-center px-4 text-sm transition-colors"
                   style={{
-                    color: active ? "#ffffff" : "var(--cds-border-subtle)",
+                    color: active ? "#ffffff" : "#8d8d8d",
                     fontWeight: active ? 600 : 400,
                   }}
                 >
                   {link.label}
                   {active && (
-                    <span className="absolute bottom-0 left-0 h-[3px] w-full" style={{ backgroundColor: "#ffffff" }} />
+                    <span
+                      className="absolute bottom-0 left-0 h-[3px] w-full"
+                      style={{ backgroundColor: "#0f62fe" }}
+                    />
                   )}
                 </Link>
               );
             })}
           </nav>
 
-          <div className="flex h-full items-center gap-2">
+          {/* Direita */}
+          <div className="flex h-full items-center gap-1">
             <button
-              className="hidden h-12 w-12 items-center justify-center transition-colors sm:flex"
-              style={{ color: "var(--cds-background)", backgroundColor: "transparent" }}
+              className="hidden h-12 w-10 items-center justify-center transition-colors hover:text-white sm:flex"
+              style={{ color: "#8d8d8d", backgroundColor: "transparent" }}
               onClick={() => router.push("/cursos")}
               aria-label="Buscar cursos"
             >
-              <Search className="h-5 w-5" />
+              <Search className="h-[18px] w-[18px]" />
             </button>
 
             {session ? (
-              <>
-                {!isInstructor && !isAdmin && (
-                  <Button
-                    size="sm"
-                    className="hidden h-8 rounded-none px-4 text-xs font-semibold sm:flex"
-                    style={{ backgroundColor: "var(--cds-button-primary)", color: "#ffffff" }}
-                    asChild
-                  >
-                    <Link href="/apoie">Apoiar</Link>
-                  </Button>
-                )}
+              <DropdownMenu>
+                <DropdownMenuTrigger className="ml-2 outline-none focus-visible:ring-2 focus-visible:ring-[#0f62fe] focus-visible:ring-offset-2 focus-visible:ring-offset-[#161616] rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={session.user?.image ?? undefined} alt={session.user?.name ?? ""} />
+                    <AvatarFallback
+                      className="text-xs font-bold"
+                      style={{ backgroundColor: "#0f62fe", color: "#ffffff" }}
+                    >
+                      {initials ?? "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="relative rounded-full outline-none ring-2 ring-transparent ring-offset-2 transition-all focus-visible:ring-[#0052ff]">
-                    <Avatar className="h-9 w-9">
-                      <AvatarImage src={session.user?.image ?? undefined} alt={session.user?.name ?? ""} />
-                      <AvatarFallback className="text-sm font-bold" style={{ backgroundColor: "#edf5ff", color: "#0052ff" }}>
-                        {initials ?? "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                  </DropdownMenuTrigger>
-
-                  <DropdownMenuContent className="w-64" align="end" sideOffset={8}>
-                    <div className="border-b px-3 py-3">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage src={session.user?.image ?? undefined} />
-                          <AvatarFallback className="text-sm font-bold" style={{ backgroundColor: "#edf5ff", color: "#0052ff" }}>
-                            {initials ?? "U"}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-semibold">{session.user?.name}</p>
-                          <p className="truncate text-xs text-muted-foreground">{session.user?.email}</p>
-                        </div>
+                <DropdownMenuContent className="w-64" align="end" sideOffset={10}>
+                  {/* Header do dropdown */}
+                  <div className="px-3 py-3 border-b">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={session.user?.image ?? undefined} />
+                        <AvatarFallback
+                          className="text-sm font-bold"
+                          style={{ backgroundColor: "#0f62fe", color: "#ffffff" }}
+                        >
+                          {initials ?? "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold">{session.user?.name}</p>
+                        <p className="truncate text-xs text-muted-foreground">{session.user?.email}</p>
                       </div>
                     </div>
+                  </div>
 
-                    <div className="py-1">
-                      <DropdownMenuItem onClick={() => router.push("/dashboard")} className="cursor-pointer">
-                        <LayoutDashboard className="mr-2.5 h-4 w-4 text-muted-foreground" />
-                        Meu painel
+                  <div className="py-1">
+                    <DropdownMenuItem onClick={() => router.push("/dashboard")} className="cursor-pointer">
+                      <LayoutDashboard className="mr-2.5 h-4 w-4 text-muted-foreground" />
+                      Meu painel
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push("/dashboard/cursos")} className="cursor-pointer">
+                      <BookOpen className="mr-2.5 h-4 w-4 text-muted-foreground" />
+                      Meus cursos
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push("/comunidade")} className="cursor-pointer">
+                      <Users className="mr-2.5 h-4 w-4 text-muted-foreground" />
+                      Comunidade
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push("/comunidade/chat")} className="cursor-pointer">
+                      <MessageSquare className="mr-2.5 h-4 w-4 text-muted-foreground" />
+                      Chat privado
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push("/perfil")} className="cursor-pointer">
+                      <User className="mr-2.5 h-4 w-4 text-muted-foreground" />
+                      Meu perfil
+                    </DropdownMenuItem>
+                    {isInstructor && (
+                      <DropdownMenuItem onClick={() => router.push("/instrutor")} className="cursor-pointer">
+                        <BookMarked className="mr-2.5 h-4 w-4 text-muted-foreground" />
+                        Área do instrutor
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => router.push("/dashboard/cursos")} className="cursor-pointer">
-                        <BookOpen className="mr-2.5 h-4 w-4 text-muted-foreground" />
-                        Meus cursos
-                      </DropdownMenuItem>
-                      {isInstructor && (
-                        <DropdownMenuItem onClick={() => router.push("/instrutor")} className="cursor-pointer">
-                          <BookMarked className="mr-2.5 h-4 w-4 text-muted-foreground" />
-                          Area do instrutor
-                        </DropdownMenuItem>
-                      )}
-                      {isAdmin && (
-                        <DropdownMenuItem onClick={() => router.push("/admin")} className="cursor-pointer">
-                          <Shield className="mr-2.5 h-4 w-4 text-muted-foreground" />
-                          Painel admin
-                        </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem onClick={() => router.push("/comunidade")} className="cursor-pointer">
-                        <MessageSquare className="mr-2.5 h-4 w-4 text-muted-foreground" />
-                        Comunidade
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => router.push("/perfil")} className="cursor-pointer">
-                        <User className="mr-2.5 h-4 w-4 text-muted-foreground" />
-                        Meu perfil
-                      </DropdownMenuItem>
-                    </div>
-
-                    {!isInstructor && !isAdmin && (
-                      <>
-                        <DropdownMenuSeparator />
-                        <div className="py-1">
-                          <DropdownMenuItem onClick={() => router.push("/apoie")} className="cursor-pointer">
-                            <Heart className="mr-2.5 h-4 w-4" style={{ color: "#0052ff" }} />
-                            <span className="font-medium" style={{ color: "#0052ff" }}>
-                              Apoiar o projeto
-                            </span>
-                          </DropdownMenuItem>
-                        </div>
-                      </>
                     )}
-
-                    <DropdownMenuSeparator />
-                    <div className="py-1">
-                      <DropdownMenuItem
-                        className="cursor-pointer text-red-500 focus:bg-red-50 focus:text-red-500"
-                        onClick={() => signOut({ callbackUrl: "/home" })}
-                      >
-                        <LogOut className="mr-2.5 h-4 w-4" />
-                        Sair da conta
+                    {isAdmin && (
+                      <DropdownMenuItem onClick={() => router.push("/admin")} className="cursor-pointer">
+                        <Shield className="mr-2.5 h-4 w-4 text-muted-foreground" />
+                        Painel admin
                       </DropdownMenuItem>
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
+                    )}
+                  </div>
+
+                  <DropdownMenuSeparator />
+                  <div className="py-1">
+                    <DropdownMenuItem onClick={() => router.push("/trilhas")} className="cursor-pointer">
+                      <GraduationCap className="mr-2.5 h-4 w-4 text-muted-foreground" />
+                      Trilhas de carreira
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push("/apoie")} className="cursor-pointer">
+                      <Heart className="mr-2.5 h-4 w-4" style={{ color: "#0f62fe" }} />
+                      <span style={{ color: "#0f62fe" }}>Apoiar o projeto</span>
+                    </DropdownMenuItem>
+                  </div>
+
+                  <DropdownMenuSeparator />
+                  <div className="py-1">
+                    <DropdownMenuItem
+                      className="cursor-pointer text-red-500 focus:bg-red-50 focus:text-red-500"
+                      onClick={() => signOut({ callbackUrl: "/home" })}
+                    >
+                      <LogOut className="mr-2.5 h-4 w-4" />
+                      Sair da conta
+                    </DropdownMenuItem>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <>
                 <button
-                  className="hidden h-12 items-center px-4 text-sm font-medium transition-colors sm:flex"
-                  style={{ color: "#c6c6c6", background: "transparent", border: "none", cursor: "pointer" }}
+                  className="hidden h-12 items-center px-4 text-sm font-medium sm:flex"
+                  style={{ color: "#8d8d8d", background: "transparent", border: "none", cursor: "pointer" }}
                   onClick={() => { window.location.href = "/entrar"; }}
                 >
                   Entrar
@@ -203,7 +221,7 @@ export function Navbar() {
                   className="hidden h-8 items-center px-4 text-xs font-semibold transition-colors hover:bg-white hover:text-[#0f62fe] sm:flex"
                   style={{ background: "#0f62fe", color: "#fff" }}
                 >
-                  Comecar gratis
+                  Começar grátis
                 </Link>
               </>
             )}
