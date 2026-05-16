@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Target, Eye, Heart, Github, Linkedin, Mail } from "lucide-react";
+import { ArrowRight, Target, Eye, Heart, ExternalLink, Mail } from "lucide-react";
 
 export const metadata = {
   title: "Sobre | CFIA — Projeto de Extensão",
@@ -144,7 +144,7 @@ export default function SobrePage() {
                   className="flex items-center gap-2 text-sm font-semibold px-4 py-2 border transition-colors hover:border-[#161616]"
                   style={{ borderColor: "#e0e0e0", color: "#525252", textDecoration: "none" }}
                 >
-                  <Github className="h-4 w-4" /> GitHub
+                  <ExternalLink className="h-4 w-4" /> GitHub
                 </a>
                 <a
                   href="mailto:gomesrenan514@gmail.com"
