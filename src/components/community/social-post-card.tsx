@@ -20,6 +20,7 @@ export interface SocialPostData {
   author: Author;
   votes: Vote[];
   _count: { comments: number };
+  connectionStatus?: "none" | "pending" | "accepted";
 }
 
 function timeAgo(dateStr: string) {
@@ -125,7 +126,11 @@ export function SocialPostCard({
   const [likes, setLikes] = useState(likeCount);
   const [showComments, setShowComments] = useState(false);
   const [commentCount, setCommentCount] = useState(post._count.comments);
-  const [connecting, setConnecting] = useState<"idle" | "loading" | "done">("idle");
+  const [connecting, setConnecting] = useState<"idle" | "loading" | "sent" | "connected">(() => {
+    if (post.connectionStatus === "accepted") return "connected";
+    if (post.connectionStatus === "pending") return "sent";
+    return "idle";
+  });
 
   async function toggleLike() {
     if (!session) { router.push("/entrar"); return; }
@@ -148,10 +153,10 @@ export function SocialPostCard({
       body: JSON.stringify({ toId: post.author.id }),
     });
     if (res.ok) {
-      setConnecting("done");
+      setConnecting("sent");
       toast.success(`Pedido enviado para ${post.author.name?.split(" ")[0] ?? "usuário"}`);
     } else if (res.status === 409) {
-      setConnecting("done");
+      setConnecting("sent");
     } else {
       setConnecting("idle");
       toast.error("Não foi possível enviar o pedido");
@@ -179,28 +184,32 @@ export function SocialPostCard({
 
         {session && !isOwnPost && (
           <div className="flex items-center gap-1.5 shrink-0">
-            {/* Chat só aparece em telas maiores para não abarrotar mobile */}
             <span className="hidden sm:flex">
               <QuickChatButton toId={post.author.id} />
             </span>
-            <button
-              onClick={connect}
-              disabled={connecting !== "idle"}
-              className="flex items-center gap-1.5 text-xs font-semibold px-3 h-7 border transition-colors disabled:opacity-60"
-              style={
-                connecting === "done"
-                  ? { borderColor: "#24a148", color: "#24a148" }
-                  : { borderColor: "#0f62fe", color: "#0f62fe" }
-              }
-            >
-              {connecting === "loading" ? (
-                <Loader2 className="h-3 w-3 animate-spin" />
-              ) : connecting === "done" ? (
-                <><Check className="h-3 w-3" /> Enviado</>
-              ) : (
-                <><UserPlus className="h-3 w-3" /> Conectar</>
-              )}
-            </button>
+
+            {connecting === "connected" ? (
+              <span className="flex items-center gap-1 text-xs font-semibold px-3 h-7 border" style={{ borderColor: "#24a148", color: "#24a148" }}>
+                <Check className="h-3 w-3" /> Conectado
+              </span>
+            ) : connecting === "sent" ? (
+              <span className="flex items-center gap-1 text-xs font-semibold px-3 h-7 border" style={{ borderColor: "#c6c6c6", color: "#8d8d8d" }}>
+                <Check className="h-3 w-3" /> Solicitado
+              </span>
+            ) : (
+              <button
+                onClick={connect}
+                disabled={connecting === "loading"}
+                className="flex items-center gap-1.5 text-xs font-semibold px-3 h-7 border transition-colors disabled:opacity-60"
+                style={{ borderColor: "#0f62fe", color: "#0f62fe" }}
+              >
+                {connecting === "loading" ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <><UserPlus className="h-3 w-3" /> Conectar</>
+                )}
+              </button>
+            )}
           </div>
         )}
       </div>

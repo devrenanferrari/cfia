@@ -7,6 +7,7 @@ import { SocialPostCard, type SocialPostData } from "@/components/community/soci
 import { CreatePostBox } from "@/components/community/create-post-box";
 import { SuggestConnectButtonClient } from "@/components/community/suggest-connect-button";
 import { TagFilter } from "@/components/community/tag-filter";
+import { UserSearchBox } from "@/components/community/user-search";
 
 export const metadata = { title: "Comunidade | CFIA" };
 
@@ -18,7 +19,7 @@ export default async function ComunidadePage({
   const { tag } = await searchParams;
   const session = await getServerSession(authOptions);
 
-  const [posts, totalUsers, xpData, connectionCount] = await Promise.all([
+  const [posts, totalUsers, xpData, connectionCount, myConnections] = await Promise.all([
     prisma.post.findMany({
       take: 30,
       orderBy: { createdAt: "desc" },
@@ -39,7 +40,22 @@ export default async function ComunidadePage({
           },
         })
       : 0,
+    session
+      ? prisma.connection.findMany({
+          where: { OR: [{ fromId: session.user.id }, { toId: session.user.id }] },
+          select: { fromId: true, toId: true, status: true },
+        })
+      : [],
   ]);
+
+  // Mapa userId → status de conexão
+  const connMap = new Map<string, "pending" | "accepted">();
+  if (session) {
+    for (const c of myConnections) {
+      const otherId = c.fromId === session.user.id ? c.toId : c.fromId;
+      connMap.set(otherId, c.status === "ACCEPTED" ? "accepted" : "pending");
+    }
+  }
 
   const suggestions = session
     ? await prisma.user.findMany({
@@ -62,6 +78,7 @@ export default async function ComunidadePage({
   const serializedPosts: SocialPostData[] = posts.map((p) => ({
     ...p,
     createdAt: p.createdAt.toISOString(),
+    connectionStatus: connMap.get(p.author.id) ?? "none",
   }));
 
   return (
@@ -207,6 +224,9 @@ export default async function ComunidadePage({
           {/* ── Sidebar Direita ───────────────────────────────────────────── */}
           <aside className="lg:col-span-3 space-y-3 hidden lg:block">
 
+            {/* Pesquisar pessoas */}
+            {session && <UserSearchBox />}
+
             {suggestions.length > 0 && (
               <div className="bg-white border border-[#e0e0e0] p-4">
                 <p className="text-[10px] uppercase tracking-widest font-mono mb-3" style={{ color: "#8d8d8d" }}>
@@ -229,7 +249,7 @@ export default async function ComunidadePage({
                           {u.role === "INSTRUCTOR" ? "Instrutor" : "Estudante"} · {u._count.posts} post{u._count.posts !== 1 ? "s" : ""}
                         </p>
                       </div>
-                      <SuggestConnectButtonClient toId={u.id} />
+                      <SuggestConnectButtonClient toId={u.id} initialStatus={connMap.get(u.id) ?? "none"} />
                     </div>
                   ))}
                 </div>

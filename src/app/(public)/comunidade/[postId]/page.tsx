@@ -58,6 +58,25 @@ export default async function PostPage({ params }: { params: Promise<{ postId: s
   const likeCount = post.votes.filter((v) => v.value === 1).length;
   const myVote = post.votes.find((v) => v.userId === session?.user?.id);
 
+  // Status de conexão com o autor do post
+  const existingConn =
+    session && session.user.id !== post.author.id
+      ? await prisma.connection.findFirst({
+          where: {
+            OR: [
+              { fromId: session.user.id, toId: post.author.id },
+              { fromId: post.author.id, toId: session.user.id },
+            ],
+          },
+          select: { status: true },
+        })
+      : null;
+  const connectionStatus = existingConn
+    ? existingConn.status === "ACCEPTED"
+      ? "accepted"
+      : "pending"
+    : "none";
+
   return (
     <div style={{ backgroundColor: "#f0f2f5", minHeight: "100vh" }}>
       <div className="mx-auto max-w-[800px] px-4 py-6">
@@ -91,7 +110,7 @@ export default async function PostPage({ params }: { params: Promise<{ postId: s
             </div>
             {session && session.user.id !== post.author.id && (
               <div className="flex gap-2">
-                <ConnectButtonClient toId={post.author.id} />
+                <ConnectButtonClient toId={post.author.id} initialStatus={connectionStatus} />
                 <QuickChatButton toId={post.author.id} />
               </div>
             )}

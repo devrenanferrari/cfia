@@ -215,7 +215,7 @@ export function Navbar() {
             ) : (
               <>
                 <button
-                  className="hidden h-12 items-center px-4 text-sm font-medium sm:flex"
+                  className="flex h-12 items-center px-3 text-sm font-medium"
                   style={{ color: "#8d8d8d", background: "transparent", border: "none", cursor: "pointer" }}
                   onClick={() => { window.location.href = "/entrar"; }}
                 >
@@ -223,10 +223,11 @@ export function Navbar() {
                 </button>
                 <Link
                   href="/cadastro"
-                  className="hidden h-8 items-center px-4 text-xs font-semibold transition-colors hover:bg-white hover:text-[#0f62fe] sm:flex"
+                  className="flex h-8 items-center px-3 text-xs font-semibold transition-colors hover:bg-white hover:text-[#0f62fe]"
                   style={{ background: "#0f62fe", color: "#fff" }}
                 >
-                  Começar grátis
+                  <span className="sm:hidden">Cadastro</span>
+                  <span className="hidden sm:inline">Começar grátis</span>
                 </Link>
               </>
             )}
