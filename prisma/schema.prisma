@@ -80,16 +80,17 @@ model User {
   certificates Certificate[]
   news         News[]        @relation("NewsAuthor")
 
-  posts           Post[]        @relation("PostAuthor")
-  postComments    PostComment[] @relation("CommentAuthor")
-  postVotes       PostVote[]    @relation("PostVotes")
-  commentVotes    CommentVote[] @relation("CommentVotes")
-  connectionsFrom Connection[]  @relation("ConnectionsFrom")
-  connectionsTo   Connection[]  @relation("ConnectionsTo")
+  posts           Post[]         @relation("PostAuthor")
+  postComments    PostComment[]  @relation("CommentAuthor")
+  postVotes       PostVote[]     @relation("PostVotes")
+  commentVotes    CommentVote[]  @relation("CommentVotes")
+  connectionsFrom Connection[]   @relation("ConnectionsFrom")
+  connectionsTo   Connection[]   @relation("ConnectionsTo")
   chatMembers     ChatMember[]
-  chatMessages    ChatMessage[] @relation("ChatMessageAuthor")
+  chatMessages    ChatMessage[]  @relation("ChatMessageAuthor")
   xp              UserXP?
   badges          UserBadge[]
+  notifications   Notification[]
 }
 
 enum Role {
@@ -557,4 +558,26 @@ model UserBadge {
   badge    Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
 
   @@unique([userId, badgeId])
+}
+
+// ─── Notificações ──────────────────────────────────────────────────────────────
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  message   String
+  link      String?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum NotificationType {
+  CONNECTION_REQUEST
+  CONNECTION_ACCEPTED
+  POST_COMMENT
+  POST_LIKE
+  NEW_MESSAGE
 }

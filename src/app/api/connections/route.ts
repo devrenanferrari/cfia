@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { notify } from "@/lib/notify";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -50,6 +51,13 @@ export async function POST(req: NextRequest) {
       to: { select: { id: true, name: true, image: true } },
     },
   });
+
+  await notify(
+    toId,
+    "CONNECTION_REQUEST",
+    `${session.user.name ?? "Alguém"} quer se conectar com você`,
+    "/comunidade"
+  );
 
   return NextResponse.json(connection, { status: 201 });
 }

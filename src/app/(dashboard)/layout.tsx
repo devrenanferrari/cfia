@@ -12,7 +12,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <>
       <Navbar />
       <div className="min-h-screen" style={{ backgroundColor: "#f4f4f4" }}>
-        <div className="mx-auto max-w-7xl px-4 md:px-8 py-8 flex gap-8 pb-24 md:pb-8">
+        <div className="mx-auto max-w-7xl px-4 md:px-8 py-8 flex gap-8 pb-20 md:pb-8">
           <DashboardSidebar />
           <main className="flex-1 min-w-0">{children}</main>
         </div>

@@ -16,6 +16,7 @@ import {
   BookOpen,
   GraduationCap,
   Heart,
+  Home,
   LayoutDashboard,
   LogOut,
   MessageSquare,
@@ -24,6 +25,7 @@ import {
   User,
   Users,
 } from "lucide-react";
+import { NotificationBell } from "@/components/community/notification-bell";
 
 export function Navbar() {
   const { data: session } = useSession();
@@ -65,6 +67,7 @@ export function Navbar() {
   const navLinks = session ? authLinks : publicLinks;
 
   return (
+    <>
     <header className="sticky top-0 z-50 w-full" style={{ backgroundColor: "#161616" }}>
       <div className="mx-auto max-w-[1584px] px-4 md:px-8">
         <div className="flex h-12 items-center justify-between gap-4">
@@ -113,6 +116,8 @@ export function Navbar() {
             >
               <Search className="h-[18px] w-[18px]" />
             </button>
+
+            {session && <NotificationBell />}
 
             {session ? (
               <DropdownMenu>
@@ -229,5 +234,41 @@ export function Navbar() {
         </div>
       </div>
     </header>
+
+    {/* Mobile bottom navigation — only for logged-in users */}
+    {session && (
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden border-t"
+        style={{ backgroundColor: "#161616", borderColor: "#393939" }}
+      >
+        {[
+          { href: "/dashboard", icon: Home, label: "Início" },
+          { href: "/cursos", icon: BookOpen, label: "Cursos" },
+          { href: "/comunidade", icon: Users, label: "Comunidade" },
+          { href: "/comunidade/chat", icon: MessageSquare, label: "Chat" },
+          { href: "/perfil", icon: User, label: "Perfil" },
+        ].map(({ href, icon: Icon, label }) => {
+          const active = pathname === href || (href !== "/dashboard" && pathname?.startsWith(href));
+          return (
+            <Link
+              key={href}
+              href={href}
+              className="relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium transition-colors"
+              style={{ color: active ? "#ffffff" : "#8d8d8d" }}
+            >
+              <Icon className="h-5 w-5" />
+              {label}
+              {active && (
+                <span
+                  className="absolute top-0 h-[2px] w-10 rounded-b"
+                  style={{ backgroundColor: "#0f62fe" }}
+                />
+              )}
+            </Link>
+          );
+        })}
+      </nav>
+    )}
+    </>
   );
 }

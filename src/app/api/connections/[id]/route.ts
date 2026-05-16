@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { notify } from "@/lib/notify";
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -20,6 +21,16 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 
   const updated = await prisma.connection.update({ where: { id }, data: { status } });
+
+  if (status === "ACCEPTED") {
+    await notify(
+      conn.fromId,
+      "CONNECTION_ACCEPTED",
+      `${session.user.name ?? "Alguém"} aceitou seu pedido de conexão`,
+      "/comunidade"
+    );
+  }
+
   return NextResponse.json(updated);
 }
 

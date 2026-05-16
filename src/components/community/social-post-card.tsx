@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Heart, MessageSquare, UserPlus, Clock, Send, Loader2, Check } from "lucide-react";
+import { QuickChatButton } from "@/components/community/quick-chat-button";
 
 type Author = { id: string; name: string | null; image: string | null };
 type Vote = { value: number; userId: string };
@@ -172,26 +173,29 @@ export function SocialPostCard({
           </div>
         </div>
 
-        {/* Botão conectar (só para outros usuários) */}
+        {/* Ações para outros usuários */}
         {session && !isOwnPost && (
-          <button
-            onClick={connect}
-            disabled={connecting !== "idle"}
-            className="flex items-center gap-1.5 text-xs font-semibold px-3 h-7 border transition-colors disabled:opacity-60"
-            style={
-              connecting === "done"
-                ? { borderColor: "#24a148", color: "#24a148" }
-                : { borderColor: "#0f62fe", color: "#0f62fe" }
-            }
-          >
-            {connecting === "loading" ? (
-              <Loader2 className="h-3 w-3 animate-spin" />
-            ) : connecting === "done" ? (
-              <><Check className="h-3 w-3" /> Enviado</>
-            ) : (
-              <><UserPlus className="h-3 w-3" /> Conectar</>
-            )}
-          </button>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <QuickChatButton toId={post.author.id} />
+            <button
+              onClick={connect}
+              disabled={connecting !== "idle"}
+              className="flex items-center gap-1.5 text-xs font-semibold px-3 h-7 border transition-colors disabled:opacity-60"
+              style={
+                connecting === "done"
+                  ? { borderColor: "#24a148", color: "#24a148" }
+                  : { borderColor: "#0f62fe", color: "#0f62fe" }
+              }
+            >
+              {connecting === "loading" ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : connecting === "done" ? (
+                <><Check className="h-3 w-3" /> Enviado</>
+              ) : (
+                <><UserPlus className="h-3 w-3" /> Conectar</>
+              )}
+            </button>
+          </div>
         )}
       </div>
 

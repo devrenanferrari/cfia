@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { notify } from "@/lib/notify";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -25,6 +26,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   });
 
   await awardXP(session.user.id, 5);
+
+  // Notificar o autor do post se for outra pessoa
+  const post = await prisma.post.findUnique({ where: { id }, select: { authorId: true, title: true } });
+  if (post && post.authorId !== session.user.id) {
+    await notify(
+      post.authorId,
+      "POST_COMMENT",
+      `${session.user.name ?? "Alguém"} comentou no seu post "${post.title.slice(0, 40)}${post.title.length > 40 ? "…" : ""}"`,
+      `/comunidade/${id}`
+    );
+  }
 
   return NextResponse.json(comment, { status: 201 });
 }
