@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node -e \"const {prisma} = require\\('./src/lib/prisma'\\); console.log\\(Object.keys\\(prisma\\)\\)\")"
+      "Bash(node -e \"const {prisma} = require\\('./src/lib/prisma'\\); console.log\\(Object.keys\\(prisma\\)\\)\")",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\user\\\\Desktop\\\\Projetos\\\\cfia\\\\cfia\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)"
     ]
   }
 }

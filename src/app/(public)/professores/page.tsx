@@ -1,66 +1,9 @@
 import Link from "next/link";
-import { ArrowRight, ExternalLink } from "lucide-react";
+import { ArrowRight, Github, Mail } from "lucide-react";
 
 export const metadata = {
-  title: "Professores | CFIA",
+  title: "Instrutor | CFIA",
 };
-
-const PROFESSORS = [
-  {
-    name: "Dr. Rafael Mendonça",
-    role: "Engenharia de IA & LLMs",
-    bio: "PhD em Ciência da Computação pela USP. Ex-pesquisador do Google Brain. 12 anos de experiência em sistemas de IA em larga escala.",
-    courses: 6,
-    students: "4.200+",
-    photo: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&q=80",
-    tags: ["LLMs", "Deep Learning", "PyTorch"],
-  },
-  {
-    name: "Dra. Camila Torres",
-    role: "Ciência de Dados & Analytics",
-    bio: "Doutora em Estatística pela UNICAMP. Liderou times de dados no Nubank e iFood. Especialista em decisões orientadas por dados.",
-    courses: 5,
-    students: "3.800+",
-    photo: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop&q=80",
-    tags: ["Python", "SQL", "Machine Learning"],
-  },
-  {
-    name: "Lucas Ferreira",
-    role: "MLOps & Infraestrutura de IA",
-    bio: "Engenheiro Sênior de ML na AWS. Responsável por pipelines que servem bilhões de predições por dia. Especialista em deploy de modelos.",
-    courses: 4,
-    students: "2.900+",
-    photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&q=80",
-    tags: ["Kubernetes", "Docker", "AWS SageMaker"],
-  },
-  {
-    name: "Dra. Priya Nambiar",
-    role: "Visão Computacional",
-    bio: "Pesquisadora com publicações no NeurIPS e CVPR. Desenvolveu modelos de visão usados por 30+ empresas da Fortune 500.",
-    courses: 3,
-    students: "2.100+",
-    photo: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&q=80",
-    tags: ["YOLO", "Transformers", "OpenCV"],
-  },
-  {
-    name: "André Costa",
-    role: "IA Generativa & Agentes",
-    bio: "Fundador de duas startups de IA adquiridas por grandes tech companies. Pioneiro na aplicação de agentes autônomos em produção.",
-    courses: 4,
-    students: "3.400+",
-    photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&q=80",
-    tags: ["RAG", "Agentes", "Prompt Engineering"],
-  },
-  {
-    name: "Dra. Isabella Rocha",
-    role: "Machine Learning & Pesquisa",
-    bio: "Pesquisadora associada do MIT Media Lab. Co-autora de 14 artigos científicos. Transforma pesquisa de ponta em aplicações práticas.",
-    courses: 3,
-    students: "1.900+",
-    photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&q=80",
-    tags: ["Reinforcement Learning", "NLP", "TensorFlow"],
-  },
-];
 
 export default function ProfessoresPage() {
   return (
@@ -75,73 +18,112 @@ export default function ProfessoresPage() {
           <div className="flex items-center gap-3 mb-8">
             <span className="h-[2px] w-8 bg-[#0f62fe]" />
             <span className="font-mono text-xs uppercase tracking-[0.2em] text-[#8d8d8d]">
-              Nosso corpo docente
+              Instrutor
             </span>
           </div>
           <h1
             className="text-5xl md:text-[64px] font-light leading-[1.05] mb-8 max-w-3xl text-white"
             style={{ letterSpacing: "-0.02em" }}
           >
-            Aprenda com quem está no mercado.
+            Aprenda com quem está aprendendo junto com você.
           </h1>
           <p className="text-xl text-[#c6c6c6] max-w-2xl leading-relaxed">
-            Nossos professores são engenheiros, pesquisadores e líderes técnicos ativos nas maiores empresas
-            de tecnologia do mundo — não apenas acadêmicos.
+            O CFIA tem um único instrutor por enquanto — Renan Ferrari, estudante de Ciência da
+            Computação que ensina o que sabe como projeto de extensão universitária. Sem grandes
+            credenciais, com honestidade.
           </p>
         </div>
       </section>
 
-      {/* ── Stats ── */}
-      <section className="bg-white border-b border-[#e0e0e0]">
-        <div className="mx-auto max-w-[1584px] grid grid-cols-2 md:grid-cols-4 gap-px bg-[#e0e0e0]">
-          {[
-            { value: "18", label: "Professores ativos" },
-            { value: "12+", label: "Anos médios de experiência" },
-            { value: "60+", label: "Publicações científicas" },
-            { value: "4.9★", label: "Avaliação média dos cursos" },
-          ].map(({ value, label }) => (
-            <div key={label} className="bg-white py-10 px-8 flex flex-col gap-2">
-              <div className="text-3xl font-light" style={{ color: "#0f62fe", letterSpacing: "-0.02em" }}>
-                {value}
-              </div>
-              <div className="text-xs font-mono uppercase tracking-widest text-[#6f6f6f]">{label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Grid de professores ── */}
-      <section className="py-24 px-4 md:px-8 bg-white">
+      {/* ── Perfil do instrutor ── */}
+      <section className="py-24 px-4 md:px-8 bg-white border-b border-[#e0e0e0]">
         <div className="mx-auto max-w-[1584px]">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-[#e0e0e0] border border-[#e0e0e0]">
-            {PROFESSORS.map((prof) => (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+
+            {/* Foto placeholder */}
+            <div className="lg:col-span-4">
               <div
-                key={prof.name}
-                className="bg-white p-8 flex flex-col hover:bg-[#f4f4f4] transition-colors"
+                className="w-full max-w-xs aspect-square flex flex-col items-center justify-center border-2 border-dashed mb-6"
+                style={{ borderColor: "#c6c6c6", backgroundColor: "#f4f4f4" }}
               >
-                <div className="flex items-start gap-5 mb-6">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={prof.photo}
-                    alt={prof.name}
-                    className="h-16 w-16 object-cover shrink-0"
-                  />
-                  <div>
-                    <h3 className="font-bold text-lg leading-tight mb-1" style={{ color: "#161616" }}>
-                      {prof.name}
-                    </h3>
-                    <p className="text-sm font-medium" style={{ color: "#0f62fe" }}>
-                      {prof.role}
-                    </p>
-                  </div>
+                <div
+                  className="w-20 h-20 rounded-full flex items-center justify-center mb-3"
+                  style={{ backgroundColor: "#edf5ff" }}
+                >
+                  <span
+                    className="text-xl font-bold"
+                    style={{ color: "#0f62fe", fontFamily: "var(--font-mono, monospace)" }}
+                  >
+                    RF
+                  </span>
                 </div>
+                <p className="text-xs" style={{ color: "#8d8d8d" }}>Foto em breve</p>
+              </div>
 
-                <p className="text-sm text-[#525252] leading-relaxed mb-6 flex-1">
-                  {prof.bio}
+              <h2 className="text-2xl font-bold mb-1" style={{ color: "#161616" }}>Renan Ferrari</h2>
+              <p className="text-base mb-4" style={{ color: "#0f62fe" }}>
+                Estudante de Ciência da Computação
+              </p>
+              <p className="text-sm mb-1" style={{ color: "#525252" }}>
+                Instrutor e fundador do CFIA
+              </p>
+              <p className="text-sm mb-6" style={{ color: "#525252" }}>
+                Projeto de extensão universitária · 2025
+              </p>
+
+              <div className="flex flex-col gap-3">
+                <a
+                  href="https://github.com/renannferrari"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2.5 border transition-colors hover:border-[#161616]"
+                  style={{ borderColor: "#e0e0e0", color: "#525252", textDecoration: "none" }}
+                >
+                  <Github className="h-4 w-4" /> GitHub
+                </a>
+                <a
+                  href="mailto:gomesrenan514@gmail.com"
+                  className="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2.5 border transition-colors hover:border-[#0f62fe]"
+                  style={{ borderColor: "#e0e0e0", color: "#525252", textDecoration: "none" }}
+                >
+                  <Mail className="h-4 w-4" /> gomesrenan514@gmail.com
+                </a>
+              </div>
+            </div>
+
+            {/* Bio e detalhes */}
+            <div className="lg:col-span-8">
+              <div className="space-y-5 text-[#525252] leading-relaxed text-base mb-10">
+                <p>
+                  Sou estudante de Ciência da Computação apaixonado por programação, algoritmos e
+                  inteligência artificial. Criei o CFIA como projeto de extensão da faculdade — uma forma
+                  de compartilhar o que aprendo e tornar o conhecimento em tecnologia mais acessível.
                 </p>
+                <p>
+                  Não tenho PhD nem 20 anos de mercado. Mas tenho a experiência de quem está
+                  aprendendo na prática, estudando as melhores referências disponíveis e tentando
+                  explicar coisas complexas de um jeito simples. Às vezes isso é mais útil do que
+                  uma aula acadêmica densa.
+                </p>
+                <p>
+                  Cada curso aqui foi feito com cuidado. Se algo estiver errado ou puder melhorar,
+                  adoraria saber — este projeto cresce com feedback real.
+                </p>
+              </div>
 
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {prof.tags.map((tag) => (
+              {/* Tags de tecnologia */}
+              <div className="mb-10">
+                <p
+                  className="text-[10px] uppercase tracking-widest mb-4"
+                  style={{ color: "#8d8d8d", fontFamily: "var(--font-mono, monospace)" }}
+                >
+                  Áreas de ensino
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    "Python", "Algoritmos", "Estrutura de Dados", "Machine Learning",
+                    "IA Generativa", "JavaScript", "Desenvolvimento Web", "SQL",
+                  ].map((tag) => (
                     <span
                       key={tag}
                       className="text-xs font-semibold px-3 py-1"
@@ -151,32 +133,39 @@ export default function ProfessoresPage() {
                     </span>
                   ))}
                 </div>
-
-                <div
-                  className="flex items-center justify-between pt-5 text-sm"
-                  style={{ borderTop: "1px solid #e0e0e0" }}
-                >
-                  <span className="text-[#525252]">
-                    <strong className="text-[#161616]">{prof.courses}</strong> cursos ·{" "}
-                    <strong className="text-[#161616]">{prof.students}</strong> alunos
-                  </span>
-                  <ExternalLink className="h-4 w-4 text-[#8d8d8d] hover:text-[#0f62fe] cursor-pointer transition-colors" />
-                </div>
               </div>
-            ))}
+
+              {/* Nota de transparência */}
+              <div
+                className="p-6 border-l-4"
+                style={{ backgroundColor: "#f4f4f4", borderColor: "#0f62fe" }}
+              >
+                <p
+                  className="text-[10px] uppercase tracking-widest mb-2"
+                  style={{ color: "#8d8d8d", fontFamily: "var(--font-mono, monospace)" }}
+                >
+                  Nota de transparência
+                </p>
+                <p className="text-sm text-[#525252] leading-relaxed">
+                  Os cursos aqui são livres — não são pós-graduação, MBA ou graduação. O certificado
+                  emitido é de conclusão de curso livre e não possui reconhecimento do MEC. O que vale
+                  é o conhecimento que você vai adquirir.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── Seja um professor ── */}
+      {/* ── Seja um instrutor ── */}
       <section className="py-20 px-4 md:px-8 border-t border-[#e0e0e0]" style={{ backgroundColor: "#f4f4f4" }}>
         <div className="mx-auto max-w-[1584px] flex flex-col md:flex-row justify-between items-center gap-8">
           <div>
             <h2 className="text-3xl font-light mb-2" style={{ color: "#161616" }}>
-              Você é especialista em IA?
+              Sabe algo que vale a pena ensinar?
             </h2>
             <p className="text-[#525252]">
-              Compartilhe seu conhecimento e alcance milhares de alunos.
+              Este projeto cresce com pessoas que querem compartilhar o que aprenderam.
             </p>
           </div>
           <Link
@@ -184,7 +173,7 @@ export default function ProfessoresPage() {
             className="h-14 px-10 border font-semibold flex items-center gap-3 hover:bg-[#161616] hover:text-white hover:border-[#161616] transition-all shrink-0"
             style={{ color: "#161616", borderColor: "#161616" }}
           >
-            Quero ser professor <ArrowRight className="h-4 w-4" />
+            Quero ser instrutor <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </section>

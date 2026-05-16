@@ -28,12 +28,12 @@ const ibmPlexSerif = IBM_Plex_Serif({
 
 export const metadata: Metadata = {
   title: {
-    default: "cfia — Centro de Formação em Inteligência Artificial",
-    template: "%s | cfia",
+    default: "CFIA — Cursos livres em programação e IA",
+    template: "%s | CFIA",
   },
   description:
-    "Aprenda Inteligência Artificial com cursos práticos, projetos reais e certificados reconhecidos.",
-  keywords: ["inteligência artificial", "machine learning", "deep learning", "cursos online", "IA"],
+    "Cursos livres e gratuitos em programação e inteligência artificial. Projeto de extensão universitária criado por Renan Ferrari, estudante de Ciência da Computação.",
+  keywords: ["cursos gratuitos", "programação", "inteligência artificial", "machine learning", "projeto de extensão", "cursos livres"],
   icons: {
     icon: "/favicon.ico",
   },

@@ -5,7 +5,6 @@ import { prisma } from "@/lib/prisma";
 import { CourseCard } from "@/components/course-card";
 import { HeroSection, SocialProofBar } from "@/components/home/hero-section";
 import { ScrollReveal, StaggerReveal, StaggerItem } from "@/components/home/scroll-reveal";
-import { AnimatedNumber } from "@/components/home/animated-number";
 import {
   ArrowRight,
   BookOpen,
@@ -59,9 +58,9 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
-              { Icon: TrendingUp, title: "Avançar na carreira", desc: "Aprenda IA e conquiste novas oportunidades.", href: "/cursos", color: "#0f62fe" },
-              { Icon: GraduationCap, title: "Obter certificado", desc: "Certificados verificáveis e compartilháveis.", href: "/cursos", color: "#0f62fe" },
-              { Icon: Building2, title: "Treinar minha equipe", desc: "Soluções para empresas e universidades.", href: "/cursos", color: "#0f62fe" },
+              { Icon: TrendingUp, title: "Aprender do zero", desc: "Cursos livres e gratuitos para quem está começando.", href: "/cursos", color: "#0f62fe" },
+              { Icon: GraduationCap, title: "Obter certificado", desc: "Certificado de conclusão verificável ao finalizar.", href: "/cursos", color: "#0f62fe" },
+              { Icon: Building2, title: "Apoiar o projeto", desc: "Saiba como ajudar este projeto de extensão a crescer.", href: "/sobre", color: "#0f62fe" },
             ].map(({ Icon, title, desc, href, color }) => (
               <Link
                 key={title}
@@ -153,16 +152,16 @@ export default async function HomePage() {
                     className="text-[10px] font-semibold uppercase tracking-[0.32em] mb-3"
                     style={{ color: "#0f62fe", opacity: 0.7, fontFamily: "var(--font-mono, monospace)" }}
                   >
-                    Formação completa
+                    Cursos livres e gratuitos
                   </p>
                   <h3
                     className="text-2xl font-bold mb-2 leading-tight"
                     style={{ color: "#161616", letterSpacing: "-0.01em" }}
                   >
-                    Domine Inteligência Artificial do zero ao avançado
+                    Aprenda programação e IA do zero
                   </h3>
                   <p className="text-sm mb-5 max-w-xs" style={{ color: "#525252", lineHeight: 1.6 }}>
-                    Trilhas estruturadas com projetos reais e certificados verificáveis.
+                    Cursos práticos com projetos reais e certificado de conclusão verificável.
                   </p>
                 </div>
                 <Link
@@ -175,7 +174,7 @@ export default async function HomePage() {
               </div>
             )}
 
-            {/* Static enterprise card */}
+            {/* Static founder card */}
             <div
               className="relative overflow-hidden p-8 flex flex-col justify-between min-h-[200px]"
               style={{ backgroundColor: "#161616" }}
@@ -185,24 +184,24 @@ export default async function HomePage() {
                   className="text-[10px] font-semibold uppercase tracking-[0.32em] mb-3"
                   style={{ color: "#4589ff", fontFamily: "var(--font-mono, monospace)" }}
                 >
-                  Para Empresas
+                  Projeto de extensão · 2025
                 </p>
                 <h3
                   className="text-2xl font-bold mb-2 text-white leading-tight"
                   style={{ letterSpacing: "-0.01em" }}
                 >
-                  Capacite sua equipe em IA
+                  Feito por um estudante de Ciência da Computação
                 </h3>
                 <p className="text-sm mb-5 max-w-xs" style={{ color: "#a8a8a8", lineHeight: 1.6 }}>
-                  Trilhas customizadas para empresas, universidades e governos.
+                  Uma plataforma honesta, em crescimento, construída com cuidado para compartilhar conhecimento.
                 </p>
               </div>
               <Link
-                href="/cursos"
+                href="/sobre"
                 className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold self-start border"
                 style={{ borderColor: "#4589ff", color: "#4589ff", textDecoration: "none", backgroundColor: "transparent" }}
               >
-                Falar com especialista <ArrowRight className="h-4 w-4" />
+                Conhecer o projeto <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>
@@ -286,8 +285,8 @@ export default async function HomePage() {
             </ScrollReveal>
             <ScrollReveal delay={0.1}>
               <p className="text-base leading-relaxed" style={{ color: "#525252" }}>
-                Quatro caminhos estruturados, cada um com currículo, projetos e
-                mentoria para chegar preparado ao mercado.
+                Quatro caminhos estruturados, cada um com currículo e projetos práticos.
+                As faixas salariais são referências de mercado, não resultados da plataforma.
               </p>
             </ScrollReveal>
           </div>
@@ -383,7 +382,7 @@ export default async function HomePage() {
                       </div>
                       <div>
                         <p className="text-[10px] uppercase tracking-widest mb-0.5" style={{ color: "#8d8d8d" }}>
-                          Salário médio
+                          Mercado
                         </p>
                         <p className="text-sm font-semibold" style={{ color: "#0f62fe" }}>
                           {track.salary}
@@ -392,80 +391,6 @@ export default async function HomePage() {
                     </div>
                   </div>
                 </Link>
-              </StaggerItem>
-            ))}
-          </StaggerReveal>
-        </div>
-      </section>
-
-      {/* ── Outcomes / Stats ─────────────────────────────────────── */}
-      <section className="py-16 px-4 md:px-8 border-b" style={{ backgroundColor: "#edf5ff", borderColor: "#c0d8ff" }}>
-        <div className="mx-auto max-w-7xl">
-          <div className="grid md:grid-cols-2 gap-12 mb-12 items-end">
-            <ScrollReveal>
-              <p
-                className="text-[11px] uppercase tracking-[0.28em] mb-3"
-                style={{ color: "#0f62fe", fontFamily: "var(--font-mono, monospace)" }}
-              >
-                Resultados que importam
-              </p>
-              <h2
-                className="font-light"
-                style={{
-                  fontFamily: "var(--font-serif, Georgia, serif)",
-                  fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)",
-                  letterSpacing: "-0.02em",
-                  lineHeight: 1.1,
-                  color: "#161616",
-                }}
-              >
-                O que acontece{" "}
-                <em style={{ fontStyle: "italic", color: "#0f62fe" }}>depois</em> da formação.
-              </h2>
-            </ScrollReveal>
-            <ScrollReveal delay={0.1}>
-              <p className="text-base leading-relaxed" style={{ color: "#525252" }}>
-                Dados das turmas formadas entre 2024 e 2026. Acompanhamos cada
-                aluno após a conclusão.
-              </p>
-            </ScrollReveal>
-          </div>
-
-          <StaggerReveal className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {[
-              { target: 87, suffix: "%", label: "Conseguem vaga ou promoção em até 6 meses" },
-              { target: 42, prefix: "+", suffix: "%", label: "Aumento médio de salário após a formação" },
-              { target: 3.2, suffix: "×", decimals: 1, label: "Mais chamadas para entrevistas com portfólio" },
-              { target: 11, prefix: "R$ ", suffix: "k", label: "Salário mediano em primeiro cargo júnior" },
-            ].map((s, i) => (
-              <StaggerItem key={i}>
-                <div
-                  className="p-6 sm:p-8"
-                  style={{ backgroundColor: "#ffffff", border: "1px solid #c0d8ff" }}
-                >
-                  <div
-                    style={{
-                      fontFamily: "var(--font-serif, Georgia, serif)",
-                      fontWeight: 400,
-                      fontSize: "clamp(2rem, 4vw, 3rem)",
-                      letterSpacing: "-0.03em",
-                      color: "#0f62fe",
-                      lineHeight: 1,
-                      marginBottom: 10,
-                    }}
-                  >
-                    <AnimatedNumber
-                      target={s.target}
-                      prefix={s.prefix}
-                      suffix={s.suffix}
-                      decimals={(s as { decimals?: number }).decimals}
-                      duration={1600}
-                    />
-                  </div>
-                  <p className="text-sm leading-relaxed" style={{ color: "#525252" }}>
-                    {s.label}
-                  </p>
-                </div>
               </StaggerItem>
             ))}
           </StaggerReveal>
@@ -530,77 +455,79 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Depoimentos ────────────────────────────────────────── */}
+      {/* ── Sobre o projeto ────────────────────────────────────────── */}
       <section className="py-16 px-4 md:px-8 border-b" style={{ backgroundColor: "#f4f4f4", borderColor: "#e0e0e0" }}>
         <div className="mx-auto max-w-7xl">
-          <ScrollReveal className="max-w-lg mb-12">
-            <p
-              className="text-[11px] uppercase tracking-[0.28em] mb-3"
-              style={{ color: "#0f62fe", fontFamily: "var(--font-mono, monospace)" }}
-            >
-              Histórias reais
-            </p>
-            <h2
-              className="font-light"
-              style={{
-                fontFamily: "var(--font-serif, Georgia, serif)",
-                fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)",
-                letterSpacing: "-0.02em",
-                lineHeight: 1.1,
-                color: "#161616",
-              }}
-            >
-              Do{" "}
-              <em style={{ fontStyle: "italic" }}>primeiro modelo</em> ao
-              primeiro cargo na área.
-            </h2>
-          </ScrollReveal>
-
-          <StaggerReveal className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {[
-              { q: "Em quatro meses saí de análise em planilha para deploy de modelos em produção. A trilha de MLOps foi decisiva.", n: "Juliana Almeida", r: "ML Engineer · Nubank", g: ["#f4d3b3", "#c89474"] },
-              { q: "Os projetos reais foram o que me destacaram em entrevista. Mostrei código, métricas e decisões — não só certificados.", n: "Thiago Nakamura", r: "Data Scientist · iFood", g: ["#b3d4ff", "#4589ff"] },
-              { q: "A mentoria semanal me tirou de travas que eu teria sozinho. Paguei o curso em três meses com o aumento do novo cargo.", n: "Leticia Freitas", r: "AI Engineer · Stone", g: ["#b3e4c4", "#4a8a60"] },
-            ].map((t, i) => (
-              <StaggerItem key={i}>
-                <figure
-                  className="p-7 m-0 flex flex-col h-full border"
-                  style={{ backgroundColor: "#ffffff", borderColor: "#e0e0e0" }}
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <ScrollReveal>
+              <p
+                className="text-[11px] uppercase tracking-[0.28em] mb-3"
+                style={{ color: "#0f62fe", fontFamily: "var(--font-mono, monospace)" }}
+              >
+                Sobre o projeto
+              </p>
+              <h2
+                className="font-light mb-5"
+                style={{
+                  fontFamily: "var(--font-serif, Georgia, serif)",
+                  fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)",
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.1,
+                  color: "#161616",
+                }}
+              >
+                Feito por um estudante,{" "}
+                <em style={{ fontStyle: "italic", color: "#0f62fe" }}>para estudantes</em>.
+              </h2>
+              <p className="text-base leading-relaxed mb-6" style={{ color: "#525252" }}>
+                O CFIA é um projeto de extensão universitária criado por Renan Ferrari,
+                estudante de Ciência da Computação. Nasceu da vontade de compartilhar o que
+                aprendo na prática — e tornar o acesso ao conhecimento em tecnologia mais fácil
+                para quem começa.
+              </p>
+              <p className="text-base leading-relaxed mb-8" style={{ color: "#525252" }}>
+                É uma plataforma jovem, em construção. Não temos milhares de alunos nem dezenas de
+                professores. Temos honestidade, conteúdo feito com cuidado e a vontade genuína de ensinar.
+              </p>
+              <ScrollReveal delay={0.1}>
+                <a
+                  href="/sobre"
+                  className="inline-flex items-center gap-2 text-sm font-semibold"
+                  style={{ color: "#0f62fe", textDecoration: "none" }}
                 >
-                  <span
-                    className="mb-4"
-                    style={{
-                      fontFamily: "var(--font-serif, Georgia, serif)",
-                      fontSize: "3.5rem",
-                      lineHeight: 0.7,
-                      color: "#0f62fe",
-                    }}
+                  Conhecer o projeto <ArrowRight className="h-4 w-4" />
+                </a>
+              </ScrollReveal>
+            </ScrollReveal>
+            <ScrollReveal delay={0.15}>
+              <div
+                className="p-8 border"
+                style={{ backgroundColor: "#ffffff", borderColor: "#e0e0e0", borderLeft: "3px solid #0f62fe" }}
+              >
+                <p
+                  className="text-[10px] uppercase tracking-widest mb-4"
+                  style={{ color: "#8d8d8d", fontFamily: "var(--font-mono, monospace)" }}
+                >
+                  Projeto de extensão universitária
+                </p>
+                {[
+                  { label: "Tipo", value: "Cursos livres (não é pós-grad ou MBA)" },
+                  { label: "Acesso", value: "100% gratuito" },
+                  { label: "Certificado", value: "De conclusão, verificável online" },
+                  { label: "Idioma", value: "Português" },
+                ].map(({ label, value }) => (
+                  <div
+                    key={label}
+                    className="flex justify-between py-3"
+                    style={{ borderBottom: "1px solid #f0f0f0" }}
                   >
-                    &ldquo;
-                  </span>
-                  <blockquote
-                    className="text-sm leading-relaxed mb-6 flex-1 m-0"
-                    style={{ color: "#161616" }}
-                  >
-                    {t.q}
-                  </blockquote>
-                  <figcaption
-                    className="flex items-center gap-3 pt-5"
-                    style={{ borderTop: "1px solid #e0e0e0" }}
-                  >
-                    <div
-                      className="w-10 h-10 rounded-full flex-shrink-0"
-                      style={{ background: `linear-gradient(135deg, ${t.g[0]}, ${t.g[1]})` }}
-                    />
-                    <div>
-                      <p className="text-sm font-semibold" style={{ color: "#161616" }}>{t.n}</p>
-                      <p className="text-xs" style={{ color: "#525252" }}>{t.r}</p>
-                    </div>
-                  </figcaption>
-                </figure>
-              </StaggerItem>
-            ))}
-          </StaggerReveal>
+                    <span className="text-sm" style={{ color: "#8d8d8d" }}>{label}</span>
+                    <span className="text-sm font-semibold" style={{ color: "#161616" }}>{value}</span>
+                  </div>
+                ))}
+              </div>
+            </ScrollReveal>
+          </div>
         </div>
       </section>
 

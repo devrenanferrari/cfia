@@ -4,16 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { AnimatedNumber } from "./animated-number";
 
 interface HeroSectionProps {
   categories: Array<{ name: string; slug: string }>;
 }
 
-const STATS = [
-  { target: 12400, suffix: "+", label: "Alunos formados", separator: true },
-  { target: 97, suffix: "%", label: "Aprovação geral" },
-  { target: 4.9, suffix: "★", label: "Nota dos instrutores", decimals: 1 },
+const HIGHLIGHTS = [
+  { value: "100%", label: "Gratuito — acesso livre a todo o conteúdo" },
+  { value: "Cert.", label: "Certificado de conclusão verificável" },
+  { value: "Ext.", label: "Projeto de extensão universitária" },
 ];
 
 export function HeroSection({ categories }: HeroSectionProps) {
@@ -44,7 +43,7 @@ export function HeroSection({ categories }: HeroSectionProps) {
               className="text-[11px] font-semibold uppercase tracking-[0.32em] mb-5"
               style={{ color: "#0f62fe", fontFamily: "var(--font-mono, monospace)" }}
             >
-              CFIA — Centro de Formação em Inteligência Artificial
+              CFIA — Projeto de Extensão · Cursos Livres em Tecnologia
             </p>
 
             <h1
@@ -66,8 +65,8 @@ export function HeroSection({ categories }: HeroSectionProps) {
               className="text-base sm:text-lg mb-7 max-w-xl"
               style={{ color: "#525252", lineHeight: 1.7 }}
             >
-              Formações práticas em IA com certificado verificável, projetos
-              reais e acompanhamento de carreira do início ao emprego.
+              Cursos livres e gratuitos em programação e inteligência artificial,
+              feitos por um estudante de Ciência da Computação como projeto de extensão.
             </p>
 
             {/* Search bar */}
@@ -149,7 +148,7 @@ export function HeroSection({ categories }: HeroSectionProps) {
             )}
           </div>
 
-          {/* ── Right: stats card ── */}
+          {/* ── Right: highlights card ── */}
           <div className="hidden md:block">
             <div
               style={{
@@ -163,17 +162,17 @@ export function HeroSection({ categories }: HeroSectionProps) {
                   className="text-[11px] font-semibold uppercase tracking-[0.28em]"
                   style={{ color: "#0f62fe", fontFamily: "var(--font-mono, monospace)" }}
                 >
-                  Resultados comprovados
+                  Por que o CFIA
                 </p>
               </div>
 
               <div>
-                {STATS.map((stat, i) => (
+                {HIGHLIGHTS.map((item, i) => (
                   <div
                     key={i}
                     className="flex items-center gap-4 px-5 py-4"
                     style={{
-                      borderBottom: i < STATS.length - 1 ? "1px solid #f0f0f0" : "none",
+                      borderBottom: i < HIGHLIGHTS.length - 1 ? "1px solid #f0f0f0" : "none",
                     }}
                   >
                     <div
@@ -185,22 +184,16 @@ export function HeroSection({ categories }: HeroSectionProps) {
                         style={{
                           fontFamily: "var(--font-serif, Georgia, serif)",
                           fontWeight: 300,
-                          fontSize: "2rem",
+                          fontSize: "1.75rem",
                           color: "#0f62fe",
                           letterSpacing: "-0.02em",
                           lineHeight: 1,
                         }}
                       >
-                        <AnimatedNumber
-                          target={stat.target}
-                          suffix={stat.suffix}
-                          decimals={stat.decimals}
-                          separator={stat.separator}
-                          duration={1800}
-                        />
+                        {item.value}
                       </div>
                       <p className="text-sm mt-0.5" style={{ color: "#525252" }}>
-                        {stat.label}
+                        {item.label}
                       </p>
                     </div>
                   </div>
@@ -224,11 +217,11 @@ export function HeroSection({ categories }: HeroSectionProps) {
   );
 }
 
-/* ─── Partner bar ─────────────────────────────────────────────────────── */
+/* ─── Tech stack bar ─────────────────────────────────────────────────────── */
 export function SocialProofBar() {
-  const partners = [
-    "Google", "IBM", "Microsoft", "OpenAI", "Meta AI",
-    "DeepMind", "Stanford", "MIT",
+  const techs = [
+    "Python", "JavaScript", "Machine Learning", "Algoritmos", "React",
+    "SQL", "IA Generativa", "Estrutura de Dados",
   ];
   return (
     <div
@@ -241,10 +234,10 @@ export function SocialProofBar() {
             className="text-xs uppercase tracking-[0.22em] flex-shrink-0"
             style={{ color: "#8d8d8d", fontFamily: "var(--font-mono, monospace)" }}
           >
-            Conteúdo referenciado em
+            Tecnologias ensinadas
           </p>
           <div className="flex flex-wrap gap-x-7 gap-y-2">
-            {partners.map((p) => (
+            {techs.map((p) => (
               <span
                 key={p}
                 className="text-sm font-semibold"
