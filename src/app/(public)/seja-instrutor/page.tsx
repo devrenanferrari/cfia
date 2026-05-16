@@ -13,9 +13,9 @@ import { CheckCircle2, ArrowRight, BookOpen, Users, Award, Zap } from "lucide-re
 
 const BENEFITS = [
   { icon: BookOpen, title: "Crie cursos completos", desc: "Upload de vídeos, organização em módulos e aulas estruturadas." },
-  { icon: Users, title: "Alcance milhares de alunos", desc: "Sua aula disponível para toda a base de alunos do cfia." },
+  { icon: Users, title: "Alcance alunos reais", desc: "Seu conteúdo disponível para quem está buscando aprender na plataforma." },
   { icon: Award, title: "Certificação no seu nome", desc: "Os alunos recebem certificados assinados com seu nome como instrutor." },
-  { icon: Zap, title: "Suporte dedicado", desc: "Nossa equipe ajuda você a criar o melhor conteúdo possível." },
+  { icon: Zap, title: "Processo simples", desc: "Plataforma nova, processo direto — sem burocracia para começar a publicar." },
 ];
 
 export default function SejaInstrutorPage() {
@@ -61,8 +61,7 @@ export default function SejaInstrutorPage() {
           </div>
           <h1 className="text-2xl font-bold mb-3">Candidatura enviada!</h1>
           <p className="text-muted-foreground mb-8 leading-relaxed">
-            Nossa equipe vai analisar seu perfil e entrar em contato em até 3 dias úteis.
-            Fique de olho no seu email.
+            Candidatura recebida. Vou analisar e entrar em contato pelo email em breve.
           </p>
           <Button variant="outline" className="rounded-[56px] px-8" asChild>
             <Link href="/">Voltar ao início</Link>
@@ -107,13 +106,13 @@ export default function SejaInstrutorPage() {
             className="font-bold mb-5"
             style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", lineHeight: "1.08", color: "#0a0b0d" }}
           >
-            Compartilhe seu conhecimento
+            Sabe algo que vale
             <br />
-            <span style={{ color: "#0052ff" }}>Torne-se instrutor cfia</span>
+            <span style={{ color: "#0052ff" }}>a pena ensinar?</span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            Junte-se à nossa rede de especialistas e ajude profissionais de todo o Brasil
-            a dominar a Inteligência Artificial.
+            O CFIA é uma plataforma nova e pequena. Se você quer contribuir com um curso,
+            o processo é direto — sem equipe de análise, sem promessa de audiência garantida.
           </p>
         </div>
       </section>
@@ -185,11 +184,11 @@ export default function SejaInstrutorPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Sua área de especialização em IA</Label>
+                <Label>O que você quer ensinar</Label>
                 <Input
                   value={form.expertise}
                   onChange={(e) => setForm({ ...form, expertise: e.target.value })}
-                  placeholder="Ex: Machine Learning, LLMs, Visão Computacional..."
+                  placeholder="Ex: Python, Algoritmos, Banco de Dados, Machine Learning..."
                   required
                 />
               </div>

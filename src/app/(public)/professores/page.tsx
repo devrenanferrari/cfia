@@ -68,7 +68,7 @@ export default function ProfessoresPage() {
                 Instrutor e fundador do CFIA
               </p>
               <p className="text-sm mb-6" style={{ color: "#525252" }}>
-                Projeto de extensão universitária · 2025
+                Projeto de extensão universitária · 2026
               </p>
 
               <div className="flex flex-col gap-3">

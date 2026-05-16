@@ -73,12 +73,12 @@ export default function RegisterPage() {
   return (
     <AuthShell
       eyebrow="Nova conta"
-      heading="Comece sua formação."
-      description="Junte-se a mais de 12.000 alunos estudando inteligência artificial e tecnologia de ponta."
+      heading="Comece a aprender."
+      description="Crie sua conta e acesse cursos livres e gratuitos em programação e inteligência artificial."
       features={[
-        "Formações com certificado verificável",
-        "Instrutores especialistas em IA",
-        "Acesso vitalício ao conteúdo",
+        "Cursos livres e gratuitos",
+        "Certificado de conclusão verificável",
+        "Conteúdo criado com cuidado por quem está aprendendo",
       ]}
     >
       <div className="mb-8">

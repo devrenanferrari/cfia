@@ -191,11 +191,11 @@ export default function LoginPage() {
     <AuthShell
       eyebrow="Acesso seguro"
       heading="Bem-vindo de volta."
-      description="Retome de onde parou. Todo seu progresso, certificados e conquistas estão sincronizados."
+      description="Retome de onde parou. Seu progresso e certificados estão salvos."
       features={[
-        "Certificados verificáveis e compartilháveis",
+        "Certificados de conclusão verificáveis",
         "Progresso salvo automaticamente",
-        "Suporte especializado em IA",
+        "Projeto de extensão universitária · Cursos gratuitos",
       ]}
     >
       <Suspense

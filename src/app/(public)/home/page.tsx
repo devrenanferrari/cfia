@@ -205,7 +205,7 @@ export default async function HomePage() {
                   className="text-[10px] font-semibold uppercase tracking-[0.32em] mb-3"
                   style={{ color: "#4589ff", fontFamily: "var(--font-mono, monospace)" }}
                 >
-                  Projeto de extensão · 2025
+                  Projeto de extensão · 2026
                 </p>
                 <h3
                   className="text-2xl font-bold mb-2 text-white leading-tight"

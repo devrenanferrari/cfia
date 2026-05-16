@@ -39,7 +39,7 @@ export default function SobrePage() {
       <section className="bg-white border-b border-[#e0e0e0]">
         <div className="mx-auto max-w-[1584px] grid grid-cols-2 md:grid-cols-4 gap-px bg-[#e0e0e0]">
           {[
-            { value: "2025",         label: "Ano de criação" },
+            { value: "2026",         label: "Ano de criação" },
             { value: "Cursos livres", label: "Sem pós-grad ou MBA" },
             { value: "100% grátis",  label: "Acesso ao conteúdo" },
             { value: "Crescendo",    label: "Plataforma em construção" },
@@ -211,8 +211,8 @@ export default function SobrePage() {
             </div>
             <div className="flex flex-col gap-px bg-[#e0e0e0] border border-[#e0e0e0]">
               {[
-                { year: "2025", event: "Criação do CFIA como projeto de extensão universitária" },
-                { year: "2025", event: "Desenvolvimento da plataforma do zero — um estudante, do início ao deploy" },
+                { year: "2026", event: "Criação do CFIA como projeto de extensão universitária" },
+                { year: "2026", event: "Desenvolvimento da plataforma do zero — um estudante, do início ao deploy" },
                 { year: "Em breve", event: "Primeiros cursos publicados e alunos certificados" },
                 { year: "Futuro", event: "Novos cursos, novos instrutores e talvez patrocínios para manter o acesso gratuito" },
               ].map(({ year, event }, i) => (
