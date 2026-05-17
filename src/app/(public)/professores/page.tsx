@@ -40,24 +40,15 @@ export default function ProfessoresPage() {
         <div className="mx-auto max-w-[1584px]">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
 
-            {/* Foto placeholder */}
+            {/* Foto */}
             <div className="lg:col-span-4">
-              <div
-                className="w-full max-w-xs aspect-square flex flex-col items-center justify-center border-2 border-dashed mb-6"
-                style={{ borderColor: "#c6c6c6", backgroundColor: "#f4f4f4" }}
-              >
-                <div
-                  className="w-20 h-20 rounded-full flex items-center justify-center mb-3"
-                  style={{ backgroundColor: "#edf5ff" }}
-                >
-                  <span
-                    className="text-xl font-bold"
-                    style={{ color: "#0f62fe", fontFamily: "var(--font-mono, monospace)" }}
-                  >
-                    RF
-                  </span>
-                </div>
-                <p className="text-xs" style={{ color: "#8d8d8d" }}>Foto em breve</p>
+              <div className="w-full max-w-xs aspect-square overflow-hidden mb-6">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/1770864546901.jpg"
+                  alt="Renan Ferrari"
+                  className="w-full h-full object-cover object-top"
+                />
               </div>
 
               <h2 className="text-2xl font-bold mb-1" style={{ color: "#161616" }}>Renan Ferrari</h2>

@@ -156,25 +156,15 @@ export default function SobrePage() {
               </div>
             </div>
 
-            {/* Foto placeholder */}
+            {/* Foto */}
             <div>
-              <div
-                className="w-full aspect-square max-w-sm flex flex-col items-center justify-center border-2 border-dashed"
-                style={{ borderColor: "#c6c6c6", backgroundColor: "#ffffff" }}
-              >
-                <div
-                  className="w-24 h-24 rounded-full mb-4 flex items-center justify-center"
-                  style={{ backgroundColor: "#edf5ff" }}
-                >
-                  <span
-                    className="text-2xl font-bold"
-                    style={{ color: "#0f62fe", fontFamily: "var(--font-mono, monospace)" }}
-                  >
-                    RF
-                  </span>
-                </div>
-                <p className="text-sm font-semibold" style={{ color: "#161616" }}>Renan Ferrari</p>
-                <p className="text-xs mt-1" style={{ color: "#8d8d8d" }}>Foto em breve</p>
+              <div className="w-full aspect-square max-w-sm overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/1770864546901.jpg"
+                  alt="Renan Ferrari"
+                  className="w-full h-full object-cover object-top"
+                />
               </div>
               <div className="mt-6">
                 <p className="text-sm font-semibold mb-1" style={{ color: "#161616" }}>Renan Ferrari</p>
