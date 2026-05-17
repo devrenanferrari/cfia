@@ -166,8 +166,13 @@ export function SocialPostCard({
   const isOwnPost = session?.user?.id === post.author.id;
 
   return (
-    <div className="bg-white border border-[#e0e0e0] overflow-hidden">
-      {/* Cabeçalho do post */}
+    <div
+      className="bg-white border border-[#e0e0e0] overflow-hidden transition-shadow"
+      style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
+      onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)"; }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)"; }}
+    >
+      {/* Cabeçalho */}
       <div className="flex items-start justify-between gap-3 px-4 pt-4 pb-3">
         <div className="flex items-start gap-3 min-w-0">
           <Avatar name={post.author.name} size={44} />

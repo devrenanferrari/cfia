@@ -7,7 +7,11 @@
       "Bash(node -e \"require\\('pusher'\\); require\\('pusher-js'\\)\")",
       "Bash(timeout 30)",
       "Bash(taskkill /F /IM node.exe)",
-      "Bash(Start-Sleep -Seconds 2)"
+      "Bash(Start-Sleep -Seconds 2)",
+      "Skill(ui-ux-pro-max)",
+      "Skill(ui-ux-pro-max:*)",
+      "Bash(python skills/ui-ux-pro-max/scripts/search.py \"LMS education platform professional IBM Carbon minimalist\" --design-system -f markdown)",
+      "Bash(python src/ui-ux-pro-max/scripts/search.py \"LMS education platform professional IBM Carbon minimalist\" --design-system -f markdown)"
     ]
   }
 }

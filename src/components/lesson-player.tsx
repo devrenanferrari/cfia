@@ -1,13 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { QuizPlayer } from "@/components/quiz-player";
 import { NotebookPlayer } from "@/components/notebook-player";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { CheckCircle, FileText, Loader2, Code2 } from "lucide-react";
+import { CheckCircle2, FileText, Loader2, Video, FlaskConical, BookOpen } from "lucide-react";
 
 interface Lesson {
   id: string;
@@ -41,15 +39,20 @@ interface LessonPlayerProps {
   bunnyLibraryId: string;
 }
 
-/** Detecta se é um videoId do Bunny (guid) ou URL externa (youtube, vimeo, etc.) */
 function isBunnyId(videoUrl: string) {
-  // Bunny GUIDs são UUIDs: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(videoUrl);
 }
 
 function getBunnyEmbedUrl(videoId: string, libraryId: string) {
   return `https://iframe.mediadelivery.net/embed/${libraryId}/${videoId}?autoplay=false&responsive=true&preload=true`;
 }
+
+const TYPE_META: Record<string, { label: string; Icon: React.FC<{ className?: string; style?: React.CSSProperties }> }> = {
+  VIDEO: { label: "Aula em vídeo", Icon: Video },
+  TEXT: { label: "Aula em texto", Icon: FileText },
+  NOTEBOOK: { label: "Notebook interativo", Icon: FlaskConical },
+  QUIZ: { label: "Quiz", Icon: BookOpen },
+};
 
 export function LessonPlayer({ lesson, courseId, isCompleted, bunnyLibraryId }: LessonPlayerProps) {
   const [marking, setMarking] = useState(false);
@@ -77,17 +80,16 @@ export function LessonPlayer({ lesson, courseId, isCompleted, bunnyLibraryId }: 
   const renderVideoPlayer = () => {
     if (!lesson.videoUrl) {
       return (
-        <div className="aspect-video rounded-xl bg-muted flex flex-col items-center justify-center gap-3 text-muted-foreground">
-          <Loader2 className="h-10 w-10 opacity-30" />
-          <p className="text-sm">Vídeo ainda não disponível</p>
+        <div className="aspect-video bg-[#161616] flex flex-col items-center justify-center gap-3 border border-[#393939]">
+          <Video className="h-10 w-10 opacity-20" style={{ color: "#ffffff" }} />
+          <p className="text-sm" style={{ color: "#8d8d8d" }}>Vídeo ainda não disponível</p>
         </div>
       );
     }
 
-    // Bunny.net (videoId UUID)
     if (isBunnyId(lesson.videoUrl)) {
       return (
-        <div className="aspect-video rounded-xl overflow-hidden bg-black shadow-lg">
+        <div className="aspect-video overflow-hidden bg-black border border-[#393939]">
           <iframe
             src={getBunnyEmbedUrl(lesson.videoUrl, bunnyLibraryId)}
             className="w-full h-full"
@@ -99,14 +101,13 @@ export function LessonPlayer({ lesson, courseId, isCompleted, bunnyLibraryId }: 
       );
     }
 
-    // YouTube
     if (lesson.videoUrl.includes("youtube.com") || lesson.videoUrl.includes("youtu.be")) {
       const ytId = lesson.videoUrl.match(
         /(?:youtube\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([A-Za-z0-9_-]{11})/
       )?.[1];
       if (ytId) {
         return (
-          <div className="aspect-video rounded-xl overflow-hidden bg-black shadow-lg">
+          <div className="aspect-video overflow-hidden bg-black border border-[#393939]">
             <iframe
               src={`https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1`}
               className="w-full h-full"
@@ -119,12 +120,11 @@ export function LessonPlayer({ lesson, courseId, isCompleted, bunnyLibraryId }: 
       }
     }
 
-    // Vimeo
     if (lesson.videoUrl.includes("vimeo.com")) {
       const vimeoId = lesson.videoUrl.match(/vimeo\.com\/(\d+)/)?.[1];
       if (vimeoId) {
         return (
-          <div className="aspect-video rounded-xl overflow-hidden bg-black shadow-lg">
+          <div className="aspect-video overflow-hidden bg-black border border-[#393939]">
             <iframe
               src={`https://player.vimeo.com/video/${vimeoId}?dnt=1&byline=0&portrait=0`}
               className="w-full h-full"
@@ -137,92 +137,190 @@ export function LessonPlayer({ lesson, courseId, isCompleted, bunnyLibraryId }: 
       }
     }
 
-    // Fallback: vídeo direto HTML5 (mp4, webm, etc.)
     return (
-      <div className="aspect-video rounded-xl overflow-hidden bg-black shadow-lg">
-        <video
-          src={lesson.videoUrl}
-          controls
-          className="w-full h-full"
-          preload="metadata"
-          playsInline
-        >
+      <div className="aspect-video overflow-hidden bg-black border border-[#393939]">
+        <video src={lesson.videoUrl} controls className="w-full h-full" preload="metadata" playsInline>
           Seu navegador não suporta a reprodução de vídeo.
         </video>
       </div>
     );
   };
 
+  const typeMeta = TYPE_META[lesson.type] ?? TYPE_META["TEXT"];
+
   return (
-    <div className="space-y-5">
-      {/* Player */}
+    <div className="space-y-0">
+
+      {/* ── Video player ───────────────────────────────────────── */}
       {lesson.type === "VIDEO" && renderVideoPlayer()}
 
-      {/* Conteúdo de texto */}
+      {/* ── Conteúdo de texto ──────────────────────────────────── */}
       {lesson.type === "TEXT" && (
-        <div className="border rounded-xl p-6">
-          <div className="flex items-center gap-2 mb-4 text-muted-foreground">
-            <FileText className="h-5 w-5" />
-            <span className="text-sm font-medium">Aula em texto</span>
+        <div className="bg-white border border-[#e0e0e0]">
+          {/* Label */}
+          <div
+            className="flex items-center gap-2 px-5 py-3 border-b border-[#e0e0e0]"
+            style={{ backgroundColor: "#f4f4f4" }}
+          >
+            <FileText className="h-4 w-4" style={{ color: "#0f62fe" }} />
+            <span className="text-xs font-semibold uppercase tracking-wider" style={{ fontFamily: "var(--font-mono)", color: "#525252", letterSpacing: "0.1em" }}>
+              Aula em texto
+            </span>
+            {lesson.duration && (
+              <span className="ml-auto text-xs" style={{ fontFamily: "var(--font-mono)", color: "#8d8d8d" }}>
+                {lesson.duration} min de leitura
+              </span>
+            )}
           </div>
+
+          {/* Conteúdo com tipografia otimizada para leitura */}
           {lesson.content ? (
-            <div className="prose prose-sm max-w-none text-foreground">
-              <p className="whitespace-pre-wrap leading-relaxed">{lesson.content}</p>
+            <div className="px-5 md:px-10 lg:px-16 py-8 md:py-10">
+              <div className="max-w-[68ch] mx-auto">
+                {lesson.content.split(/\n{2,}/).map((block, i) => {
+                  const trimmed = block.trim();
+                  if (!trimmed) return null;
+
+                  // Detecta bloco de código (linhas com 4+ espaços ou indentação comum de código)
+                  const looksLikeCode =
+                    trimmed.startsWith("```") ||
+                    trimmed.split("\n").every((l) => l.startsWith("    ") || l.startsWith("\t") || l === "");
+
+                  if (looksLikeCode) {
+                    const codeContent = trimmed.replace(/^```[a-z]*\n?/, "").replace(/```$/, "").replace(/^(    |\t)/gm, "");
+                    return (
+                      <pre
+                        key={i}
+                        className="mb-6 p-4 text-sm overflow-x-auto border border-[#e0e0e0]"
+                        style={{
+                          fontFamily: "var(--font-mono), 'IBM Plex Mono', monospace",
+                          backgroundColor: "#161616",
+                          color: "#f4f4f4",
+                          lineHeight: "1.6",
+                          fontSize: "13px",
+                        }}
+                      >
+                        <code>{codeContent}</code>
+                      </pre>
+                    );
+                  }
+
+                  // Detecta título (linha curta seguida de nova linha ou começa com #)
+                  if (trimmed.startsWith("# ")) {
+                    return (
+                      <h2
+                        key={i}
+                        className="text-xl font-semibold mb-4 mt-8 first:mt-0"
+                        style={{ color: "#161616", letterSpacing: "-0.01em" }}
+                      >
+                        {trimmed.replace(/^# /, "")}
+                      </h2>
+                    );
+                  }
+                  if (trimmed.startsWith("## ")) {
+                    return (
+                      <h3
+                        key={i}
+                        className="text-base font-semibold mb-3 mt-6"
+                        style={{ color: "#161616" }}
+                      >
+                        {trimmed.replace(/^## /, "")}
+                      </h3>
+                    );
+                  }
+
+                  // Parágrafo normal
+                  return (
+                    <p
+                      key={i}
+                      className="mb-5 last:mb-0"
+                      style={{
+                        color: "#393939",
+                        fontSize: "16px",
+                        lineHeight: "1.8",
+                      }}
+                    >
+                      {trimmed.split("\n").map((line, j, arr) => (
+                        <span key={j}>
+                          {line}
+                          {j < arr.length - 1 && <br />}
+                        </span>
+                      ))}
+                    </p>
+                  );
+                })}
+              </div>
             </div>
           ) : (
-            <p className="text-muted-foreground">Conteúdo não disponível.</p>
+            <p className="px-5 py-8 text-sm" style={{ color: "#8d8d8d" }}>Conteúdo não disponível.</p>
           )}
         </div>
       )}
 
-      {/* Jupyter Notebook interativo */}
+      {/* ── Notebook ───────────────────────────────────────────── */}
       {lesson.type === "NOTEBOOK" && lesson.content && (
         <NotebookPlayer content={lesson.content} />
       )}
 
+      {/* ── Quiz ───────────────────────────────────────────────── */}
       {lesson.type === "QUIZ" && lesson.quiz && (
         <QuizPlayer quizId={lesson.quiz.id} isCompleted={completed} />
       )}
-
       {lesson.type === "QUIZ" && !lesson.quiz && (
-        <div className="rounded-xl border p-6 text-sm text-muted-foreground">
+        <div className="border border-[#e0e0e0] bg-white p-6 text-sm" style={{ color: "#8d8d8d" }}>
           Este quiz ainda não foi configurado pelo instrutor.
         </div>
       )}
 
-      {/* Info + botão de conclusão */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-semibold">{lesson.title}</h2>
-          {lesson.description && (
-            <p className="text-muted-foreground text-sm mt-1">{lesson.description}</p>
-          )}
-          <div className="flex items-center gap-2 mt-2">
-            <Badge variant="outline" className="text-xs">
-              {lesson.type === "VIDEO" ? "Vídeo" : lesson.type === "TEXT" ? "Texto" : lesson.type === "NOTEBOOK" ? "Notebook" : "Quiz"}
-            </Badge>
+      {/* ── Barra de info + conclusão ───────────────────────────── */}
+      <div className="bg-white border border-[#e0e0e0] border-t-0 px-5 py-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div className="min-w-0">
+          {/* Tipo da aula */}
+          <div className="flex items-center gap-1.5 mb-2">
+            <typeMeta.Icon className="h-3.5 w-3.5 shrink-0" style={{ color: "#0f62fe" }} />
+            <span className="text-xs font-semibold uppercase" style={{ fontFamily: "var(--font-mono)", color: "#8d8d8d", letterSpacing: "0.1em" }}>
+              {typeMeta.label}
+            </span>
             {lesson.duration && (
-              <Badge variant="outline" className="text-xs">{lesson.duration} min</Badge>
+              <>
+                <span style={{ color: "#c6c6c6" }}>·</span>
+                <span className="text-xs" style={{ fontFamily: "var(--font-mono)", color: "#8d8d8d" }}>
+                  {lesson.duration} min
+                </span>
+              </>
             )}
           </div>
+          <h2 className="text-lg font-semibold leading-snug" style={{ color: "#161616" }}>
+            {lesson.title}
+          </h2>
+          {lesson.description && (
+            <p className="text-sm mt-1.5 leading-relaxed" style={{ color: "#525252" }}>
+              {lesson.description}
+            </p>
+          )}
         </div>
 
         {lesson.type !== "QUIZ" && (
-          <Button
+          <button
             onClick={markAsComplete}
             disabled={marking || completed}
-            variant={completed ? "secondary" : "default"}
-            className="flex-shrink-0"
+            className="flex items-center gap-2 px-5 h-10 text-sm font-semibold shrink-0 transition-colors disabled:opacity-70 self-start sm:self-auto"
+            style={
+              completed
+                ? { backgroundColor: "#defbe6", color: "#24a148", border: "1px solid #24a148" }
+                : { backgroundColor: "#0f62fe", color: "#ffffff" }
+            }
           >
             {marking ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <CheckCircle className="mr-2 h-4 w-4" />
+              <CheckCircle2 className="h-4 w-4" />
             )}
             {completed ? "Concluída" : marking ? "Salvando..." : "Marcar como concluída"}
-          </Button>
+          </button>
         )}
       </div>
+
     </div>
   );
 }
