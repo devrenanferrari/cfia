@@ -4,6 +4,32 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notify } from "@/lib/notify";
 
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const comments = await prisma.postComment.findMany({
+    where: { postId: id, parentId: null },
+    orderBy: { createdAt: "asc" },
+    include: {
+      author: { select: { id: true, name: true, image: true } },
+      votes: { select: { value: true, userId: true } },
+      replies: {
+        orderBy: { createdAt: "asc" },
+        include: {
+          author: { select: { id: true, name: true, image: true } },
+          votes: { select: { value: true, userId: true } },
+        },
+      },
+    },
+  });
+  return NextResponse.json(
+    comments.map((c) => ({
+      ...c,
+      createdAt: c.createdAt.toISOString(),
+      replies: c.replies.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() })),
+    }))
+  );
+}
+
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await getServerSession(authOptions);

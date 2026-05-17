@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import {
   ThumbsUp, MessageSquare, UserPlus, Send, Loader2, Check,
+  CornerDownRight, ArrowRight,
 } from "lucide-react";
 
 type Author = { id: string; name: string | null; image: string | null };
@@ -24,6 +25,15 @@ export interface SocialPostData {
   connectionStatus?: "none" | "pending" | "accepted";
 }
 
+interface CommentData {
+  id: string;
+  body: string;
+  createdAt: string;
+  author: Author;
+  votes: Vote[];
+  replies?: CommentData[];
+}
+
 function timeAgo(dateStr: string) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const m = Math.floor(diff / 60000);
@@ -37,12 +47,13 @@ function timeAgo(dateStr: string) {
 }
 
 function Avatar({ name, size = 40 }: { name: string | null; size?: number }) {
-  const initials = name
-    ?.split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0].toUpperCase())
-    .join("") ?? "?";
+  const initials =
+    name
+      ?.split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0].toUpperCase())
+      .join("") ?? "?";
   return (
     <div
       className="rounded-full flex items-center justify-center shrink-0 font-bold select-none"
@@ -59,59 +70,106 @@ function Avatar({ name, size = 40 }: { name: string | null; size?: number }) {
   );
 }
 
-interface CommentInputProps {
+function CommentItem({
+  comment,
+  postId,
+  onReplyAdded,
+}: {
+  comment: CommentData;
   postId: string;
-  authorName: string | null;
-  onCommentAdded: (count: number) => void;
-}
-
-function CommentInput({ postId, authorName, onCommentAdded }: CommentInputProps) {
+  onReplyAdded: (parentId: string, reply: CommentData) => void;
+}) {
   const { data: session } = useSession();
-  const router = useRouter();
-  const [body, setBody] = useState("");
+  const [replying, setReplying] = useState(false);
+  const [replyBody, setReplyBody] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function submit() {
-    if (!session) { router.push("/entrar"); return; }
-    if (!body.trim()) return;
+  async function submitReply() {
+    if (!replyBody.trim()) return;
     setLoading(true);
     try {
       const res = await fetch(`/api/community/posts/${postId}/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body: body.trim() }),
+        body: JSON.stringify({ body: replyBody.trim(), parentId: comment.id }),
       });
-      if (!res.ok) { toast.error("Erro ao comentar"); return; }
-      setBody("");
-      onCommentAdded(1);
-      toast.success("Comentário publicado!");
+      if (!res.ok) { toast.error("Erro ao responder"); return; }
+      const reply = await res.json();
+      onReplyAdded(comment.id, { ...reply, replies: [] });
+      setReplyBody("");
+      setReplying(false);
     } catch {
-      toast.error("Erro ao comentar");
+      toast.error("Erro ao responder");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="flex items-center gap-3 px-4 py-3">
-      <Avatar name={session?.user?.name ?? null} size={32} />
-      <div className="flex-1 flex items-center border border-[#e0e0e0] rounded-full overflow-hidden" style={{ backgroundColor: "#f4f4f4" }}>
-        <input
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) submit(); }}
-          placeholder={`Comentar como ${session?.user?.name?.split(" ")[0] ?? "você"}...`}
-          className="flex-1 h-9 px-4 text-sm bg-transparent focus:outline-none"
-          style={{ color: "#161616" }}
-        />
-        <button
-          onClick={submit}
-          disabled={loading || !body.trim()}
-          className="h-9 w-10 flex items-center justify-center disabled:opacity-40 transition-colors hover:text-[#0f62fe]"
-          style={{ color: "#8d8d8d" }}
+    <div className="flex gap-2.5">
+      <Avatar name={comment.author.name} size={30} />
+      <div className="flex-1 min-w-0">
+        <div
+          className="rounded-2xl px-3 py-2"
+          style={{ backgroundColor: "#f4f4f4" }}
         >
-          {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
-        </button>
+          <p className="text-xs font-bold mb-0.5" style={{ color: "#161616" }}>
+            {comment.author.name ?? "Anônimo"}
+          </p>
+          <p className="text-sm leading-relaxed" style={{ color: "#393939" }}>
+            {comment.body}
+          </p>
+        </div>
+        <div className="flex items-center gap-3 mt-1 pl-1">
+          <span className="text-[11px]" style={{ color: "#a8a8a8" }}>
+            {timeAgo(comment.createdAt)}
+          </span>
+          {session && (
+            <button
+              onClick={() => setReplying((v) => !v)}
+              className="text-[11px] font-bold transition-colors hover:text-[#0f62fe]"
+              style={{ color: "#8d8d8d" }}
+            >
+              Responder
+            </button>
+          )}
+        </div>
+
+        {replying && (
+          <div className="mt-2 flex items-center gap-2">
+            <Avatar name={session?.user?.name ?? null} size={24} />
+            <div
+              className="flex-1 flex items-center rounded-full overflow-hidden"
+              style={{ backgroundColor: "#f4f4f4", border: "1px solid #e0e0e0" }}
+            >
+              <input
+                value={replyBody}
+                onChange={(e) => setReplyBody(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") submitReply(); }}
+                placeholder="Escreva uma resposta..."
+                className="flex-1 h-8 px-3 text-xs bg-transparent focus:outline-none"
+                style={{ color: "#161616" }}
+                autoFocus
+              />
+              <button
+                onClick={submitReply}
+                disabled={loading || !replyBody.trim()}
+                className="h-8 w-8 flex items-center justify-center disabled:opacity-40 hover:text-[#0f62fe] transition-colors"
+                style={{ color: "#8d8d8d" }}
+              >
+                {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {comment.replies && comment.replies.length > 0 && (
+          <div className="mt-2.5 space-y-2.5 pl-2 border-l-2" style={{ borderColor: "#e0e0e0" }}>
+            {comment.replies.map((reply) => (
+              <CommentItem key={reply.id} comment={reply} postId={postId} onReplyAdded={onReplyAdded} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -126,6 +184,7 @@ export function SocialPostCard({
 }) {
   const { data: session } = useSession();
   const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const myVote = post.votes.find((v) => v.userId === (currentUserId ?? session?.user?.id));
   const likeCount = post.votes.filter((v) => v.value === 1).length;
@@ -134,6 +193,10 @@ export function SocialPostCard({
   const [likes, setLikes] = useState(likeCount);
   const [showComments, setShowComments] = useState(false);
   const [commentCount, setCommentCount] = useState(post._count.comments);
+  const [comments, setComments] = useState<CommentData[] | null>(null);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [newComment, setNewComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [connecting, setConnecting] = useState<"idle" | "loading" | "sent" | "connected">(() => {
     if (post.connectionStatus === "accepted") return "connected";
     if (post.connectionStatus === "pending") return "sent";
@@ -141,6 +204,29 @@ export function SocialPostCard({
   });
 
   const isOwnPost = session?.user?.id === post.author.id;
+
+  async function loadComments() {
+    if (comments !== null) return;
+    setCommentsLoading(true);
+    try {
+      const res = await fetch(`/api/community/posts/${post.id}/comments`);
+      const data = await res.json();
+      setComments(Array.isArray(data) ? data : []);
+    } catch {
+      setComments([]);
+    } finally {
+      setCommentsLoading(false);
+    }
+  }
+
+  function toggleComments() {
+    const next = !showComments;
+    setShowComments(next);
+    if (next) {
+      loadComments();
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }
 
   async function toggleLike() {
     if (!session) { router.push("/entrar"); return; }
@@ -152,6 +238,36 @@ export function SocialPostCard({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ value: 1 }),
     });
+  }
+
+  async function submitComment() {
+    if (!session) { router.push("/entrar"); return; }
+    if (!newComment.trim()) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/community/posts/${post.id}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ body: newComment.trim() }),
+      });
+      if (!res.ok) { toast.error("Erro ao comentar"); return; }
+      const comment = await res.json();
+      setComments((prev) => [...(prev ?? []), { ...comment, replies: [] }]);
+      setCommentCount((prev) => prev + 1);
+      setNewComment("");
+    } catch {
+      toast.error("Erro ao comentar");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  function handleReplyAdded(parentId: string, reply: CommentData) {
+    setComments((prev) =>
+      prev?.map((c) =>
+        c.id === parentId ? { ...c, replies: [...(c.replies ?? []), reply] } : c
+      ) ?? null
+    );
   }
 
   async function connect() {
@@ -177,15 +293,15 @@ export function SocialPostCard({
     <article
       className="bg-white border border-[#e0e0e0] transition-shadow"
       style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}
-      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)"; }}
+      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 10px rgba(0,0,0,0.08)"; }}
       onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "0 1px 2px rgba(0,0,0,0.04)"; }}
     >
-      {/* ── Cabeçalho do autor ── */}
-      <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-3">
+      {/* ── Cabeçalho ── */}
+      <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-2">
         <div className="flex items-center gap-3 min-w-0">
           <Avatar name={post.author.name} size={42} />
           <div className="min-w-0">
-            <p className="text-sm font-bold leading-tight truncate" style={{ color: "#161616" }}>
+            <p className="text-sm font-bold leading-tight" style={{ color: "#161616" }}>
               {post.author.name ?? "Anônimo"}
             </p>
             <p className="text-xs" style={{ color: "#8d8d8d" }}>
@@ -194,11 +310,10 @@ export function SocialPostCard({
           </div>
         </div>
 
-        {/* Botão conectar — só aparece para posts de outros */}
         {session && !isOwnPost && (
           <div className="shrink-0">
             {connecting === "connected" ? (
-              <span className="flex items-center gap-1 text-xs font-semibold px-2.5 h-7" style={{ color: "#24a148" }}>
+              <span className="flex items-center gap-1 text-xs font-bold px-2.5 h-7" style={{ color: "#24a148" }}>
                 <Check className="h-3 w-3" /> Conectado
               </span>
             ) : connecting === "sent" ? (
@@ -209,7 +324,7 @@ export function SocialPostCard({
               <button
                 onClick={connect}
                 disabled={connecting === "loading"}
-                className="flex items-center gap-1.5 text-xs font-semibold px-3 h-7 border transition-all hover:bg-[#0f62fe] hover:text-white hover:border-[#0f62fe] disabled:opacity-50"
+                className="flex items-center gap-1.5 text-xs font-bold px-3 h-7 border transition-all hover:bg-[#0f62fe] hover:text-white hover:border-[#0f62fe] disabled:opacity-50"
                 style={{ borderColor: "#0f62fe", color: "#0f62fe" }}
               >
                 {connecting === "loading"
@@ -221,7 +336,7 @@ export function SocialPostCard({
         )}
       </div>
 
-      {/* ── Conteúdo principal — clicável ── */}
+      {/* ── Conteúdo clicável ── */}
       <Link href={`/comunidade/${post.id}`} className="block px-4 pb-3 group">
         <h2
           className="font-bold leading-snug mb-2 group-hover:text-[#0f62fe] transition-colors"
@@ -239,10 +354,10 @@ export function SocialPostCard({
             {post.tags.map((tag) => (
               <span
                 key={tag}
-                className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full"
+                className="text-[11px] font-bold px-2.5 py-0.5 rounded-full"
                 style={{ backgroundColor: "#edf5ff", color: "#0043ce" }}
               >
-                {tag}
+                #{tag}
               </span>
             ))}
           </div>
@@ -268,7 +383,7 @@ export function SocialPostCard({
           )}
           {commentCount > 0 && (
             <button
-              onClick={() => setShowComments((v) => !v)}
+              onClick={toggleComments}
               className="ml-auto hover:underline transition-colors hover:text-[#0f62fe]"
             >
               {commentCount} comentário{commentCount !== 1 ? "s" : ""}
@@ -281,7 +396,7 @@ export function SocialPostCard({
       <div className="flex items-center border-t" style={{ borderColor: "#e0e0e0" }}>
         <button
           onClick={toggleLike}
-          className="flex flex-1 items-center justify-center gap-2 h-10 text-sm font-semibold transition-colors hover:bg-[#f4f4f4]"
+          className="flex flex-1 items-center justify-center gap-2 h-10 text-sm font-bold transition-colors hover:bg-[#f4f4f4]"
           style={{ color: liked ? "#0f62fe" : "#525252" }}
         >
           <ThumbsUp
@@ -294,23 +409,86 @@ export function SocialPostCard({
         <div className="w-px h-5" style={{ backgroundColor: "#e0e0e0" }} />
 
         <button
-          onClick={() => setShowComments((v) => !v)}
-          className="flex flex-1 items-center justify-center gap-2 h-10 text-sm font-semibold transition-colors hover:bg-[#f4f4f4]"
+          onClick={toggleComments}
+          className="flex flex-1 items-center justify-center gap-2 h-10 text-sm font-bold transition-colors hover:bg-[#f4f4f4]"
           style={{ color: showComments ? "#0f62fe" : "#525252" }}
         >
           <MessageSquare className="h-4 w-4" />
           Comentar
         </button>
+
+        <div className="w-px h-5" style={{ backgroundColor: "#e0e0e0" }} />
+
+        <Link
+          href={`/comunidade/${post.id}`}
+          className="flex flex-1 items-center justify-center gap-2 h-10 text-sm font-bold transition-colors hover:bg-[#f4f4f4]"
+          style={{ color: "#525252" }}
+        >
+          <ArrowRight className="h-4 w-4" />
+          Ver post
+        </Link>
       </div>
 
-      {/* ── Área de comentários ── */}
+      {/* ── Seção de comentários ── */}
       {showComments && (
-        <div className="border-t" style={{ borderColor: "#e0e0e0" }}>
-          <CommentInput
-            postId={post.id}
-            authorName={post.author.name}
-            onCommentAdded={(n) => setCommentCount((prev) => prev + n)}
-          />
+        <div className="border-t px-4 py-3 space-y-3" style={{ borderColor: "#e0e0e0" }}>
+          {/* Input novo comentário */}
+          <div className="flex items-center gap-3">
+            <Avatar name={session?.user?.name ?? null} size={32} />
+            <div
+              className="flex-1 flex items-center rounded-full overflow-hidden"
+              style={{ backgroundColor: "#f4f4f4", border: "1px solid #e0e0e0" }}
+            >
+              <input
+                ref={inputRef}
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) submitComment(); }}
+                placeholder={session ? `Comentar como ${session.user.name?.split(" ")[0]}...` : "Faça login para comentar"}
+                readOnly={!session}
+                onClick={() => { if (!session) router.push("/entrar"); }}
+                className="flex-1 h-9 px-4 text-sm bg-transparent focus:outline-none"
+                style={{ color: "#161616" }}
+              />
+              {session && (
+                <button
+                  onClick={submitComment}
+                  disabled={submitting || !newComment.trim()}
+                  className="h-9 w-10 flex items-center justify-center disabled:opacity-40 hover:text-[#0f62fe] transition-colors"
+                  style={{ color: "#8d8d8d" }}
+                >
+                  {submitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Lista de comentários */}
+          {commentsLoading ? (
+            <div className="flex justify-center py-4">
+              <Loader2 className="h-5 w-5 animate-spin" style={{ color: "#8d8d8d" }} />
+            </div>
+          ) : comments && comments.length > 0 ? (
+            <div className="space-y-3 pt-1">
+              {comments.map((c) => (
+                <CommentItem key={c.id} comment={c} postId={post.id} onReplyAdded={handleReplyAdded} />
+              ))}
+              {commentCount > comments.length && (
+                <Link
+                  href={`/comunidade/${post.id}`}
+                  className="flex items-center gap-1 text-xs font-bold mt-1 hover:underline"
+                  style={{ color: "#0f62fe" }}
+                >
+                  <CornerDownRight className="h-3 w-3" />
+                  Ver todos os {commentCount} comentários
+                </Link>
+              )}
+            </div>
+          ) : comments !== null && comments.length === 0 ? (
+            <p className="text-xs text-center py-3" style={{ color: "#8d8d8d" }}>
+              Nenhum comentário ainda. Seja o primeiro!
+            </p>
+          ) : null}
         </div>
       )}
     </article>
