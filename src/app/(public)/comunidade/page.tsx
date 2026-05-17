@@ -2,7 +2,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { ArrowRight, PenLine, Users, Zap, BookOpen, MessageSquare } from "lucide-react";
+import {
+  PenLine, Users, Zap, BookOpen, TrendingUp, ArrowRight,
+} from "lucide-react";
 import { SocialPostCard, type SocialPostData } from "@/components/community/social-post-card";
 import { CreatePostBox } from "@/components/community/create-post-box";
 import { SuggestConnectButtonClient } from "@/components/community/suggest-connect-button";
@@ -19,9 +21,9 @@ export default async function ComunidadePage({
   const { tag } = await searchParams;
   const session = await getServerSession(authOptions);
 
-  const [posts, totalUsers, xpData, connectionCount, myConnections] = await Promise.all([
+  const [posts, totalUsers, totalPosts, xpData, connectionCount, myConnections] = await Promise.all([
     prisma.post.findMany({
-      take: 30,
+      take: 40,
       orderBy: { createdAt: "desc" },
       where: tag ? { tags: { has: tag } } : undefined,
       include: {
@@ -31,6 +33,7 @@ export default async function ComunidadePage({
       },
     }),
     prisma.user.count(),
+    prisma.post.count(),
     session ? prisma.userXP.findUnique({ where: { userId: session.user.id } }) : null,
     session
       ? prisma.connection.count({
@@ -48,7 +51,6 @@ export default async function ComunidadePage({
       : [],
   ]);
 
-  // Mapa userId → status de conexão
   const connMap = new Map<string, "pending" | "accepted">();
   if (session) {
     for (const c of myConnections) {
@@ -64,7 +66,7 @@ export default async function ComunidadePage({
           connectionsFrom: { none: { toId: session.user.id } },
           connectionsTo: { none: { fromId: session.user.id } },
         },
-        take: 5,
+        take: 6,
         orderBy: { createdAt: "desc" },
         select: { id: true, name: true, role: true, _count: { select: { posts: true } } },
       })
@@ -83,98 +85,116 @@ export default async function ComunidadePage({
 
   return (
     <div style={{ backgroundColor: "#f0f2f5", minHeight: "100vh" }}>
-      <div className="mx-auto max-w-[1200px] px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className="mx-auto max-w-[1200px] px-0 sm:px-4 py-0 sm:py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 sm:gap-4">
 
-          {/* ── Sidebar Esquerda ─────────────────────────────────────────── */}
-          <aside className="lg:col-span-3 space-y-3 hidden lg:block">
+          {/* ── Sidebar Esquerda (desktop only) ── */}
+          <aside className="lg:col-span-3 hidden lg:flex flex-col gap-3">
 
+            {/* Card do perfil */}
             <div className="bg-white border border-[#e0e0e0] overflow-hidden">
-              <div className="h-14" style={{ backgroundColor: "#0f62fe" }} />
+              <div className="h-16 relative" style={{ backgroundColor: "#0f62fe" }}>
+                <div
+                  className="absolute inset-0 opacity-20"
+                  style={{
+                    backgroundImage: "repeating-linear-gradient(45deg, #ffffff 0, #ffffff 1px, transparent 0, transparent 50%)",
+                    backgroundSize: "8px 8px",
+                  }}
+                />
+              </div>
               <div className="px-4 pb-4">
                 <div
-                  className="-mt-7 mb-3 h-14 w-14 rounded-full border-2 border-white flex items-center justify-center font-bold text-lg"
+                  className="-mt-8 mb-3 h-16 w-16 rounded-full border-4 border-white flex items-center justify-center font-bold text-xl select-none"
                   style={{ backgroundColor: "#161616", color: "#ffffff" }}
                 >
                   {session?.user?.name?.[0]?.toUpperCase() ?? "?"}
                 </div>
+
                 {session ? (
                   <>
                     <p className="text-sm font-bold leading-tight" style={{ color: "#161616" }}>
                       {session.user.name}
                     </p>
-                    <p className="text-xs mt-0.5" style={{ color: "#8d8d8d" }}>
+                    <p className="text-xs mt-0.5 mb-3" style={{ color: "#8d8d8d" }}>
                       {session.user.role === "INSTRUCTOR" ? "Instrutor" : "Estudante"} · CFIA
                     </p>
 
-                    <div className="mt-3 pt-3 border-t border-[#e0e0e0]">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-mono" style={{ color: "#525252" }}>
-                          Nível {level} — {xp} XP
-                        </span>
-                        <span className="text-[10px]" style={{ color: "#8d8d8d" }}>{xpPct}%</span>
+                    {/* Stats rápidos */}
+                    <div className="grid grid-cols-2 gap-px mb-3" style={{ backgroundColor: "#e0e0e0" }}>
+                      <div className="bg-white py-2 text-center">
+                        <p className="text-base font-bold" style={{ color: "#161616" }}>{connectionCount}</p>
+                        <p className="text-[10px]" style={{ color: "#8d8d8d" }}>Conexões</p>
                       </div>
-                      <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: "#e0e0e0" }}>
+                      <div className="bg-white py-2 text-center">
+                        <p className="text-base font-bold" style={{ color: "#161616" }}>{level}</p>
+                        <p className="text-[10px]" style={{ color: "#8d8d8d" }}>Nível</p>
+                      </div>
+                    </div>
+
+                    {/* XP bar */}
+                    <div className="mb-3">
+                      <div className="flex justify-between mb-1">
+                        <span className="text-[11px] font-mono" style={{ color: "#525252" }}>
+                          {xp} XP
+                        </span>
+                        <span className="text-[11px] font-mono" style={{ color: "#8d8d8d" }}>
+                          {xpToNext} para nível {level + 1}
+                        </span>
+                      </div>
+                      <div className="h-1.5 w-full" style={{ backgroundColor: "#e0e0e0" }}>
                         <div
-                          className="h-1.5 rounded-full transition-all"
+                          className="h-1.5 transition-all"
                           style={{ width: `${xpPct}%`, backgroundColor: "#0f62fe" }}
                         />
                       </div>
                     </div>
 
-                    <div className="mt-3 space-y-1.5">
-                      <Link
-                        href="/comunidade/chat"
-                        className="flex items-center gap-2 text-xs px-2 py-1.5 rounded hover:bg-[#f4f4f4] transition-colors w-full"
-                        style={{ color: "#525252" }}
-                      >
-                        <MessageSquare className="h-3.5 w-3.5 shrink-0" style={{ color: "#0f62fe" }} />
-                        <span>Chat privado</span>
-                      </Link>
+                    {/* Links rápidos */}
+                    <div className="border-t pt-3" style={{ borderColor: "#f4f4f4" }}>
                       <Link
                         href="/dashboard/cursos"
-                        className="flex items-center gap-2 text-xs px-2 py-1.5 rounded hover:bg-[#f4f4f4] transition-colors w-full"
+                        className="flex items-center gap-2 text-xs py-1.5 hover:text-[#0f62fe] transition-colors"
                         style={{ color: "#525252" }}
                       >
                         <BookOpen className="h-3.5 w-3.5 shrink-0" style={{ color: "#0f62fe" }} />
-                        <span>Meus cursos</span>
+                        Meus cursos
                       </Link>
-                      <div
-                        className="flex items-center gap-2 text-xs px-2 py-1.5"
+                      <Link
+                        href="/trilhas"
+                        className="flex items-center gap-2 text-xs py-1.5 hover:text-[#0f62fe] transition-colors"
                         style={{ color: "#525252" }}
                       >
-                        <Users className="h-3.5 w-3.5 shrink-0" style={{ color: "#0f62fe" }} />
-                        <span><strong>{connectionCount}</strong> conexões</span>
-                      </div>
+                        <TrendingUp className="h-3.5 w-3.5 shrink-0" style={{ color: "#0f62fe" }} />
+                        Trilhas de carreira
+                      </Link>
                     </div>
                   </>
                 ) : (
-                  <>
-                    <p className="text-sm font-bold" style={{ color: "#161616" }}>
-                      Entre na comunidade
-                    </p>
-                    <p className="text-xs mt-1 mb-3" style={{ color: "#8d8d8d" }}>
-                      Crie uma conta gratuita e comece a interagir.
+                  <div>
+                    <p className="text-sm font-bold mb-1" style={{ color: "#161616" }}>Entre na comunidade</p>
+                    <p className="text-xs mb-3" style={{ color: "#8d8d8d" }}>
+                      Crie uma conta e comece a interagir.
                     </p>
                     <Link
                       href="/cadastro"
-                      className="flex items-center justify-center text-xs font-semibold h-8"
+                      className="flex items-center justify-center text-xs font-bold h-9 w-full transition-colors hover:bg-[#0353e9]"
                       style={{ backgroundColor: "#0f62fe", color: "#ffffff" }}
                     >
                       Criar conta grátis
                     </Link>
-                  </>
+                  </div>
                 )}
               </div>
             </div>
 
+            {/* Atalhos da plataforma */}
             <div className="bg-white border border-[#e0e0e0] p-4">
               <p className="text-[10px] uppercase tracking-widest font-mono mb-3" style={{ color: "#8d8d8d" }}>
-                Descobrir
+                Explorar
               </p>
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 {[
-                  { href: "/cursos", label: "Ver cursos" },
+                  { href: "/cursos", label: "Cursos" },
                   { href: "/trilhas", label: "Trilhas de carreira" },
                   { href: "/laboratorio", label: "Laboratório" },
                   { href: "/sobre", label: "Sobre o CFIA" },
@@ -182,51 +202,99 @@ export default async function ComunidadePage({
                   <Link
                     key={l.href}
                     href={l.href}
-                    className="flex items-center gap-2 text-xs px-2 py-1.5 rounded hover:bg-[#f4f4f4] transition-colors"
+                    className="flex items-center gap-2 text-xs px-2 py-2 hover:bg-[#f4f4f4] transition-colors group"
                     style={{ color: "#525252" }}
                   >
-                    <ArrowRight className="h-3 w-3 shrink-0" style={{ color: "#0f62fe" }} />
+                    <ArrowRight className="h-3 w-3 shrink-0 group-hover:translate-x-0.5 transition-transform" style={{ color: "#0f62fe" }} />
                     {l.label}
                   </Link>
                 ))}
               </div>
             </div>
+
           </aside>
 
-          {/* ── Feed Central ─────────────────────────────────────────────── */}
-          <main className="lg:col-span-6 space-y-3">
-            <CreatePostBox />
+          {/* ── Feed Central ── */}
+          <main className="lg:col-span-6 flex flex-col gap-0 sm:gap-3">
 
-            {/* Filtro por tag */}
-            <TagFilter />
+            {/* CreatePostBox */}
+            <div className="sm:block">
+              <CreatePostBox />
+            </div>
 
+            {/* Filtros de tag */}
+            <div className="bg-white border-y sm:border border-[#e0e0e0] px-4 py-2.5">
+              <TagFilter />
+            </div>
+
+            {/* Posts */}
             {posts.length === 0 ? (
               <div className="bg-white border border-[#e0e0e0] p-12 text-center">
                 <PenLine className="h-10 w-10 mx-auto mb-3" style={{ color: "#c6c6c6" }} />
-                <p className="text-base font-light mb-1" style={{ color: "#161616" }}>
-                  {tag ? `Nenhum post com a tag "${tag}" ainda.` : "Ninguém publicou ainda."}
+                <p className="text-base font-semibold mb-1" style={{ color: "#161616" }}>
+                  {tag ? `Nenhum post com "${tag}" ainda.` : "Ninguém publicou ainda."}
                 </p>
                 <p className="text-sm" style={{ color: "#8d8d8d" }}>
-                  {tag ? "Tente outra tag ou escreva o primeiro." : "Seja o primeiro a compartilhar algo."}
+                  Seja o primeiro a compartilhar algo!
                 </p>
               </div>
             ) : (
-              serializedPosts.map((post) => (
-                <SocialPostCard
-                  key={post.id}
-                  post={post}
-                  currentUserId={session?.user?.id}
-                />
-              ))
+              <div className="flex flex-col gap-0 sm:gap-3">
+                {serializedPosts.map((post) => (
+                  <SocialPostCard
+                    key={post.id}
+                    post={post}
+                    currentUserId={session?.user?.id}
+                  />
+                ))}
+              </div>
             )}
+
           </main>
 
-          {/* ── Sidebar Direita ───────────────────────────────────────────── */}
-          <aside className="lg:col-span-3 space-y-3 hidden lg:block">
+          {/* ── Sidebar Direita (desktop only) ── */}
+          <aside className="lg:col-span-3 hidden lg:flex flex-col gap-3">
 
             {/* Pesquisar pessoas */}
             {session && <UserSearchBox />}
 
+            {/* Stats da comunidade */}
+            <div className="bg-white border border-[#e0e0e0] p-4">
+              <p className="text-[10px] uppercase tracking-widest font-mono mb-3" style={{ color: "#8d8d8d" }}>
+                Comunidade CFIA
+              </p>
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="flex items-center gap-1.5" style={{ color: "#525252" }}>
+                    <Users className="h-3.5 w-3.5" style={{ color: "#0f62fe" }} /> Membros
+                  </span>
+                  <span className="font-bold" style={{ color: "#161616" }}>{totalUsers.toLocaleString("pt-BR")}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="flex items-center gap-1.5" style={{ color: "#525252" }}>
+                    <PenLine className="h-3.5 w-3.5" style={{ color: "#0f62fe" }} /> Publicações
+                  </span>
+                  <span className="font-bold" style={{ color: "#161616" }}>{totalPosts.toLocaleString("pt-BR")}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="flex items-center gap-1.5" style={{ color: "#525252" }}>
+                    <Zap className="h-3.5 w-3.5" style={{ color: "#0f62fe" }} /> Sistema de XP
+                  </span>
+                  <span className="font-bold" style={{ color: "#0f62fe" }}>Ativo</span>
+                </div>
+              </div>
+              {!session && (
+                <Link
+                  href="/cadastro"
+                  className="mt-4 flex items-center justify-center text-xs font-bold h-9 w-full transition-colors hover:bg-[#0353e9]"
+                  style={{ backgroundColor: "#0f62fe", color: "#ffffff" }}
+                >
+                  Participar da comunidade
+                </Link>
+              )}
+            </div>
+
+            {/* Sugestões de conexão */}
             {suggestions.length > 0 && (
               <div className="bg-white border border-[#e0e0e0] p-4">
                 <p className="text-[10px] uppercase tracking-widest font-mono mb-3" style={{ color: "#8d8d8d" }}>
@@ -236,17 +304,18 @@ export default async function ComunidadePage({
                   {suggestions.map((u) => (
                     <div key={u.id} className="flex items-center gap-3">
                       <div
-                        className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-                        style={{ backgroundColor: "#edf5ff", color: "#0f62fe" }}
+                        className="h-9 w-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0 select-none"
+                        style={{ backgroundColor: "#0f62fe", color: "#ffffff" }}
                       >
                         {u.name?.[0]?.toUpperCase() ?? "?"}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold truncate" style={{ color: "#161616" }}>
+                        <p className="text-xs font-bold truncate" style={{ color: "#161616" }}>
                           {u.name}
                         </p>
                         <p className="text-[10px]" style={{ color: "#8d8d8d" }}>
-                          {u.role === "INSTRUCTOR" ? "Instrutor" : "Estudante"} · {u._count.posts} post{u._count.posts !== 1 ? "s" : ""}
+                          {u.role === "INSTRUCTOR" ? "Instrutor" : "Estudante"}
+                          {u._count.posts > 0 ? ` · ${u._count.posts} post${u._count.posts !== 1 ? "s" : ""}` : ""}
                         </p>
                       </div>
                       <SuggestConnectButtonClient toId={u.id} initialStatus={connMap.get(u.id) ?? "none"} />
@@ -256,36 +325,20 @@ export default async function ComunidadePage({
               </div>
             )}
 
+            {/* Regras */}
             <div className="bg-white border border-[#e0e0e0] p-4">
               <p className="text-[10px] uppercase tracking-widest font-mono mb-3" style={{ color: "#8d8d8d" }}>
-                Comunidade
+                Regras da comunidade
               </p>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span style={{ color: "#525252" }}>Membros</span>
-                  <span className="font-semibold" style={{ color: "#161616" }}>{totalUsers}</span>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span style={{ color: "#525252" }}>Publicações</span>
-                  <span className="font-semibold" style={{ color: "#161616" }}>{posts.length}</span>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span style={{ color: "#525252" }}>Gamificado</span>
-                  <span className="flex items-center gap-1 font-semibold" style={{ color: "#0f62fe" }}>
-                    <Zap className="h-3 w-3" /> XP
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white border border-[#e0e0e0] p-4">
-              <p className="text-[10px] uppercase tracking-widest font-mono mb-3" style={{ color: "#8d8d8d" }}>
-                Regras
-              </p>
-              <ol className="space-y-1.5 text-xs" style={{ color: "#525252" }}>
-                {["Respeito acima de tudo", "Foco em programação e IA", "Sem spam", "Conteúdo real"].map((r, i) => (
-                  <li key={i} className="flex gap-2">
-                    <span className="font-mono font-bold shrink-0" style={{ color: "#0f62fe" }}>
+              <ol className="space-y-2 text-xs" style={{ color: "#525252" }}>
+                {[
+                  "Respeito acima de tudo",
+                  "Foco em programação e IA",
+                  "Sem spam ou autopromoção",
+                  "Compartilhe conteúdo real",
+                ].map((r, i) => (
+                  <li key={i} className="flex gap-2.5 items-start">
+                    <span className="font-mono font-bold shrink-0 mt-0.5" style={{ color: "#0f62fe" }}>
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     {r}
@@ -293,7 +346,9 @@ export default async function ComunidadePage({
                 ))}
               </ol>
             </div>
+
           </aside>
+
         </div>
       </div>
     </div>

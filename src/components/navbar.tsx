@@ -19,7 +19,6 @@ import {
   Home,
   LayoutDashboard,
   LogOut,
-  MessageSquare,
   Search,
   Shield,
   User,
@@ -166,10 +165,6 @@ export function Navbar() {
                       <Users className="mr-2.5 h-4 w-4 text-muted-foreground" />
                       Comunidade
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => router.push("/comunidade/chat")} className="cursor-pointer">
-                      <MessageSquare className="mr-2.5 h-4 w-4 text-muted-foreground" />
-                      Chat privado
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => router.push("/perfil")} className="cursor-pointer">
                       <User className="mr-2.5 h-4 w-4 text-muted-foreground" />
                       Meu perfil
@@ -246,7 +241,7 @@ export function Navbar() {
           { href: "/dashboard", icon: Home, label: "Início" },
           { href: "/cursos", icon: BookOpen, label: "Cursos" },
           { href: "/comunidade", icon: Users, label: "Comunidade" },
-          { href: "/comunidade/chat", icon: MessageSquare, label: "Chat" },
+          { href: "/trilhas", icon: GraduationCap, label: "Trilhas" },
           { href: "/perfil", icon: User, label: "Perfil" },
         ].map(({ href, icon: Icon, label }) => {
           const active = pathname === href || (href !== "/dashboard" && pathname?.startsWith(href));

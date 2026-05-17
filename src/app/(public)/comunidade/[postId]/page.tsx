@@ -7,7 +7,6 @@ import { ArrowLeft, Clock, MessageSquare } from "lucide-react";
 import { CommentSection } from "@/components/community/comment-section";
 import { ConnectButtonClient } from "@/components/community/connect-button";
 import { PostActionBar } from "@/components/community/post-action-bar";
-import { QuickChatButton } from "@/components/community/quick-chat-button";
 
 export async function generateMetadata({ params }: { params: Promise<{ postId: string }> }) {
   const { postId } = await params;
@@ -109,10 +108,7 @@ export default async function PostPage({ params }: { params: Promise<{ postId: s
               </div>
             </div>
             {session && session.user.id !== post.author.id && (
-              <div className="flex gap-2">
-                <ConnectButtonClient toId={post.author.id} initialStatus={connectionStatus} />
-                <QuickChatButton toId={post.author.id} />
-              </div>
+              <ConnectButtonClient toId={post.author.id} initialStatus={connectionStatus} />
             )}
           </div>
 

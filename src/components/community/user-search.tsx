@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { Search, UserPlus, Check, Loader2, MessageSquare, X } from "lucide-react";
+import { Search, UserPlus, Check, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 
 type ConnStatus = "none" | "pending" | "accepted";
@@ -16,10 +15,8 @@ type UserResult = {
 };
 
 function UserRow({ user }: { user: UserResult }) {
-  const router = useRouter();
   const [connStatus, setConnStatus] = useState<ConnStatus>(user.connectionStatus);
   const [connLoading, setConnLoading] = useState(false);
-  const [chatLoading, setChatLoading] = useState(false);
 
   async function connect() {
     setConnLoading(true);
@@ -42,24 +39,8 @@ function UserRow({ user }: { user: UserResult }) {
     }
   }
 
-  async function openChat() {
-    setChatLoading(true);
-    try {
-      const res = await fetch("/api/chat/rooms", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ toId: user.id }),
-      });
-      if (!res.ok) { toast.error("Erro ao abrir chat"); return; }
-      const room = await res.json();
-      router.push(`/comunidade/chat/${room.id}`);
-    } finally {
-      setChatLoading(false);
-    }
-  }
-
   return (
-    <div className="flex items-center gap-3 py-3 border-b last:border-b-0" style={{ borderColor: "#f4f4f4" }}>
+    <div className="flex items-center gap-3 py-2.5 border-b last:border-b-0" style={{ borderColor: "#f4f4f4" }}>
       <div
         className="h-9 w-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
         style={{ backgroundColor: "#edf5ff", color: "#0f62fe" }}
@@ -72,17 +53,7 @@ function UserRow({ user }: { user: UserResult }) {
           {user.role === "INSTRUCTOR" ? "Instrutor" : "Estudante"}
         </p>
       </div>
-      <div className="flex items-center gap-1.5 shrink-0">
-        <button
-          onClick={openChat}
-          disabled={chatLoading}
-          className="flex items-center gap-1 text-[11px] font-semibold px-2.5 h-7 border transition-colors hover:border-[#0f62fe] hover:text-[#0f62fe] disabled:opacity-50"
-          style={{ borderColor: "#e0e0e0", color: "#525252" }}
-          title="Enviar mensagem"
-        >
-          {chatLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <MessageSquare className="h-3 w-3" />}
-        </button>
-
+      <div className="shrink-0">
         {connStatus === "accepted" ? (
           <span className="flex items-center gap-1 text-[11px] font-semibold px-2.5 h-7" style={{ color: "#24a148" }}>
             <Check className="h-3 w-3" /> Conectado
@@ -95,7 +66,7 @@ function UserRow({ user }: { user: UserResult }) {
           <button
             onClick={connect}
             disabled={connLoading}
-            className="flex items-center gap-1 text-[11px] font-semibold px-2.5 h-7 border transition-colors disabled:opacity-50"
+            className="flex items-center gap-1 text-[11px] font-semibold px-2.5 h-7 border transition-colors disabled:opacity-50 hover:bg-[#0f62fe] hover:text-white hover:border-[#0f62fe]"
             style={{ borderColor: "#0f62fe", color: "#0f62fe" }}
           >
             {connLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <><UserPlus className="h-3 w-3" /> Conectar</>}
@@ -158,13 +129,10 @@ export function UserSearchBox() {
           </button>
         )}
       </div>
-
       {searched && (
         <div className="px-3">
           {results.length === 0 ? (
-            <p className="py-4 text-xs text-center" style={{ color: "#8d8d8d" }}>
-              Nenhum usuário encontrado
-            </p>
+            <p className="py-4 text-xs text-center" style={{ color: "#8d8d8d" }}>Nenhum usuário encontrado</p>
           ) : (
             results.map((u) => <UserRow key={u.id} user={u} />)
           )}

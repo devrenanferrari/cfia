@@ -4,16 +4,33 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowRight, Loader2, X, Code2, HelpCircle, Lightbulb, FolderGit2 } from "lucide-react";
+import { ArrowRight, Loader2, X, Code2, HelpCircle, Lightbulb, FolderGit2, Image } from "lucide-react";
 
 const TAGS = ["Python", "JavaScript", "IA", "Algoritmos", "ML", "Web", "SQL", "Dúvida", "Projeto"];
 
 const QUICK_ACTIONS = [
-  { icon: Code2, label: "Compartilhar código", tag: "Python" },
-  { icon: HelpCircle, label: "Tirar dúvida", tag: "Dúvida" },
-  { icon: Lightbulb, label: "Compartilhar ideia", tag: "IA" },
-  { icon: FolderGit2, label: "Mostrar projeto", tag: "Projeto" },
+  { icon: Code2,      label: "Compartilhar código", tag: "Python" },
+  { icon: HelpCircle, label: "Tirar dúvida",         tag: "Dúvida" },
+  { icon: Lightbulb,  label: "Compartilhar ideia",   tag: "IA" },
+  { icon: FolderGit2, label: "Mostrar projeto",       tag: "Projeto" },
 ];
+
+function UserAvatar({ name }: { name: string | null | undefined }) {
+  const initials = name
+    ?.split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("") ?? "?";
+  return (
+    <div
+      className="rounded-full flex items-center justify-center shrink-0 font-bold select-none"
+      style={{ width: 40, height: 40, backgroundColor: "#0f62fe", color: "#ffffff", fontSize: 14 }}
+    >
+      {initials}
+    </div>
+  );
+}
 
 export function CreatePostBox() {
   const { data: session } = useSession();
@@ -24,7 +41,6 @@ export function CreatePostBox() {
   const [tags, setTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const letter = session?.user?.name?.[0]?.toUpperCase() ?? "?";
   const firstName = session?.user?.name?.split(" ")[0];
 
   function handleOpen(preTag?: string) {
@@ -47,7 +63,7 @@ export function CreatePostBox() {
   }
 
   async function submit() {
-    if (!title.trim()) { toast.error("Escreva um título"); return; }
+    if (!title.trim()) { toast.error("Escreva um título para o post"); return; }
     setLoading(true);
     try {
       const res = await fetch("/api/community/posts", {
@@ -57,7 +73,7 @@ export function CreatePostBox() {
       });
       if (!res.ok) { toast.error("Erro ao publicar"); return; }
       const post = await res.json();
-      toast.success("Post publicado!");
+      toast.success("Post publicado com sucesso!");
       router.push(`/comunidade/${post.id}`);
     } catch {
       toast.error("Erro. Tente novamente.");
@@ -66,21 +82,17 @@ export function CreatePostBox() {
     }
   }
 
+  /* ── Estado colapsado ── */
   if (!expanded) {
     return (
-      <div className="bg-white border border-[#e0e0e0]">
-        {/* Trigger */}
-        <div className="flex items-center gap-3 px-4 pt-4 pb-3">
-          <div
-            className="h-10 w-10 rounded-full flex items-center justify-center shrink-0 font-bold text-sm"
-            style={{ backgroundColor: "#0f62fe", color: "#ffffff" }}
-          >
-            {session ? letter : "?"}
-          </div>
+      <div className="bg-white border border-[#e0e0e0]" style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
+        {/* Trigger principal */}
+        <div className="flex items-center gap-3 px-4 py-3">
+          <UserAvatar name={session?.user?.name} />
           <button
             onClick={() => handleOpen()}
-            className="flex-1 h-10 rounded-full border border-[#e0e0e0] text-left px-4 text-sm transition-colors hover:border-[#8d8d8d] hover:bg-[#f4f4f4]"
-            style={{ color: "#8d8d8d" }}
+            className="flex-1 h-10 rounded-full border text-left px-4 text-sm transition-colors hover:bg-[#f4f4f4] focus:outline-none"
+            style={{ color: "#8d8d8d", borderColor: "#d0d0d0", backgroundColor: "#f4f4f4" }}
           >
             {session
               ? `No que você está pensando, ${firstName}?`
@@ -88,13 +100,13 @@ export function CreatePostBox() {
           </button>
         </div>
 
-        {/* Atalhos rápidos */}
-        <div className="flex items-center gap-px border-t border-[#f4f4f4]">
+        {/* Ações rápidas */}
+        <div className="flex items-center border-t" style={{ borderColor: "#e0e0e0" }}>
           {QUICK_ACTIONS.map(({ icon: Icon, label, tag }) => (
             <button
               key={label}
               onClick={() => handleOpen(tag)}
-              className="flex flex-1 items-center justify-center gap-1.5 h-10 text-xs font-medium transition-colors hover:bg-[#f4f4f4]"
+              className="flex flex-1 items-center justify-center gap-1.5 h-10 text-xs font-semibold transition-colors hover:bg-[#f4f4f4]"
               style={{ color: "#525252" }}
             >
               <Icon className="h-3.5 w-3.5 shrink-0" style={{ color: "#0f62fe" }} />
@@ -106,52 +118,67 @@ export function CreatePostBox() {
     );
   }
 
+  /* ── Estado expandido ── */
   return (
-    <div className="bg-white border border-[#0f62fe]">
+    <div className="bg-white border border-[#0f62fe]" style={{ boxShadow: "0 0 0 1px #0f62fe20" }}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[#e0e0e0]">
-        <div className="flex items-center gap-2">
-          <div
-            className="h-8 w-8 rounded-full flex items-center justify-center font-bold text-xs"
-            style={{ backgroundColor: "#0f62fe", color: "#ffffff" }}
-          >
-            {letter}
+        <div className="flex items-center gap-3">
+          <UserAvatar name={session?.user?.name} />
+          <div>
+            <p className="text-sm font-bold" style={{ color: "#161616" }}>
+              {session?.user?.name ?? "Você"}
+            </p>
+            <p className="text-[11px]" style={{ color: "#8d8d8d" }}>
+              Publicando na comunidade
+            </p>
           </div>
-          <span className="text-sm font-semibold" style={{ color: "#161616" }}>
-            {session?.user?.name ?? "Você"}
-          </span>
         </div>
-        <button onClick={close} className="p-1 transition-colors hover:bg-[#f4f4f4]" aria-label="Fechar">
+        <button
+          onClick={close}
+          className="p-1.5 transition-colors hover:bg-[#f4f4f4]"
+          aria-label="Fechar"
+        >
           <X className="h-4 w-4" style={{ color: "#8d8d8d" }} />
         </button>
       </div>
 
       <div className="p-4 space-y-3">
         {/* Título */}
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Título da sua publicação..."
-          autoFocus
-          maxLength={200}
-          className="w-full text-base font-semibold pb-2 border-b border-[#e0e0e0] focus:outline-none focus:border-[#0f62fe] transition-colors"
-          style={{ color: "#161616" }}
-        />
+        <div>
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Título da sua publicação..."
+            autoFocus
+            maxLength={200}
+            className="w-full text-base font-bold pb-2 border-b focus:outline-none focus:border-[#0f62fe] transition-colors bg-transparent"
+            style={{ color: "#161616", borderColor: title ? "#0f62fe" : "#e0e0e0" }}
+          />
+          <div className="flex justify-end mt-1">
+            <span className="text-[11px] font-mono" style={{ color: title.length > 180 ? "#da1e28" : "#8d8d8d" }}>
+              {title.length}/200
+            </span>
+          </div>
+        </div>
 
         {/* Corpo */}
         <textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}
-          placeholder="Compartilhe mais detalhes, código, links ou contexto... (opcional)"
+          placeholder="Adicione detalhes, código, links ou contexto... (opcional)"
           rows={4}
-          className="w-full text-sm leading-relaxed resize-none focus:outline-none"
+          className="w-full text-sm leading-relaxed resize-none focus:outline-none bg-transparent"
           style={{ color: "#525252" }}
         />
 
         {/* Tags */}
         <div>
-          <p className="text-[10px] uppercase font-semibold mb-2" style={{ fontFamily: "var(--font-mono)", color: "#8d8d8d", letterSpacing: "0.1em" }}>
-            Tags (máx. 4)
+          <p
+            className="text-[10px] uppercase font-bold mb-2 tracking-widest"
+            style={{ fontFamily: "var(--font-mono)", color: "#8d8d8d" }}
+          >
+            Tópicos (máx. 4)
           </p>
           <div className="flex flex-wrap gap-1.5">
             {TAGS.map((tag) => (
@@ -159,7 +186,7 @@ export function CreatePostBox() {
                 key={tag}
                 type="button"
                 onClick={() => toggleTag(tag)}
-                className="text-xs px-2.5 py-1 rounded-full border transition-colors font-medium"
+                className="text-xs px-3 py-1 border transition-all font-semibold"
                 style={{
                   backgroundColor: tags.includes(tag) ? "#0f62fe" : "transparent",
                   color: tags.includes(tag) ? "#ffffff" : "#525252",
@@ -173,14 +200,20 @@ export function CreatePostBox() {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-1 border-t border-[#f4f4f4]">
-          <span className="text-xs" style={{ color: title.length > 180 ? "#da1e28" : "#8d8d8d" }}>
-            {title.length}/200
-          </span>
+        <div className="flex items-center justify-between pt-1 border-t" style={{ borderColor: "#f4f4f4" }}>
+          <button
+            className="flex items-center gap-1.5 text-xs px-2 py-1.5 transition-colors hover:text-[#0f62fe]"
+            style={{ color: "#8d8d8d" }}
+            type="button"
+            title="Em breve"
+          >
+            <Image className="h-3.5 w-3.5" /> Imagem
+          </button>
+
           <div className="flex gap-2">
             <button
               onClick={close}
-              className="h-9 px-4 text-sm font-medium border transition-colors hover:bg-[#f4f4f4]"
+              className="h-9 px-4 text-sm font-semibold border transition-colors hover:bg-[#f4f4f4]"
               style={{ borderColor: "#e0e0e0", color: "#525252" }}
             >
               Cancelar
@@ -188,10 +221,12 @@ export function CreatePostBox() {
             <button
               onClick={submit}
               disabled={loading || !title.trim()}
-              className="h-9 px-5 flex items-center gap-2 text-sm font-semibold disabled:opacity-50 transition-colors hover:bg-[#0353e9]"
+              className="h-9 px-5 flex items-center gap-2 text-sm font-bold disabled:opacity-50 transition-colors hover:bg-[#0353e9]"
               style={{ backgroundColor: "#0f62fe", color: "#ffffff" }}
             >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Publicar <ArrowRight className="h-4 w-4" /></>}
+              {loading
+                ? <Loader2 className="h-4 w-4 animate-spin" />
+                : <>Publicar <ArrowRight className="h-4 w-4" /></>}
             </button>
           </div>
         </div>
