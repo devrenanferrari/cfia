@@ -652,7 +652,7 @@ const TRACKS: Track[] = [
 
 /* ── Helpers ──────────────────────────────────────────────────────────── */
 
-const PHASE_COLORS = ["#0f62fe", "#0353e9", "#6929c4", "#198038"];
+const PHASE_COLORS = ["#0f62fe", "#0353e9", "#002d9c", "#001d6c"];
 
 function nodeTypeIcon(type: NodeType) {
   if (type === "concept") return <BookOpen className="h-3.5 w-3.5" />;
@@ -1183,7 +1183,7 @@ export function RoadmapVisual() {
             <div
               className="flex items-center gap-2 px-5 py-2 font-bold text-xs uppercase tracking-widest"
               style={{
-                backgroundColor: "#198038",
+                backgroundColor: "#0f62fe",
                 color: "#ffffff",
                 fontFamily: "var(--font-mono, monospace)",
               }}
