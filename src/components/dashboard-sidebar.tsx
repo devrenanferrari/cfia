@@ -16,7 +16,8 @@ export function DashboardSidebar() {
 
   return (
     <aside className="hidden w-52 flex-shrink-0 md:block">
-      <nav className="sticky top-20 border border-[#e0e0e0] bg-white">
+      <div className="sticky top-20 flex flex-col gap-4">
+      <nav className="border border-[#e0e0e0] bg-white">
         {links.map(({ href, label, icon: Icon, exact }) => {
           const active = exact ? pathname === href : pathname?.startsWith(href);
           return (
@@ -38,7 +39,7 @@ export function DashboardSidebar() {
         })}
       </nav>
 
-      <div className="mt-4 border p-4" style={{ backgroundColor: "#edf5ff", borderColor: "#a6c8ff" }}>
+      <div className="border p-4" style={{ backgroundColor: "#edf5ff", borderColor: "#a6c8ff" }}>
         <Heart className="mb-3 h-4 w-4" style={{ color: "#0f62fe" }} />
         <p
           className="mb-1 text-xs font-semibold uppercase tracking-widest"
@@ -56,6 +57,7 @@ export function DashboardSidebar() {
         >
           Apoiar projeto →
         </Link>
+      </div>
       </div>
     </aside>
   );
