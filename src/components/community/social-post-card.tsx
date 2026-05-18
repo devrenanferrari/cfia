@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import {
-  ThumbsUp, MessageSquare, UserPlus, Send, Loader2, Check,
-  CornerDownRight, ArrowRight,
+  ThumbsUp, MessageSquare, Send, Loader2,
+  CornerDownRight, ExternalLink, ChevronDown,
 } from "lucide-react";
 
 type Author = { id: string; name: string | null; image: string | null };
@@ -46,15 +46,27 @@ function timeAgo(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
 }
 
-function Avatar({ name, size = 40 }: { name: string | null; size?: number }) {
-  const initials =
+function initials(name: string | null) {
+  return (
     name
       ?.split(" ")
       .filter(Boolean)
       .slice(0, 2)
       .map((w) => w[0].toUpperCase())
-      .join("") ?? "?";
-  return (
+      .join("") ?? "?"
+  );
+}
+
+function Avatar({
+  name,
+  size = 40,
+  href,
+}: {
+  name: string | null;
+  size?: number;
+  href?: string;
+}) {
+  const inner = (
     <div
       className="rounded-full flex items-center justify-center shrink-0 font-bold select-none"
       style={{
@@ -65,19 +77,29 @@ function Avatar({ name, size = 40 }: { name: string | null; size?: number }) {
         fontSize: size * 0.36,
       }}
     >
-      {initials}
+      {initials(name)}
     </div>
   );
+  if (href) {
+    return (
+      <Link href={href} onClick={(e) => e.stopPropagation()}>
+        {inner}
+      </Link>
+    );
+  }
+  return inner;
 }
 
 function CommentItem({
   comment,
   postId,
   onReplyAdded,
+  depth = 0,
 }: {
   comment: CommentData;
   postId: string;
   onReplyAdded: (parentId: string, reply: CommentData) => void;
+  depth?: number;
 }) {
   const { data: session } = useSession();
   const [replying, setReplying] = useState(false);
@@ -107,15 +129,17 @@ function CommentItem({
 
   return (
     <div className="flex gap-2.5">
-      <Avatar name={comment.author.name} size={30} />
+      <Avatar name={comment.author.name} size={30} href={`/u/${comment.author.id}`} />
       <div className="flex-1 min-w-0">
-        <div
-          className="rounded-2xl px-3 py-2"
-          style={{ backgroundColor: "#f4f4f4" }}
-        >
-          <p className="text-xs font-bold mb-0.5" style={{ color: "#161616" }}>
+        <div className="rounded-2xl px-3 py-2" style={{ backgroundColor: "#f4f4f4" }}>
+          <Link
+            href={`/u/${comment.author.id}`}
+            className="text-xs font-bold mb-0.5 inline-block hover:text-[#0f62fe] transition-colors"
+            style={{ color: "#161616" }}
+            onClick={(e) => e.stopPropagation()}
+          >
             {comment.author.name ?? "Anônimo"}
-          </p>
+          </Link>
           <p className="text-sm leading-relaxed" style={{ color: "#393939" }}>
             {comment.body}
           </p>
@@ -124,7 +148,7 @@ function CommentItem({
           <span className="text-[11px]" style={{ color: "#a8a8a8" }}>
             {timeAgo(comment.createdAt)}
           </span>
-          {session && (
+          {session && depth < 2 && (
             <button
               onClick={() => setReplying((v) => !v)}
               className="text-[11px] font-bold transition-colors hover:text-[#0f62fe]"
@@ -166,7 +190,13 @@ function CommentItem({
         {comment.replies && comment.replies.length > 0 && (
           <div className="mt-2.5 space-y-2.5 pl-2 border-l-2" style={{ borderColor: "#e0e0e0" }}>
             {comment.replies.map((reply) => (
-              <CommentItem key={reply.id} comment={reply} postId={postId} onReplyAdded={onReplyAdded} />
+              <CommentItem
+                key={reply.id}
+                comment={reply}
+                postId={postId}
+                onReplyAdded={onReplyAdded}
+                depth={depth + 1}
+              />
             ))}
           </div>
         )}
@@ -197,13 +227,6 @@ export function SocialPostCard({
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [connecting, setConnecting] = useState<"idle" | "loading" | "sent" | "connected">(() => {
-    if (post.connectionStatus === "accepted") return "connected";
-    if (post.connectionStatus === "pending") return "sent";
-    return "idle";
-  });
-
-  const isOwnPost = session?.user?.id === post.author.id;
 
   async function loadComments() {
     if (comments !== null) return;
@@ -270,99 +293,60 @@ export function SocialPostCard({
     );
   }
 
-  async function connect() {
-    if (!session) { router.push("/entrar"); return; }
-    setConnecting("loading");
-    const res = await fetch("/api/connections", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ toId: post.author.id }),
-    });
-    if (res.ok) {
-      setConnecting("sent");
-      toast.success(`Pedido enviado para ${post.author.name?.split(" ")[0] ?? "usuário"}`);
-    } else if (res.status === 409) {
-      setConnecting("sent");
-    } else {
-      setConnecting("idle");
-      toast.error("Não foi possível enviar o pedido");
-    }
-  }
+  const authorProfileUrl = `/u/${post.author.id}`;
 
   return (
     <article
       className="bg-white border border-[#e0e0e0] transition-shadow"
       style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}
-      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 10px rgba(0,0,0,0.08)"; }}
-      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "0 1px 2px rgba(0,0,0,0.04)"; }}
     >
       {/* ── Cabeçalho ── */}
-      <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-2">
-        <div className="flex items-center gap-3 min-w-0">
-          <Avatar name={post.author.name} size={42} />
-          <div className="min-w-0">
-            <p className="text-sm font-bold leading-tight" style={{ color: "#161616" }}>
-              {post.author.name ?? "Anônimo"}
-            </p>
-            <p className="text-xs" style={{ color: "#8d8d8d" }}>
-              {timeAgo(post.createdAt)}
-            </p>
-          </div>
+      <div className="flex items-center gap-3 px-4 pt-4 pb-2">
+        <Avatar name={post.author.name} size={42} href={authorProfileUrl} />
+        <div className="flex-1 min-w-0">
+          <Link
+            href={authorProfileUrl}
+            className="text-sm font-bold leading-tight hover:text-[#0f62fe] transition-colors inline-block"
+            style={{ color: "#161616" }}
+          >
+            {post.author.name ?? "Anônimo"}
+          </Link>
+          <p className="text-xs" style={{ color: "#8d8d8d" }}>
+            {timeAgo(post.createdAt)}
+          </p>
         </div>
-
-        {session && !isOwnPost && (
-          <div className="shrink-0">
-            {connecting === "connected" ? (
-              <span className="flex items-center gap-1 text-xs font-bold px-2.5 h-7" style={{ color: "#24a148" }}>
-                <Check className="h-3 w-3" /> Conectado
-              </span>
-            ) : connecting === "sent" ? (
-              <span className="flex items-center gap-1 text-xs px-2.5 h-7" style={{ color: "#8d8d8d" }}>
-                <Check className="h-3 w-3" /> Solicitado
-              </span>
-            ) : (
-              <button
-                onClick={connect}
-                disabled={connecting === "loading"}
-                className="flex items-center gap-1.5 text-xs font-bold px-3 h-7 border transition-all hover:bg-[#0f62fe] hover:text-white hover:border-[#0f62fe] disabled:opacity-50"
-                style={{ borderColor: "#0f62fe", color: "#0f62fe" }}
-              >
-                {connecting === "loading"
-                  ? <Loader2 className="h-3 w-3 animate-spin" />
-                  : <><UserPlus className="h-3 w-3" /> Conectar</>}
-              </button>
-            )}
-          </div>
-        )}
       </div>
 
-      {/* ── Conteúdo clicável ── */}
-      <Link href={`/comunidade/${post.id}`} className="block px-4 pb-3 group">
-        <h2
-          className="font-bold leading-snug mb-2 group-hover:text-[#0f62fe] transition-colors"
-          style={{ color: "#161616", fontSize: "17px" }}
-        >
-          {post.title}
-        </h2>
-        {post.body && (
-          <p className="text-sm leading-relaxed line-clamp-3 mb-3" style={{ color: "#525252" }}>
-            {post.body}
-          </p>
-        )}
+      {/* ── Conteúdo ── */}
+      <div className="px-4 pb-3">
+        <Link href={`/comunidade/${post.id}`} className="block group">
+          <h2
+            className="font-bold leading-snug mb-2 group-hover:text-[#0f62fe] transition-colors"
+            style={{ color: "#161616", fontSize: "17px" }}
+          >
+            {post.title}
+          </h2>
+          {post.body && (
+            <p className="text-sm leading-relaxed line-clamp-3 mb-3" style={{ color: "#525252" }}>
+              {post.body}
+            </p>
+          )}
+        </Link>
         {post.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {post.tags.map((tag) => (
-              <span
+              <Link
                 key={tag}
-                className="text-[11px] font-bold px-2.5 py-0.5 rounded-full"
+                href={`/comunidade?tag=${encodeURIComponent(tag)}`}
+                className="text-[11px] font-bold px-2.5 py-0.5 rounded-full transition-colors hover:bg-[#0f62fe] hover:text-white"
                 style={{ backgroundColor: "#edf5ff", color: "#0043ce" }}
               >
                 #{tag}
-              </span>
+              </Link>
             ))}
           </div>
         )}
-      </Link>
+      </div>
 
       {/* ── Contadores ── */}
       {(likes > 0 || commentCount > 0) && (
@@ -414,7 +398,16 @@ export function SocialPostCard({
           style={{ color: showComments ? "#0f62fe" : "#525252" }}
         >
           <MessageSquare className="h-4 w-4" />
-          Comentar
+          <span>Comentar</span>
+          {commentCount > 0 && (
+            <ChevronDown
+              className="h-3.5 w-3.5 transition-transform"
+              style={{
+                transform: showComments ? "rotate(180deg)" : "rotate(0deg)",
+                color: showComments ? "#0f62fe" : "#8d8d8d",
+              }}
+            />
+          )}
         </button>
 
         <div className="w-px h-5" style={{ backgroundColor: "#e0e0e0" }} />
@@ -424,7 +417,7 @@ export function SocialPostCard({
           className="flex flex-1 items-center justify-center gap-2 h-10 text-sm font-bold transition-colors hover:bg-[#f4f4f4]"
           style={{ color: "#525252" }}
         >
-          <ArrowRight className="h-4 w-4" />
+          <ExternalLink className="h-4 w-4" />
           Ver post
         </Link>
       </div>
@@ -444,7 +437,11 @@ export function SocialPostCard({
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) submitComment(); }}
-                placeholder={session ? `Comentar como ${session.user.name?.split(" ")[0]}...` : "Faça login para comentar"}
+                placeholder={
+                  session
+                    ? `Comentar como ${session.user.name?.split(" ")[0]}...`
+                    : "Faça login para comentar"
+                }
                 readOnly={!session}
                 onClick={() => { if (!session) router.push("/entrar"); }}
                 className="flex-1 h-9 px-4 text-sm bg-transparent focus:outline-none"
@@ -457,7 +454,11 @@ export function SocialPostCard({
                   className="h-9 w-10 flex items-center justify-center disabled:opacity-40 hover:text-[#0f62fe] transition-colors"
                   style={{ color: "#8d8d8d" }}
                 >
-                  {submitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                  {submitting ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Send className="h-3.5 w-3.5" />
+                  )}
                 </button>
               )}
             </div>
@@ -471,12 +472,17 @@ export function SocialPostCard({
           ) : comments && comments.length > 0 ? (
             <div className="space-y-3 pt-1">
               {comments.map((c) => (
-                <CommentItem key={c.id} comment={c} postId={post.id} onReplyAdded={handleReplyAdded} />
+                <CommentItem
+                  key={c.id}
+                  comment={c}
+                  postId={post.id}
+                  onReplyAdded={handleReplyAdded}
+                />
               ))}
               {commentCount > comments.length && (
                 <Link
                   href={`/comunidade/${post.id}`}
-                  className="flex items-center gap-1 text-xs font-bold mt-1 hover:underline"
+                  className="flex items-center gap-1.5 text-xs font-bold mt-1 hover:underline"
                   style={{ color: "#0f62fe" }}
                 >
                   <CornerDownRight className="h-3 w-3" />
