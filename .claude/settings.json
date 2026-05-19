@@ -17,7 +17,10 @@
       "PowerShell(cd \"c:\\\\Users\\\\user\\\\Desktop\\\\Projetos\\\\cfia\\\\cfia\"; $env:DATABASE_URL=\"postgresql://postgres:EkViRwKhHefoLTumrPwShBhQYBhmhnVb@roundhouse.proxy.rlwy.net:17398/railway\"; npx prisma migrate dev --name \"community_views_savedposts\" 2>&1)",
       "PowerShell(cd \"c:\\\\Users\\\\user\\\\Desktop\\\\Projetos\\\\cfia\\\\cfia\"; $env:DATABASE_URL=\"postgresql://postgres:EkViRwKhHefoLTumrPwShBhQYBhmhnVb@roundhouse.proxy.rlwy.net:17398/railway\"; npx prisma db push 2>&1)",
       "Bash(node -e \"require\\('nodemailer'\\); console.log\\('ok'\\)\")",
-      "Bash(findstr /i \"smtp\")"
+      "Bash(findstr /i \"smtp\")",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\user\\Desktop\\Projetos\\cfia\\cfia\\src\\app\\(public)\\u"
