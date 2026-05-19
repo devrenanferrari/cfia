@@ -9,13 +9,29 @@ export default function EsqueciSenhaPage() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError("");
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setSent(true);
-    setLoading(false);
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Erro ao enviar email.");
+      } else {
+        setSent(true);
+      }
+    } catch {
+      setError("Erro de conexão. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -94,6 +110,12 @@ export default function EsqueciSenhaPage() {
                 style={{ color: "#161616" }}
               />
             </div>
+
+            {error && (
+              <p className="text-sm" style={{ color: "#da1e28" }}>
+                {error}
+              </p>
+            )}
 
             <div className="pt-2">
               <button

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { sendMail } from "@/lib/mailer";
+import { welcomeEmail } from "@/lib/email-templates";
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,6 +28,11 @@ export async function POST(req: NextRequest) {
         password: hashed,
       },
     });
+
+    const { subject, html } = welcomeEmail(name);
+    sendMail({ to: email, subject, html }).catch((err) =>
+      console.error("[register] welcome email failed:", err)
+    );
 
     return NextResponse.json({ id: user.id }, { status: 201 });
   } catch (err) {
