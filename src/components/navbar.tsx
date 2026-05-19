@@ -165,9 +165,21 @@ export function Navbar() {
                       <Users className="mr-2.5 h-4 w-4 text-muted-foreground" />
                       Comunidade
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push("/conexoes")} className="cursor-pointer">
+                      <Users className="mr-2.5 h-4 w-4 text-muted-foreground" />
+                      Minhas conexões
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push("/notificacoes")} className="cursor-pointer">
+                      <Home className="mr-2.5 h-4 w-4 text-muted-foreground" />
+                      Notificações
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push(`/u/${session?.user?.id}`)} className="cursor-pointer">
+                      <User className="mr-2.5 h-4 w-4 text-muted-foreground" />
+                      Meu perfil público
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => router.push("/perfil")} className="cursor-pointer">
                       <User className="mr-2.5 h-4 w-4 text-muted-foreground" />
-                      Meu perfil
+                      Editar perfil
                     </DropdownMenuItem>
                     {isInstructor && (
                       <DropdownMenuItem onClick={() => router.push("/instrutor")} className="cursor-pointer">
@@ -188,6 +200,10 @@ export function Navbar() {
                     <DropdownMenuItem onClick={() => router.push("/trilhas")} className="cursor-pointer">
                       <GraduationCap className="mr-2.5 h-4 w-4 text-muted-foreground" />
                       Trilhas de carreira
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push("/comunidade/top")} className="cursor-pointer">
+                      <GraduationCap className="mr-2.5 h-4 w-4 text-muted-foreground" />
+                      Leaderboard
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => router.push("/apoie")} className="cursor-pointer">
                       <Heart className="mr-2.5 h-4 w-4" style={{ color: "#0f62fe" }} />

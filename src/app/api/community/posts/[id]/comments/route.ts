@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notify } from "@/lib/notify";
+import { checkAndAwardBadges } from "@/lib/badges";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -52,6 +53,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   });
 
   await awardXP(session.user.id, 5);
+  checkAndAwardBadges(session.user.id).catch(() => {});
 
   // Notificar o autor do post se for outra pessoa
   const post = await prisma.post.findUnique({ where: { id }, select: { authorId: true, title: true } });

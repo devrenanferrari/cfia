@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { checkAndAwardBadges } from "@/lib/badges";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -53,6 +54,7 @@ export async function POST(req: NextRequest) {
   });
 
   await awardXP(session.user.id, 10);
+  checkAndAwardBadges(session.user.id).catch(() => {});
 
   return NextResponse.json(post, { status: 201 });
 }

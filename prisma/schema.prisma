@@ -84,6 +84,7 @@ model User {
   postComments    PostComment[]  @relation("CommentAuthor")
   postVotes       PostVote[]     @relation("PostVotes")
   commentVotes    CommentVote[]  @relation("CommentVotes")
+  savedPosts      SavedPost[]    @relation("SavedPosts")
   connectionsFrom Connection[]   @relation("ConnectionsFrom")
   connectionsTo   Connection[]   @relation("ConnectionsTo")
   chatMembers     ChatMember[]
@@ -410,6 +411,7 @@ model Post {
   body      String?    @db.Text
   type      PostType   @default(TEXT)
   tags      String[]
+  views     Int        @default(0)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
@@ -418,6 +420,19 @@ model Post {
 
   comments  PostComment[]
   votes     PostVote[]
+  savedBy   SavedPost[]
+}
+
+model SavedPost {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user      User     @relation("SavedPosts", fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
 }
 
 enum PostType {
