@@ -47,19 +47,46 @@ export async function POST(req: NextRequest) {
     switch (event.type) {
       case "checkout.session.completed": {
         const cs = event.data.object as Stripe.Checkout.Session;
-        if (cs.mode !== "subscription") break;
         const userId = cs.metadata?.userId;
-        const plan = cs.metadata?.plan as "MONTHLY" | "ANNUAL" | undefined;
         if (!userId) break;
 
-        await prisma.user.update({
-          where: { id: userId },
-          data: {
-            subscriptionId: cs.subscription as string,
-            subscriptionStatus: SubscriptionStatus.ACTIVE,
-            subscriptionPlan: plan ?? "MONTHLY",
-          },
-        });
+        if (cs.mode === "payment") {
+          const courseId = cs.metadata?.courseId;
+          if (!courseId) break;
+
+          const amountTotal = cs.amount_total ?? 0;
+
+          await prisma.$transaction([
+            prisma.purchase.upsert({
+              where: { stripeSessionId: cs.id },
+              create: {
+                userId,
+                courseId,
+                amount: amountTotal,
+                stripeSessionId: cs.id,
+              },
+              update: {},
+            }),
+            prisma.enrollment.upsert({
+              where: { userId_courseId: { userId, courseId } },
+              create: { userId, courseId, status: "ACTIVE" },
+              update: { status: "ACTIVE" },
+            }),
+          ]);
+          break;
+        }
+
+        if (cs.mode === "subscription") {
+          const plan = cs.metadata?.plan as "MONTHLY" | "ANNUAL" | undefined;
+          await prisma.user.update({
+            where: { id: userId },
+            data: {
+              subscriptionId: cs.subscription as string,
+              subscriptionStatus: SubscriptionStatus.ACTIVE,
+              subscriptionPlan: plan ?? "MONTHLY",
+            },
+          });
+        }
         break;
       }
 

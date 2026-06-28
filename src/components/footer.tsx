@@ -8,7 +8,6 @@ const socialLinks = [
   { icon: Globe, href: "https://github.com/renannferrari", label: "GitHub" },
   { icon: Mail, href: "mailto:contato@cfia.com.br", label: "Email" },
   { icon: Rss, href: "/noticias", label: "Noticias" },
-  { icon: Heart, href: "/apoie", label: "Apoie" },
 ];
 
 export function Footer() {
@@ -21,7 +20,7 @@ export function Footer() {
               <span className="leading-none" style={{ letterSpacing: "0" }}>cfia</span>
             </Link>
             <p className="mb-6 max-w-xs text-sm leading-relaxed" style={{ color: "var(--cds-border-subtle)" }}>
-              Projeto de extensao universitario com cursos livres e gratuitos em programacao e inteligencia artificial.
+              Cursos práticos em programação e inteligência artificial. Acesso vitalício, certificado verificável e suporte ativo.
             </p>
             <div className="flex items-center gap-2">
               {socialLinks.map(({ icon: Icon, href, label }) => (
@@ -61,12 +60,11 @@ export function Footer() {
 
           <div>
             <h3 className="mb-5 text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--cds-text-secondary)" }}>
-              Projeto
+              Empresa
             </h3>
             <ul className="space-y-3 text-sm">
               {[
                 { href: "/sobre", label: "Sobre" },
-                { href: "/apoie", label: "Apoie o projeto" },
                 { href: "/ajuda", label: "Ajuda" },
                 { href: "/contato", label: "Contato" },
               ].map(({ href, label }) => (
@@ -94,7 +92,7 @@ export function Footer() {
           className="flex flex-col items-center justify-between gap-4 pt-8 text-xs md:flex-row"
           style={{ borderTop: "1px solid var(--cds-layer-02)", color: "var(--cds-border-subtle)" }}
         >
-          <p>© {new Date().getFullYear()} CFIA. Projeto em construcao.</p>
+          <p>© {new Date().getFullYear()} CFIA. Todos os direitos reservados.</p>
           <div className="flex items-center gap-6">
             <Link href="/termos" className="transition-colors hover:text-white">Termos</Link>
             <Link href="/privacidade" className="transition-colors hover:text-white">Privacidade</Link>

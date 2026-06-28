@@ -5,7 +5,6 @@ import { prisma } from "@/lib/prisma";
 import { CourseCard } from "@/components/course-card";
 import { HeroSection, SocialProofBar } from "@/components/home/hero-section";
 import { ScrollReveal, StaggerReveal, StaggerItem } from "@/components/home/scroll-reveal";
-import { InterestForm } from "@/components/interest-form";
 import {
   ArrowRight,
   BookOpen,
@@ -13,8 +12,8 @@ import {
   Award,
   Briefcase,
   GraduationCap,
-  Building2,
   TrendingUp,
+  ShieldCheck,
 } from "lucide-react";
 
 async function getHomeData() {
@@ -59,9 +58,9 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
-              { Icon: TrendingUp, title: "Aprender do zero", desc: "Cursos livres e gratuitos para quem está começando.", href: "/cursos", color: "#0f62fe" },
-              { Icon: GraduationCap, title: "Obter certificado", desc: "Certificado de conclusão verificável ao finalizar.", href: "/cursos", color: "#0f62fe" },
-              { Icon: Building2, title: "Apoiar o projeto", desc: "Saiba como ajudar este projeto de extensão a crescer.", href: "/apoie", color: "#0f62fe" },
+              { Icon: TrendingUp, title: "Aprenda do zero", desc: "Cursos práticos que saem da teoria e entram na prática desde a primeira aula.", href: "/cursos", color: "#0f62fe" },
+              { Icon: GraduationCap, title: "Obtenha certificado", desc: "Certificado de conclusão verificável incluído em todos os cursos.", href: "/cursos", color: "#0f62fe" },
+              { Icon: ShieldCheck, title: "Acesso vitalício", desc: "Compre uma vez e assista quantas vezes quiser, para sempre.", href: "/cursos", color: "#0f62fe" },
             ].map(({ Icon, title, desc, href, color }) => (
               <Link
                 key={title}
@@ -86,26 +85,6 @@ export default async function HomePage() {
               </Link>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="py-10 px-4 md:px-8 border-b" style={{ borderColor: "#e0e0e0", backgroundColor: "#ffffff" }}>
-        <div className="mx-auto max-w-7xl grid gap-6 md:grid-cols-2 md:items-center">
-          <div>
-            <p
-              className="text-[11px] uppercase tracking-[0.24em] mb-2"
-              style={{ color: "#0f62fe", fontFamily: "var(--font-mono, monospace)" }}
-            >
-              Novos cursos em breve
-            </p>
-            <h2 className="text-2xl font-light mb-2" style={{ color: "#161616" }}>
-              Quer ser avisado quando uma trilha abrir?
-            </h2>
-            <p className="text-sm leading-relaxed" style={{ color: "#525252" }}>
-              Deixe seu email para receber novidades do projeto, cursos publicados e bastidores da plataforma.
-            </p>
-          </div>
-          <InterestForm source="home" />
         </div>
       </section>
 
@@ -152,11 +131,7 @@ export default async function HomePage() {
                   <Link
                     href={banner.ctaUrl}
                     className="relative z-10 inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold self-start"
-                    style={{
-                      backgroundColor: "#0f62fe",
-                      color: "#ffffff",
-                      textDecoration: "none",
-                    }}
+                    style={{ backgroundColor: "#0f62fe", color: "#ffffff", textDecoration: "none" }}
                   >
                     {banner.ctaText} <ArrowRight className="h-4 w-4" />
                   </Link>
@@ -173,16 +148,16 @@ export default async function HomePage() {
                     className="text-[10px] font-semibold uppercase tracking-[0.32em] mb-3"
                     style={{ color: "#0f62fe", opacity: 0.7, fontFamily: "var(--font-mono, monospace)" }}
                   >
-                    Cursos livres e gratuitos
+                    Cursos de programação e IA
                   </p>
                   <h3
                     className="text-2xl font-bold mb-2 leading-tight"
                     style={{ color: "#161616", letterSpacing: "-0.01em" }}
                   >
-                    Aprenda programação e IA do zero
+                    Do zero à primeira vaga em tecnologia
                   </h3>
                   <p className="text-sm mb-5 max-w-xs" style={{ color: "#525252", lineHeight: 1.6 }}>
-                    Cursos práticos com projetos reais e certificado de conclusão verificável.
+                    Aprenda com projetos reais e saia com portfólio e certificado em mãos.
                   </p>
                 </div>
                 <Link
@@ -190,12 +165,12 @@ export default async function HomePage() {
                   className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold self-start"
                   style={{ backgroundColor: "#0f62fe", color: "#ffffff", textDecoration: "none" }}
                 >
-                  Explorar cursos <ArrowRight className="h-4 w-4" />
+                  Ver cursos <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
             )}
 
-            {/* Static founder card */}
+            {/* Value proposition card */}
             <div
               className="relative overflow-hidden p-8 flex flex-col justify-between min-h-[200px]"
               style={{ backgroundColor: "#161616" }}
@@ -205,16 +180,16 @@ export default async function HomePage() {
                   className="text-[10px] font-semibold uppercase tracking-[0.32em] mb-3"
                   style={{ color: "#4589ff", fontFamily: "var(--font-mono, monospace)" }}
                 >
-                  Projeto de extensão · 2026
+                  Por que a CFIA
                 </p>
                 <h3
                   className="text-2xl font-bold mb-2 text-white leading-tight"
                   style={{ letterSpacing: "-0.01em" }}
                 >
-                  Feito por um estudante de Ciência da Computação
+                  Conteúdo prático feito por quem realmente programa
                 </h3>
                 <p className="text-sm mb-5 max-w-xs" style={{ color: "#a8a8a8", lineHeight: 1.6 }}>
-                  Uma plataforma honesta, em crescimento, construída com cuidado para compartilhar conhecimento.
+                  Sem teoria vazia. Cada curso é construído com projetos reais, código comentado e suporte ativo.
                 </p>
               </div>
               <Link
@@ -222,7 +197,7 @@ export default async function HomePage() {
                 className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold self-start border"
                 style={{ borderColor: "#4589ff", color: "#4589ff", textDecoration: "none", backgroundColor: "transparent" }}
               >
-                Conhecer o projeto <ArrowRight className="h-4 w-4" />
+                Saiba mais <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>
@@ -307,7 +282,7 @@ export default async function HomePage() {
             <ScrollReveal delay={0.1}>
               <p className="text-base leading-relaxed" style={{ color: "#525252" }}>
                 Quatro caminhos estruturados, cada um com currículo e projetos práticos.
-                As faixas salariais são referências de mercado, não resultados da plataforma.
+                As faixas salariais são referências de mercado, não resultados garantidos.
               </p>
             </ScrollReveal>
           </div>
@@ -445,10 +420,10 @@ export default async function HomePage() {
 
           <StaggerReveal className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { Icon: BookOpen, step: "01", title: "Aprenda", desc: "Cursos práticos com linguagem simples e conteúdo direto ao ponto." },
-              { Icon: FolderGit2, step: "02", title: "Construa", desc: "Projetos reais para compor um portfólio profissional sólido." },
+              { Icon: BookOpen, step: "01", title: "Escolha um curso", desc: "Encontre o curso ideal para seu objetivo e adquira com acesso vitalício." },
+              { Icon: FolderGit2, step: "02", title: "Construa projetos", desc: "Projetos reais para compor um portfólio profissional sólido." },
               { Icon: Award, step: "03", title: "Certifique-se", desc: "Receba certificados verificáveis ao concluir cada formação." },
-              { Icon: Briefcase, step: "04", title: "Trabalhe", desc: "Prepare-se para vagas e oportunidades na área de IA." },
+              { Icon: Briefcase, step: "04", title: "Avance na carreira", desc: "Prepare-se para vagas e oportunidades na área de tecnologia e IA." },
             ].map((step) => (
               <StaggerItem key={step.step}>
                 <div
@@ -476,7 +451,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Sobre o projeto ────────────────────────────────────────── */}
+      {/* ── Sobre a plataforma ─────────────────────────────────────── */}
       <section className="py-16 px-4 md:px-8 border-b" style={{ backgroundColor: "#f4f4f4", borderColor: "#e0e0e0" }}>
         <div className="mx-auto max-w-7xl">
           <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -485,7 +460,7 @@ export default async function HomePage() {
                 className="text-[11px] uppercase tracking-[0.28em] mb-3"
                 style={{ color: "#0f62fe", fontFamily: "var(--font-mono, monospace)" }}
               >
-                Sobre o projeto
+                Sobre a CFIA
               </p>
               <h2
                 className="font-light mb-5"
@@ -497,18 +472,16 @@ export default async function HomePage() {
                   color: "#161616",
                 }}
               >
-                Feito por um estudante,{" "}
-                <em style={{ fontStyle: "italic", color: "#0f62fe" }}>para estudantes</em>.
+                Feito com cuidado,{" "}
+                <em style={{ fontStyle: "italic", color: "#0f62fe" }}>para quem quer crescer</em>.
               </h2>
               <p className="text-base leading-relaxed mb-6" style={{ color: "#525252" }}>
-                O CFIA é um projeto de extensão universitária criado por Renan Ferrari,
-                estudante de Ciência da Computação. Nasceu da vontade de compartilhar o que
-                aprendo na prática — e tornar o acesso ao conhecimento em tecnologia mais fácil
-                para quem começa.
+                A CFIA é uma plataforma de cursos práticos em programação e inteligência artificial.
+                Cada curso é desenvolvido com projetos reais, linguagem clara e foco total em resultado.
               </p>
               <p className="text-base leading-relaxed mb-8" style={{ color: "#525252" }}>
-                É uma plataforma jovem, em construção. Não temos milhares de alunos nem dezenas de
-                professores. Temos honestidade, conteúdo feito com cuidado e a vontade genuína de ensinar.
+                Não vendemos promessas vazias. Nosso compromisso é entregar conteúdo honesto,
+                atualizado e aplicável — com certificado verificável e suporte ativo.
               </p>
               <ScrollReveal delay={0.1}>
                 <a
@@ -516,7 +489,7 @@ export default async function HomePage() {
                   className="inline-flex items-center gap-2 text-sm font-semibold"
                   style={{ color: "#0f62fe", textDecoration: "none" }}
                 >
-                  Conhecer o projeto <ArrowRight className="h-4 w-4" />
+                  Conhecer a plataforma <ArrowRight className="h-4 w-4" />
                 </a>
               </ScrollReveal>
             </ScrollReveal>
@@ -529,12 +502,12 @@ export default async function HomePage() {
                   className="text-[10px] uppercase tracking-widest mb-4"
                   style={{ color: "#8d8d8d", fontFamily: "var(--font-mono, monospace)" }}
                 >
-                  Projeto de extensão universitária
+                  O que está incluído
                 </p>
                 {[
-                  { label: "Tipo", value: "Cursos livres (não é pós-grad ou MBA)" },
-                  { label: "Acesso", value: "100% gratuito" },
-                  { label: "Certificado", value: "De conclusão, verificável online" },
+                  { label: "Tipo", value: "Cursos avulsos com preço único" },
+                  { label: "Acesso", value: "Vitalício após a compra" },
+                  { label: "Certificado", value: "Verificável online, incluso" },
                   { label: "Idioma", value: "Português" },
                 ].map(({ label, value }) => (
                   <div
@@ -569,18 +542,18 @@ export default async function HomePage() {
             <em style={{ fontStyle: "italic" }}>começa aqui</em>.
           </h2>
           <p className="text-base mb-8" style={{ color: "rgba(255,255,255,0.75)" }}>
-            Comece hoje e construa seu futuro na área de Inteligência Artificial.
+            Escolha um curso, aprenda na prática e saia com certificado e portfólio.
           </p>
           <Link
-            href="/cadastro"
+            href="/cursos"
             className="btn-glow-white inline-flex items-center gap-3 px-8 py-4 bg-white font-bold text-base transition-colors hover:bg-[#f4f4f4]"
             style={{ color: "#0f62fe", textDecoration: "none" }}
           >
-            Começar gratuitamente
+            Explorar cursos
             <ArrowRight className="h-5 w-5" />
           </Link>
           <p className="mt-5 text-sm" style={{ color: "rgba(255,255,255,0.45)" }}>
-            Sem cartão&nbsp;•&nbsp;Acesso imediato&nbsp;•&nbsp;Certificado incluso
+            Acesso vitalício&nbsp;•&nbsp;Certificado incluso&nbsp;•&nbsp;Suporte ativo
           </p>
         </ScrollReveal>
       </section>

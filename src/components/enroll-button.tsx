@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Mail } from "lucide-react";
+import { Loader2, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -12,8 +11,12 @@ interface EnrollButtonProps {
   courseSlug: string;
   isEnrolled: boolean;
   isFree: boolean;
+  price: number;
   isLoggedIn: boolean;
-  isSubscribed: boolean;
+}
+
+function formatPrice(price: number): string {
+  return price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
 export function EnrollButton({
@@ -21,13 +24,13 @@ export function EnrollButton({
   courseSlug,
   isEnrolled,
   isFree,
+  price,
   isLoggedIn,
-  isSubscribed,
 }: EnrollButtonProps) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  async function handleEnroll() {
+  async function handleFreeEnroll() {
     if (!isLoggedIn) {
       router.push(`/entrar?callbackUrl=/cursos/${courseSlug}`);
       return;
@@ -46,7 +49,7 @@ export function EnrollButton({
         throw new Error(data.error ?? "Erro ao matricular");
       }
 
-      toast.success("Matricula realizada com sucesso.");
+      toast.success("Matrícula realizada com sucesso.");
       router.push(`/dashboard/cursos/${courseSlug}`);
       router.refresh();
     } catch (err) {
@@ -56,44 +59,80 @@ export function EnrollButton({
     }
   }
 
+  async function handleBuy() {
+    if (!isLoggedIn) {
+      router.push(`/entrar?callbackUrl=/cursos/${courseSlug}`);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/stripe/checkout/course", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseId }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error ?? "Erro ao iniciar pagamento");
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao iniciar pagamento");
+      setLoading(false);
+    }
+  }
+
   if (isEnrolled) {
     return (
-      <Button className="h-12 w-full rounded-[56px] text-sm font-semibold" style={{ backgroundColor: "#0052ff" }} asChild>
+      <Button
+        className="h-12 w-full text-sm font-semibold"
+        style={{ backgroundColor: "#0f62fe", color: "#ffffff", borderRadius: 0 }}
+        asChild
+      >
         <a href={`/dashboard/cursos/${courseSlug}`}>Continuar aprendendo</a>
       </Button>
     );
   }
 
-  if (!isFree && !isSubscribed) {
+  if (isFree || price === 0) {
     return (
-      <div className="space-y-3">
-        <Button className="h-12 w-full gap-2 rounded-[56px] text-sm font-bold" style={{ backgroundColor: "#0052ff" }} asChild>
-          <Link href="/apoie">
-            <Mail className="h-4 w-4" />
-            Entrar na lista de interesse
-          </Link>
-        </Button>
-        <p className="text-center text-xs" style={{ color: "#5b616e" }}>
-          Este curso ainda nao esta com acesso gratuito liberado.
-        </p>
-      </div>
+      <Button
+        className="h-12 w-full text-sm font-semibold"
+        style={{ backgroundColor: "#0f62fe", color: "#ffffff", borderRadius: 0 }}
+        onClick={handleFreeEnroll}
+        disabled={loading}
+      >
+        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Matricular-se grátis"}
+      </Button>
     );
   }
 
   return (
-    <Button
-      className="h-12 w-full rounded-[56px] text-sm font-semibold"
-      style={{ backgroundColor: "#0052ff" }}
-      onClick={handleEnroll}
-      disabled={loading}
-    >
-      {loading ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
-      ) : isFree ? (
-        "Matricular-se gratis"
-      ) : (
-        "Comecar agora"
-      )}
-    </Button>
+    <div className="space-y-3">
+      <Button
+        className="h-12 w-full gap-2 text-sm font-bold"
+        style={{ backgroundColor: "#0f62fe", color: "#ffffff", borderRadius: 0 }}
+        onClick={handleBuy}
+        disabled={loading}
+      >
+        {loading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <>
+            <ShoppingCart className="h-4 w-4" />
+            Comprar — {formatPrice(price)}
+          </>
+        )}
+      </Button>
+      <p className="text-center text-xs" style={{ color: "#525252" }}>
+        Acesso vitalício · Certificado incluso
+      </p>
+    </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, ArrowRight } from "lucide-react";
+import { Search, ArrowRight, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
 interface HeroSectionProps {
@@ -10,9 +10,9 @@ interface HeroSectionProps {
 }
 
 const HIGHLIGHTS = [
-  { value: "100%", label: "Gratuito — acesso livre a todo o conteúdo" },
-  { value: "Cert.", label: "Certificado de conclusão verificável" },
-  { value: "Ext.", label: "Projeto de extensão universitária" },
+  { value: "Certificado", label: "Certificado verificável ao concluir" },
+  { value: "Projetos reais", label: "Aprenda construindo do zero" },
+  { value: "Acesso vitalício", label: "Assista quando e onde quiser" },
 ];
 
 export function HeroSection({ categories }: HeroSectionProps) {
@@ -43,7 +43,7 @@ export function HeroSection({ categories }: HeroSectionProps) {
               className="text-[11px] font-semibold uppercase tracking-[0.32em] mb-5"
               style={{ color: "#0f62fe", fontFamily: "var(--font-mono, monospace)" }}
             >
-              CFIA — Projeto de Extensão · Cursos Livres em Tecnologia
+              CFIA — Programação e Inteligência Artificial
             </p>
 
             <h1
@@ -56,17 +56,16 @@ export function HeroSection({ categories }: HeroSectionProps) {
                 color: "#161616",
               }}
             >
-              O que você quer{" "}
-              <em style={{ fontStyle: "italic", color: "#0f62fe" }}>aprender</em>{" "}
-              hoje?
+              Domine as habilidades que o{" "}
+              <em style={{ fontStyle: "italic", color: "#0f62fe" }}>mercado exige</em>.
             </h1>
 
             <p
               className="text-base sm:text-lg mb-7 max-w-xl"
               style={{ color: "#525252", lineHeight: 1.7 }}
             >
-              Cursos livres e gratuitos em programação e inteligência artificial,
-              feitos por um estudante de Ciência da Computação como projeto de extensão.
+              Cursos práticos em programação e IA com projetos reais, certificado verificável
+              e acesso vitalício. Aprenda no seu ritmo e avance sua carreira.
             </p>
 
             {/* Search bar */}
@@ -162,7 +161,7 @@ export function HeroSection({ categories }: HeroSectionProps) {
                   className="text-[11px] font-semibold uppercase tracking-[0.28em]"
                   style={{ color: "#0f62fe", fontFamily: "var(--font-mono, monospace)" }}
                 >
-                  Por que o CFIA
+                  O que você recebe
                 </p>
               </div>
 
@@ -175,19 +174,15 @@ export function HeroSection({ categories }: HeroSectionProps) {
                       borderBottom: i < HIGHLIGHTS.length - 1 ? "1px solid #f0f0f0" : "none",
                     }}
                   >
-                    <div
-                      className="w-1 self-stretch flex-shrink-0"
-                      style={{ backgroundColor: "#0f62fe" }}
-                    />
+                    <CheckCircle className="h-5 w-5 flex-shrink-0" style={{ color: "#24a148" }} />
                     <div>
                       <div
                         style={{
-                          fontFamily: "var(--font-serif, Georgia, serif)",
-                          fontWeight: 300,
-                          fontSize: "1.75rem",
-                          color: "#0f62fe",
-                          letterSpacing: "-0.02em",
-                          lineHeight: 1,
+                          fontFamily: "var(--font-sans)",
+                          fontWeight: 600,
+                          fontSize: "0.9rem",
+                          color: "#161616",
+                          lineHeight: 1.2,
                         }}
                       >
                         {item.value}
@@ -202,11 +197,11 @@ export function HeroSection({ categories }: HeroSectionProps) {
 
               <div className="p-5" style={{ backgroundColor: "#f4f4f4" }}>
                 <Link
-                  href="/cadastro"
+                  href="/cursos"
                   className="flex items-center justify-between text-sm font-semibold"
                   style={{ color: "#0f62fe", textDecoration: "none" }}
                 >
-                  Comece gratuitamente <ArrowRight className="h-4 w-4" />
+                  Explorar cursos <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
             </div>

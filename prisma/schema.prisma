@@ -100,6 +100,7 @@ model User {
   xp              UserXP?
   badges          UserBadge[]
   notifications   Notification[]
+  purchases       Purchase[]
 }
 
 enum Role {
@@ -169,6 +170,7 @@ model Course {
   reviews      Review[]
   certificates Certificate[]
   tags         CourseTag[]
+  purchases    Purchase[]
 }
 
 enum Level {
@@ -295,6 +297,23 @@ model QuestionResponse {
   option     Option?     @relation(fields: [optionId], references: [id], onDelete: SetNull)
 
   @@unique([attemptId, questionId])
+}
+
+// ─── Compras ───────────────────────────────────────────────────────────────────
+
+model Purchase {
+  id              String   @id @default(cuid())
+  userId          String
+  courseId        String
+  amount          Int      // em centavos
+  currency        String   @default("brl")
+  stripeSessionId String   @unique
+  createdAt       DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
 }
 
 // ─── Matrículas ────────────────────────────────────────────────────────────────

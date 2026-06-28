@@ -16,6 +16,8 @@ import {
   Video,
   FileText,
   FlaskConical,
+  ShieldCheck,
+  Infinity,
 } from "lucide-react";
 
 const levelLabel: Record<string, string> = {
@@ -30,6 +32,10 @@ const lessonTypeIcon: Record<string, React.FC<{ className?: string; style?: Reac
   NOTEBOOK: FlaskConical,
   QUIZ: BookOpen,
 };
+
+function formatPrice(price: number): string {
+  return price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
 
 async function getCourse(slug: string) {
   return prisma.course.findUnique({
@@ -64,13 +70,18 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
 
   const session = await getServerSession(authOptions);
 
-  const enrollment = session
-    ? await prisma.enrollment.findUnique({
-        where: { userId_courseId: { userId: session.user.id, courseId: course.id } },
-      })
-    : null;
+  const [enrollment, purchase] = session
+    ? await Promise.all([
+        prisma.enrollment.findUnique({
+          where: { userId_courseId: { userId: session.user.id, courseId: course.id } },
+        }),
+        prisma.purchase.findUnique({
+          where: { userId_courseId: { userId: session.user.id, courseId: course.id } },
+        }),
+      ])
+    : [null, null];
 
-  const isSubscribed = session?.user?.subscriptionStatus === "ACTIVE";
+  const hasAccess = !!enrollment;
 
   const totalLessons = course.modules.reduce((acc, m) => acc + m.lessons.length, 0);
   const avgRating =
@@ -78,24 +89,25 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
       ? (course.reviews.reduce((a, r) => a + r.rating, 0) / course.reviews.length).toFixed(1)
       : null;
 
+  const isFreeOrZero = course.isFree || course.price === 0;
+
   return (
     <div style={{ backgroundColor: "#f0f2f5", minHeight: "100vh" }}>
       {/* Hero */}
       <div className="bg-[#161616] border-b border-[#393939]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
           <div className="max-w-3xl">
-            {/* Breadcrumb-style labels */}
             <div className="flex items-center gap-2 mb-4">
               {course.category && (
                 <span
-                  className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full"
+                  className="text-[11px] font-semibold px-2.5 py-0.5"
                   style={{ backgroundColor: "#edf5ff20", color: "#78a9ff", border: "1px solid #78a9ff40" }}
                 >
                   {course.category.name}
                 </span>
               )}
               <span
-                className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full"
+                className="text-[11px] font-semibold px-2.5 py-0.5"
                 style={{ backgroundColor: "#ffffff10", color: "#a8a8a8", border: "1px solid #ffffff20" }}
               >
                 {levelLabel[course.level] ?? course.level}
@@ -187,7 +199,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                               <LessonIcon className="h-3.5 w-3.5 shrink-0" style={{ color: "#8d8d8d" }} />
                               <span
                                 className="truncate"
-                                style={{ color: enrollment || lesson.isFree ? "#161616" : "#8d8d8d" }}
+                                style={{ color: hasAccess || lesson.isFree ? "#161616" : "#8d8d8d" }}
                               >
                                 {lesson.title}
                               </span>
@@ -196,7 +208,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                                   className="text-[10px] font-semibold px-1.5 py-0.5 shrink-0"
                                   style={{ backgroundColor: "#defbe6", color: "#24a148" }}
                                 >
-                                  Grátis
+                                  Prévia
                                 </span>
                               )}
                             </div>
@@ -223,7 +235,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
               </div>
               <div className="p-5 flex items-start gap-4">
                 <div
-                  className="h-14 w-14 rounded-full flex items-center justify-center shrink-0 font-bold text-lg overflow-hidden"
+                  className="h-14 w-14 flex items-center justify-center shrink-0 font-bold text-lg overflow-hidden"
                   style={{ backgroundColor: "#0f62fe", color: "#ffffff" }}
                 >
                   {course.instructor.image ? (
@@ -262,7 +274,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                     <div key={review.id} className="p-5">
                       <div className="flex items-center gap-2.5 mb-2">
                         <div
-                          className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden"
+                          className="h-8 w-8 flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden"
                           style={{ backgroundColor: "#0f62fe", color: "#ffffff" }}
                         >
                           {review.user.image ? (
@@ -302,22 +314,24 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
               </div>
 
               <div className="p-5">
-                {/* Price / access */}
+                {/* Price display */}
                 <div className="mb-4">
-                  {course.isFree ? (
-                    <span className="text-2xl font-light" style={{ color: "#24a148", letterSpacing: "-0.01em" }}>Grátis</span>
-                  ) : isSubscribed ? (
+                  {hasAccess ? (
                     <span
                       className="inline-block text-sm font-semibold px-3 py-1.5"
                       style={{ backgroundColor: "#defbe6", color: "#24a148" }}
                     >
-                      Acesso liberado pela assinatura
+                      Você já tem acesso a este curso
                     </span>
+                  ) : isFreeOrZero ? (
+                    <span className="text-2xl font-light" style={{ color: "#24a148", letterSpacing: "-0.01em" }}>Grátis</span>
                   ) : (
                     <div>
-                      <span className="text-2xl font-light" style={{ color: "#161616", letterSpacing: "-0.01em" }}>Em breve</span>
-                      <p className="text-xs mt-1" style={{ color: "#8d8d8d" }}>
-                        Este curso ainda não está com acesso liberado.
+                      <span className="text-3xl font-bold" style={{ color: "#161616", letterSpacing: "-0.02em" }}>
+                        {formatPrice(course.price)}
+                      </span>
+                      <p className="text-xs mt-1" style={{ color: "#525252" }}>
+                        Pagamento único · Acesso vitalício
                       </p>
                     </div>
                   )}
@@ -326,27 +340,38 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
                 <EnrollButton
                   courseId={course.id}
                   courseSlug={course.slug}
-                  isEnrolled={!!enrollment}
-                  isFree={course.isFree}
+                  isEnrolled={hasAccess}
+                  isFree={isFreeOrZero}
+                  price={course.price}
                   isLoggedIn={!!session}
-                  isSubscribed={!!isSubscribed}
                 />
 
-                {/* Course details */}
+                {/* Course includes */}
                 <div className="mt-4 space-y-2.5 pt-4 border-t border-[#f4f4f4]">
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "#525252", fontFamily: "var(--font-mono)" }}>
+                    Este curso inclui
+                  </p>
                   <div className="flex items-center gap-2 text-sm" style={{ color: "#525252" }}>
-                    <BookOpen className="h-4 w-4 shrink-0" style={{ color: "#8d8d8d" }} />
+                    <BookOpen className="h-4 w-4 shrink-0" style={{ color: "#0f62fe" }} />
                     {totalLessons} aulas
                   </div>
                   {course.duration && (
                     <div className="flex items-center gap-2 text-sm" style={{ color: "#525252" }}>
-                      <Clock className="h-4 w-4 shrink-0" style={{ color: "#8d8d8d" }} />
+                      <Clock className="h-4 w-4 shrink-0" style={{ color: "#0f62fe" }} />
                       {Math.round(course.duration / 60)}h de conteúdo
                     </div>
                   )}
                   <div className="flex items-center gap-2 text-sm" style={{ color: "#525252" }}>
-                    <Award className="h-4 w-4 shrink-0" style={{ color: "#8d8d8d" }} />
+                    <Infinity className="h-4 w-4 shrink-0" style={{ color: "#0f62fe" }} />
+                    Acesso vitalício
+                  </div>
+                  <div className="flex items-center gap-2 text-sm" style={{ color: "#525252" }}>
+                    <Award className="h-4 w-4 shrink-0" style={{ color: "#0f62fe" }} />
                     Certificado de conclusão
+                  </div>
+                  <div className="flex items-center gap-2 text-sm" style={{ color: "#525252" }}>
+                    <ShieldCheck className="h-4 w-4 shrink-0" style={{ color: "#0f62fe" }} />
+                    Pagamento seguro via Stripe
                   </div>
                 </div>
               </div>

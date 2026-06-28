@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { BookOpen, Users, ArrowRight, Star, Clock } from "lucide-react";
+import { BookOpen, Users, ArrowRight, Star } from "lucide-react";
 
 type Course = {
   id: string;
@@ -24,6 +24,10 @@ const levelLabel: Record<string, string> = {
   ADVANCED: "Avançado",
 };
 
+function formatPrice(price: number): string {
+  return price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
 export function CourseCard({ course, index = 0 }: { course: Course; index?: number }) {
   return (
     <motion.div
@@ -36,9 +40,7 @@ export function CourseCard({ course, index = 0 }: { course: Course; index?: numb
       <Link href={`/cursos/${course.slug}`} className="group block h-full">
         <div
           className="layer-01 overflow-hidden h-full flex flex-col transition-colors duration-200"
-          style={{
-            borderBottom: "2px solid transparent",
-          }}
+          style={{ borderBottom: "2px solid transparent" }}
           onMouseEnter={(e) => {
             (e.currentTarget as HTMLDivElement).style.backgroundColor = "var(--cds-layer-02)";
             (e.currentTarget as HTMLDivElement).style.borderBottomColor = "var(--cds-interactive)";
@@ -71,29 +73,28 @@ export function CourseCard({ course, index = 0 }: { course: Course; index?: numb
               </div>
             )}
 
-            {/* Hover overlay with ArrowRight matching IBM Tiles */}
+            {/* Hover overlay */}
             <div className="absolute inset-0 flex items-end justify-end p-4 opacity-0 group-hover:opacity-100 transition-opacity bg-black/10">
-               <div className="h-8 w-8 flex items-center justify-center bg-white">
-                 <ArrowRight className="h-4 w-4" style={{ color: "var(--cds-interactive)" }} />
-               </div>
+              <div className="h-8 w-8 flex items-center justify-center bg-white">
+                <ArrowRight className="h-4 w-4" style={{ color: "var(--cds-interactive)" }} />
+              </div>
             </div>
 
-            {/* Badges */}
+            {/* Price badge */}
             <div className="absolute top-2.5 left-2.5 flex gap-1.5">
-              {course.isFree ? (
+              {course.isFree || course.price === 0 ? (
                 <span
-                  className="text-xs font-semibold px-2 py-1 flex items-center gap-1"
+                  className="text-xs font-semibold px-2 py-1"
                   style={{ backgroundColor: "var(--cds-support-success)", color: "white" }}
                 >
-                  Gratis
+                  Grátis
                 </span>
               ) : (
                 <span
-                  className="text-xs font-semibold px-2 py-1 flex items-center gap-1"
-                  style={{ backgroundColor: "var(--cds-text-primary)", color: "white" }}
+                  className="text-xs font-bold px-2 py-1"
+                  style={{ backgroundColor: "#161616", color: "white" }}
                 >
-                  <Clock className="h-3 w-3" />
-                  Em breve
+                  {formatPrice(course.price)}
                 </span>
               )}
             </div>
@@ -151,11 +152,10 @@ export function CourseCard({ course, index = 0 }: { course: Course; index?: numb
                 <Users className="h-4 w-4" />
                 {course._count.enrollments}
               </div>
-              <span
-                className="text-base font-semibold"
-                style={{ color: "var(--cds-text-primary)" }}
-              >
-                {course.isFree ? "Acesso livre" : "Em breve"}
+              <span className="text-base font-bold" style={{ color: "var(--cds-text-primary)" }}>
+                {course.isFree || course.price === 0
+                  ? "Grátis"
+                  : formatPrice(course.price)}
               </span>
             </div>
           </div>
